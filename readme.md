@@ -16,6 +16,10 @@
 
 release提供了打包好的exe文件，无需安装python环境
 
+## 关于二进制文件大小
+
+Pyinstaller打包Qt程序时会自动添加不必要的QT Plugin，导致二进制文件过大，认真修改spec文件排除不需要的dll和库可以减小到差不多30MB，但是我懒得改了，就这样吧
+
 ## Other
 
 写着方便自己用的，没时间接受pr，有需要请自行fork
