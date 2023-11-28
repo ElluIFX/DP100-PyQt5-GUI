@@ -1,0 +1,9 @@
+.*/
+*.pdf
+*.log
+__pycache__
+venv/
+build/
+dist/
+*.exe
+*.txt
