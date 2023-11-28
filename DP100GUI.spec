@@ -25,6 +25,13 @@ a = Analysis(
         "PIL",
         "llvmlite",
         "numba",
+        "PySide6",
+        "cryptography",
+        "jedi",
+        "gevent",
+        "IPython",
+        "pygments",
+        "h5py",
     ],  #
     win_no_prefer_redirects=False,
     win_private_assemblies=False,

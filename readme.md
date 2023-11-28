@@ -16,9 +16,11 @@
 
 release提供了打包好的exe文件，无需安装python环境
 
+> 界面字体用了更纱黑体且没做fallback，记得去微软商店装一个
+
 ## 关于二进制文件大小
 
-Pyinstaller打包Qt程序时会自动添加不必要的QT Plugin，导致二进制文件过大，认真修改spec文件排除不需要的dll和库可以减小到差不多30MB，但是我懒得改了，就这样吧
+Pyinstaller打包Qt程序时会自动添加不必要的Qt Plugins，导致二进制文件过大，认真修改spec文件排除不需要的dll和库可以减小到差不多30MB，但是我懒得改了，就这样
 
 ## Other
 
