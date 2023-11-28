@@ -14,6 +14,8 @@
 
 使用了修改后的`QFramelessWindow`包，在`lib`文件夹中
 
+release提供了打包好的exe文件，无需安装python环境
+
 ## Other
 
 写着方便自己用的，没时间接受pr，有需要请自行fork
