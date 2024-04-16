@@ -1,57 +1,43 @@
-# 基于PyQt5的正点原子DP100数控电源上位机
 
-A PyQt5-based PC GUI for Aliantek DP100 digital power supply
+# A PyQt5-based PC GUI for Aliantek DP100 digital power supply
 
-## 功能
+![interface](image/readme/interface.png)
 
-- 基本参数设定、预设组管理、设置修改
-- 高达100Hz（可调）的数据采集、绘图、分析、保存
-- PID恒功率控制
-- 参数扫描（电压/电流）
-- 函数发生器（正弦/方波/三角波/锯齿波/随机波）
-- 操作序列（顺序执行操作）
-- Material Design 风格
+Translated to English from the original author
 
 ## Features
 
 - Basic parameter setting, preset group management, setting modification
-- Data acquisition, plotting, analysis and saving up to 100Hz (adjustable)
+- Data acquisition, plotting, analysis, and saving up to 100Hz (adjustable)
 - PID constant power control
 - Parameter scanning (voltage/current)
 - Function generator (sine/square/triangle/sawtooth/random)
 - Operation sequence (execute operations in sequence)
 - Material Design style
 
-## 依赖
-
-使用了修改后的`QFramelessWindow`包，在`lib`文件夹中
-
-release提供了打包好的exe文件，无需安装python环境
-
-> 界面字体用了更纱黑体且没做fallback，记得去[微软商店](https://www.microsoft.com/store/productId/9MW0M424NCZ7?ocid=pdpshare)装一个
-
 ## Dependencies
 
-A modified `QFramelessWindow` package is used in the `lib` folder
+A modified `QFramelessWindow` package is used in the `lib` folder.
 
-The release provides a packaged exe file, no need to install the python environment
+The release provides a packaged .exe file, no need to install the Python environment.
 
-> The interface font uses Sarasa UI and no fallback. Remember to install one in the [Microsoft Store](https://www.microsoft.com/store/productId/9MW0M424NCZ7?ocid=pdpshare)
-
-## 关于二进制文件大小
-
-Pyinstaller打包Qt程序时会自动添加不必要的Qt Plugins，导致二进制文件过大，认真修改spec文件排除不需要的dll和库可以减小到差不多30MB，但是我懒得改了，就这样
+> The interface font uses Sarasa UI and has no fallback. Remember to install one from the [Microsoft Store](https://www.microsoft.com/store/productId/9MW0M424NCZ7?ocid=pdpshare).
 
 ## About the size of the binary file
 
-When Pyinstaller packages Qt programs, it will automatically add unnecessary Qt Plugins, which will cause the binary file to be too large. Carefully modify the spec file to exclude unnecessary dll and libraries, which can be reduced to about 30MB, but I am too lazy to change it, so it is
+When PyInstaller packages Qt programs, it will automatically add unnecessary Qt Plugins, causing the binary file to be too large. Carefully modifying the spec file to exclude unnecessary DLLs and libraries can reduce the size to about 30MB, but I am too lazy to change it, so it stays as it is.
 
-## Other
+## Acknowledgements
 
-写着方便自己用的，没时间接受pr，有需要请自行fork
+Shout out to:
 
-Written for my own use, no time to accept pr, please fork it yourself if you need it
+- @ElluIFX's DP100-PyQt5-GUI project as a helpful reference and source of the DLL for reverse-engineering.
+- @vinivius [DP100_PS_PC-Sofware](https://github.com/vinivius/DP100_PS_PC-Sofware) for posting software / firmware and relevant DLLs
 
-## Screenshots
+# Notes
 
-![1701177770319](image/readme/1701177770319.png)
+At the time of writing sequence generator still doesn't work, perhaps I've broken its functionality or it didn't work before (did not check as I cant read Chinese). Definitely something I will look into.
+
+# WIP
+
+Translation of .ui files
