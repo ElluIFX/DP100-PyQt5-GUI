@@ -1,1 +1,1 @@
-.\venv\Scripts\pyinstaller.exe .\DP100GUI.spec --noconfirm
+.venv\Scripts\pyinstaller.exe .\DP100GUI.spec --noconfirm
