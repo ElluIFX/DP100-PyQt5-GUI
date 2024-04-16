@@ -3,9 +3,7 @@
 
 ![interface](image/readme/interface.png)
 
-Translated to English from the original author
-
-## Features
+Translated to English by utilizing ChatGPT-4. There could be errors in translation resulting in nonsensical menu names (hopefully that will not be the case).
 
 - Basic parameter setting, preset group management, setting modification
 - Data acquisition, plotting, analysis, and saving up to 100Hz (adjustable)
@@ -31,13 +29,9 @@ When PyInstaller packages Qt programs, it will automatically add unnecessary Qt 
 
 Shout out to:
 
-- @ElluIFX's DP100-PyQt5-GUI project as a helpful reference and source of the DLL for reverse-engineering.
-- @vinivius [DP100_PS_PC-Sofware](https://github.com/vinivius/DP100_PS_PC-Sofware) for posting software / firmware and relevant DLLs
+- @ElluIFX's [DP100-PyQt5-GUI](https://github.com/ElluIFX/DP100-PyQt5-GUI) project as a helpful reference and source of the DLL for reverse-engineering.
+- @vinivius [DP100_PS_PC-Sofware](https://github.com/vinivius/DP100_PS_PC-Sofware) for posting firmware, software, relevant DLLs and users manual
 
 # Notes
 
 At the time of writing sequence generator still doesn't work, perhaps I've broken its functionality or it didn't work before (did not check as I cant read Chinese). Definitely something I will look into.
-
-# WIP
-
-Translation of .ui files
