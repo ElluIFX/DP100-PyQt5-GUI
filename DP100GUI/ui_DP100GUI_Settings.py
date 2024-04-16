@@ -138,13 +138,13 @@ class Ui_DialogSettings(object):
 
     def retranslateUi(self, DialogSettings):
         _translate = QtCore.QCoreApplication.translate
-        DialogSettings.setWindowTitle(_translate("DialogSettings", "电源设置"))
-        self.label_34.setText(_translate("DialogSettings", "背光亮度"))
-        self.label_35.setText(_translate("DialogSettings", "音量等级"))
-        self.label_32.setText(_translate("DialogSettings", "功率保护"))
-        self.label_33.setText(_translate("DialogSettings", "高温保护"))
-        self.label_36.setText(_translate("DialogSettings", "反接保护"))
-        self.checkBoxRevProtect.setText(_translate("DialogSettings", "启用"))
-        self.label_37.setText(_translate("DialogSettings", "上电输出"))
-        self.checkBoxAuto.setText(_translate("DialogSettings", "启用"))
-        self.btnSave.setText(_translate("DialogSettings", "保存"))
+        DialogSettings.setWindowTitle(_translate("DialogSettings", "Power Settings"))
+        self.label_34.setText(_translate("DialogSettings", "Backlight Brightness"))
+        self.label_35.setText(_translate("DialogSettings", "Volume Level"))
+        self.label_32.setText(_translate("DialogSettings", "Power Protection"))
+        self.label_33.setText(_translate("DialogSettings", "High Temperature Protection"))
+        self.label_36.setText(_translate("DialogSettings", "Reverse Connection Protection"))
+        self.checkBoxRevProtect.setText(_translate("DialogSettings", "Enable"))
+        self.label_37.setText(_translate("DialogSettings", "Power-on Output"))
+        self.checkBoxAuto.setText(_translate("DialogSettings", "Enable"))
+        self.btnSave.setText(_translate("DialogSettings", "Save"))

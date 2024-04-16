@@ -148,7 +148,7 @@ class FPSCounter(object):
 class CustomTitleBar(TitleBar):
     def __init__(self, parent):
         super().__init__(parent)
-        self.label = QtWidgets.QLabel("DP100数控电源上位机", self)
+        self.label = QtWidgets.QLabel("AlienTek DP100 Controller", self)
         self.label.setStyleSheet(
             "QLabel{font: 13px 'Microsoft YaHei UI'; margin: 10px}"
         )
@@ -269,7 +269,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         else:
             self.showFullScreen()
 
-    ##########  基本功能  ##########
+    ##########  Basic Functions  ##########
 
     @property
     def preset(self):
@@ -314,10 +314,10 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         v_set = state["v_set"]
         i_set = state["i_set"]
         if to_state:
-            self.ui.btnOutput.setText("开启")
+            self.ui.btnOutput.setText("Running")
             set_color(self.ui.btnOutput, "lightgreen")
         else:
-            self.ui.btnOutput.setText("关闭")
+            self.ui.btnOutput.setText("Stopped")
             set_color(self.ui.btnOutput, "khaki")
         self.output_state = to_state
         self.ui.comboPreset.setCurrentText(str(preset))
@@ -337,7 +337,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     def update_connection_state(self):
         state = api.connected
         if state:
-            self.ui.labelConnectState.setText("已连接")
+            self.ui.labelConnectState.setText("Connected")
             set_color(self.ui.labelConnectState, "lightgreen")
             self.ui.frameOutputSetting.setEnabled(True)
             self.ui.frameGraph.setEnabled(True)
@@ -349,12 +349,12 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
                 and self.data.current < 0.9 * self.i_set
                 and time.perf_counter() - self._last_state_change_t > 0.5
             ):
-                self.ui.btnOutput.setText("异常")
+                self.ui.btnOutput.setText("Error")
                 set_color(self.ui.btnOutput, "red")
-            elif self.ui.btnOutput.text() == "异常":
+            elif self.ui.btnOutput.text() == "Error":
                 self.update_output_state_text()
         else:
-            self.ui.labelConnectState.setText("未连接")
+            self.ui.labelConnectState.setText("Not Connected")
             set_color(self.ui.labelConnectState, "red")
             set_color(self.ui.btnOutput, "grey")
             self.ui.frameOutputSetting.setEnabled(False)
@@ -386,7 +386,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
                 self.update_output_state_text()
                 self.ui.btnGraphClear.clicked.emit()
         except Exception as e:
-            self.ui.labelConnectState.setText("连接失败")
+            self.ui.labelConnectState.setText("Connection Failed")
             set_color(self.ui.labelConnectState, "red")
             QtCore.QTimer.singleShot(1000, self.update_connection_state)
             return
@@ -506,14 +506,14 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
             return
         self.i_set = value
 
-    ##########  图像绘制  ##########
+    ##########  Image Plotting  ##########
 
     def initGraph(self):
         self.ui.widgetGraph1.setBackground(None)
         self.ui.widgetGraph2.setBackground(None)
-        self.ui.widgetGraph1.setLabel("left", "电压", units="V")
-        self.ui.widgetGraph2.setLabel("left", "电流", units="A")
-        self._graph_units_dict = {"电压": "V", "电流": "A", "功率": "W", "阻抗": "Ω"}
+        self.ui.widgetGraph1.setLabel("left", "Voltage", units="V")
+        self.ui.widgetGraph2.setLabel("left", "Current", units="A")
+        self._graph_units_dict = {"Voltage": "V", "Current": "A", "Power": "W", "Impedance": "Ω"}
         self.ui.widgetGraph1.showGrid(x=True, y=True)
         self.ui.widgetGraph2.showGrid(x=True, y=True)
         self.ui.widgetGraph1.setMouseEnabled(x=False, y=False)
@@ -531,26 +531,26 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         self.ui.widgetGraph2.setAxisItems(
             axisItems={"left": FmtAxisItem(orientation="left")}
         )
-        self._set_graph1_data("电压")
-        self._set_graph2_data("电流")
+        self._set_graph1_data("Voltage")
+        self._set_graph2_data("Current")
 
     def _get_data(self, text):
-        if text == "电压":
+        if text == "Voltage":
             return self.data.voltages[self.data.update_count :]
-        elif text == "电流":
+        elif text == "Current":
             return self.data.currents[self.data.update_count :]
-        elif text == "功率":
+        elif text == "Power":
             return self.data.powers[self.data.update_count :]
-        elif text == "阻抗":
+        elif text == "Impedance":
             return self.data.resistances[self.data.update_count :]
-        elif text == "无":
+        elif text == "None":
             return None
 
     _typename_dict = {
-        "电压": "V",
-        "电流": "I",
-        "功率": "P",
-        "阻抗": "R",
+        "Voltage": "V",
+        "Current": "I",
+        "Power": "P",
+        "Impedance": "R",
     }
 
     def float_str(self, value, limit=1e5):
@@ -613,14 +613,14 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
                     self.ui.widgetGraph2.setXRange(time[0], time[-1])
 
     def _set_graph1_data(self, text):
-        if text == "无":
+        if text == "None":
             self.ui.widgetGraph1.hide()
             return
         self.ui.widgetGraph1.show()
         self.ui.widgetGraph1.setLabel("left", text, units=self._graph_units_dict[text])
 
     def _set_graph2_data(self, text):
-        if text == "无":
+        if text == "None":
             self.ui.widgetGraph2.hide()
             return
         self.ui.widgetGraph2.show()
@@ -645,9 +645,9 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     def on_btnGraphKeep_clicked(self):
         self.graph_keep_flag = not self.graph_keep_flag
         if self.graph_keep_flag:
-            self.ui.btnGraphKeep.setText("解除")
+            self.ui.btnGraphKeep.setText("Release")
         else:
-            self.ui.btnGraphKeep.setText("保持")
+            self.ui.btnGraphKeep.setText("Hold")
         mouse_enabled = self.graph_keep_flag or (not self._graph_auto_scale_flag)
         self.ui.widgetGraph1.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
         self.ui.widgetGraph2.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
@@ -656,9 +656,9 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     def on_btnGraphAutoScale_clicked(self):
         self._graph_auto_scale_flag = not self._graph_auto_scale_flag
         if self._graph_auto_scale_flag:
-            self.ui.btnGraphAutoScale.setText("适应")
+            self.ui.btnGraphAutoScale.setText("Auto")
         else:
-            self.ui.btnGraphAutoScale.setText("手动")
+            self.ui.btnGraphAutoScale.setText("Manual")
         mouse_enabled = self.graph_keep_flag or (not self._graph_auto_scale_flag)
         self.ui.widgetGraph1.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
         self.ui.widgetGraph2.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
@@ -670,17 +670,17 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
             self.graph_record_data = Data_Record()
             time_str = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
             self.graph_record_filename = f"./record_{time_str}.csv"
-            self.ui.btnGraphRecord.setText("停止")
+            self.ui.btnGraphRecord.setText("Stop")
             self.graph_record_save_timer.start(5000)
         else:
             self.graph_record_save_timer.stop()
             self.graph_record_data.to_csv(self.graph_record_filename)
             self.graph_record_data = Data_Record()
             msg_box = QtWidgets.QMessageBox()
-            msg_box.setWindowTitle("录制完成")
-            msg_box.setText(f"数据已保存至：{self.graph_record_filename[2:]}")
+            msg_box.setWindowTitle("Recording Complete")
+            msg_box.setText(f"Data saved to: {self.graph_record_filename[2:]}")
             msg_box.exec_()
-            self.ui.btnGraphRecord.setText("录制")
+            self.ui.btnGraphRecord.setText("Record")
 
     def _graph_record_save(self):
         if self.graph_record_flag:
@@ -688,17 +688,17 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         else:
             self.graph_record_save_timer.stop()
 
-    ######### 辅助功能-预设组 #########
+    ######### Auxiliary Functions - Preset Group #########
 
     def _check_edit_presets(self):
         if (
             self.ui.comboPresetEdit.currentText() == self.ui.comboPreset.currentText()
             or self.ui.comboPresetEdit.currentText() == "0"
         ):
-            self.ui.btnPresetSave.setText("无法修改")
+            self.ui.btnPresetSave.setText("Cannot Modify")
             self.ui.btnPresetSave.setEnabled(False)
         else:
-            self.ui.btnPresetSave.setText("保存")
+            self.ui.btnPresetSave.setText("Save")
             self.ui.btnPresetSave.setEnabled(True)
 
     def _set_preset(self, text):
@@ -730,10 +730,10 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         ocp = self.ui.spinBoxPresetOcp.value()
         try:
             api.set_preset(preset, v_set, i_set, ovp, ocp)
-            self.ui.btnPresetSave.setText("保存成功")
+            self.ui.btnPresetSave.setText("Save Successful")
         except:
-            self.ui.btnPresetSave.setText("保存失败")
-        QtCore.QTimer.singleShot(1000, lambda: self.ui.btnPresetSave.setText("保存"))
+            self.ui.btnPresetSave.setText("Save Failed")
+        QtCore.QTimer.singleShot(1000, lambda: self.ui.btnPresetSave.setText("Save"))
 
     def _get_preset(self, text):
         preset = int(text)
@@ -744,7 +744,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         self.ui.spinBoxPresetOcp.setValue(get["ocp"])
         self._check_edit_presets()
 
-    ######### 辅助功能-参数扫描 #########
+    ######### Auxiliary Functions - Parameter Scan #########
 
     @QtCore.pyqtSlot()
     def on_btnSweep_clicked(self):
@@ -761,17 +761,17 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
                 assert self._sweep_start != self._sweep_stop
                 assert self._sweep_delay > 0
             except:
-                self.ui.btnSweep.setText("非法参数")
+                self.ui.btnSweep.setText("Invalid Parameter")
                 QtCore.QTimer.singleShot(
-                    1000, lambda: self.ui.btnSweep.setText("功能已关闭")
+                    1000, lambda: self.ui.btnSweep.setText("Disabled")
                 )
                 return
             self._sweep_temp = None
             self.func_sweep_timer.start(int(self._sweep_delay * 1000))
-            self.ui.btnSweep.setText("功能已开启")
-            if self._sweep_target == "电压":
+            self.ui.btnSweep.setText("Enabled")
+            if self._sweep_target == "Voltage":
                 self.ui.spinBoxVoltage.setEnabled(False)
-            elif self._sweep_target == "电流":
+            elif self._sweep_target == "Current":
                 self.ui.spinBoxCurrent.setEnabled(False)
             self.ui.scrollAreaSweep.setEnabled(False)
             if not self.output_state:
@@ -780,10 +780,10 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
 
     def stop_func_sweep(self):
         self.func_sweep_timer.stop()
-        self.ui.btnSweep.setText("功能已关闭")
-        if self._sweep_target == "电压":
+        self.ui.btnSweep.setText("Disabled")
+        if self._sweep_target == "Voltage":
             self.ui.spinBoxVoltage.setEnabled(True)
-        elif self._sweep_target == "电流":
+        elif self._sweep_target == "Current":
             self.ui.spinBoxCurrent.setEnabled(True)
         self.ui.scrollAreaSweep.setEnabled(True)
 
@@ -804,12 +804,12 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         ):
             self._swep_temp = self._sweep_stop
             self.stop_func_sweep()
-        if self._sweep_target == "电压":
+        if self._sweep_target == "Voltage":
             self.v_set = self._sweep_temp
-        elif self._sweep_target == "电流":
+        elif self._sweep_target == "Current":
             self.i_set = self._sweep_temp
 
-    ######### 辅助功能-发生器 #########
+    ######### Auxiliary Functions - Generator #########
 
     @QtCore.pyqtSlot()
     def on_btnWaveGen_clicked(self):
@@ -826,14 +826,14 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
                 assert self._wavegen_period > 0
                 assert self._wavegen_loopfreq > 0
             except:
-                self.ui.btnWaveGen.setText("非法参数")
+                self.ui.btnWaveGen.setText("Invalid Parameter")
                 QtCore.QTimer.singleShot(
-                    1000, lambda: self.ui.btnWaveGen.setText("功能已关闭")
+                    1000, lambda: self.ui.btnWaveGen.setText("Disabled")
                 )
                 return
             self._wavegen_start_time = time.perf_counter()
             self.func_wave_gen_timer.start(int(1000 / self._wavegen_loopfreq))
-            self.ui.btnWaveGen.setText("功能已开启")
+            self.ui.btnWaveGen.setText("Enabled")
             self.ui.spinBoxWaveGenLoopFreq.setEnabled(False)
             self.ui.spinBoxVoltage.setEnabled(False)
             if not self.output_state:
@@ -842,7 +842,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
 
     def stop_func_wave_gen(self):
         self.func_wave_gen_timer.stop()
-        self.ui.btnWaveGen.setText("功能已关闭")
+        self.ui.btnWaveGen.setText("Disabled")
         self.ui.spinBoxWaveGenLoopFreq.setEnabled(True)
         self.ui.spinBoxVoltage.setEnabled(True)
 
@@ -863,40 +863,40 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
 
     def _func_wave_gen(self):
         t = time.perf_counter() - self._wavegen_start_time
-        if self._wavegen_type == "正弦波":
+        if self._wavegen_type == "Sine Wave":
             voltage = (
                 self._wavegen_lowlevel
                 + (self._wavegen_highlevel - self._wavegen_lowlevel)
                 * (math.sin(2 * math.pi / self._wavegen_period * t) + 1.0)
                 / 2
             )
-        elif self._wavegen_type == "方波":
+        elif self._wavegen_type == "Square Wave":
             voltage = (
                 self._wavegen_highlevel
                 if math.sin(2 * math.pi / self._wavegen_period * t) > 0
                 else self._wavegen_lowlevel
             )
-        elif self._wavegen_type == "三角波":
+        elif self._wavegen_type == "Triangle Wave":
             mul = (t / self._wavegen_period) % 2
             mul = mul if mul < 1 else 2 - mul
             voltage = (
                 self._wavegen_lowlevel
                 + (self._wavegen_highlevel - self._wavegen_lowlevel) * mul
             )
-        elif self._wavegen_type == "锯齿波":
+        elif self._wavegen_type == "Sawtooth Wave":
             voltage = (self._wavegen_highlevel - self._wavegen_lowlevel) * (
                 (t / self._wavegen_period) % 1
             ) + self._wavegen_lowlevel
-        elif self._wavegen_type == "噪音":
+        elif self._wavegen_type == "Noise":
             voltage = random.uniform(self._wavegen_lowlevel, self._wavegen_highlevel)
         else:
             voltage = 0
         voltage = max(
             min(voltage, self._wavegen_highlevel), self._wavegen_lowlevel
-        )  # 限幅
+        )  # Limiting
         self.v_set = voltage
 
-    ######### 辅助功能-功率保持 #########
+    ######### Auxiliary Functions - Power Hold #########
 
     @QtCore.pyqtSlot()
     def on_btnKeepPower_clicked(self):
@@ -911,9 +911,9 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
                 assert self._keep_power_loopfreq > 0
                 assert self._keep_power_pid_i > 0
             except:
-                self.ui.btnKeepPower.setText("非法参数")
+                self.ui.btnKeepPower.setText("Invalid Parameter")
                 QtCore.QTimer.singleShot(
-                    1000, lambda: self.ui.btnKeepPower.setText("功能已关闭")
+                    1000, lambda: self.ui.btnKeepPower.setText("Disabled")
                 )
                 return
             self._keep_power_pid = PID(
@@ -926,13 +926,13 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
             self._keep_power_pid.output_limits = (0, self._keep_power_pid_max_v)
             self._keep_power_pid.set_auto_mode(True, last_output=self.v_set)
             self.func_keep_power_timer.start(int(1000 / self._keep_power_loopfreq))
-            self.ui.btnKeepPower.setText("功能已开启")
+            self.ui.btnKeepPower.setText("Enabled")
             self.ui.spinBoxVoltage.setEnabled(False)
             self.ui.spinBoxKeepPowerLoopFreq.setEnabled(False)
 
     def stop_func_keep_power(self):
         self.func_keep_power_timer.stop()
-        self.ui.btnKeepPower.setText("功能已关闭")
+        self.ui.btnKeepPower.setText("Disabled")
         self.ui.spinBoxVoltage.setEnabled(True)
         self.ui.spinBoxKeepPowerLoopFreq.setEnabled(True)
 
@@ -965,7 +965,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         if self.func_keep_power_timer.isActive():
             self._keep_power_pid.output_limits = (0, self._keep_power_pid_max_v)
 
-    ######### 辅助功能-序列 #########
+    ######### Auxiliary Functions - Sequence #########
 
     def _seq_btn_disable(self):
         self.ui.btnSeqSave.hide()
@@ -1016,7 +1016,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         self.func_seq_timer.stop()
         self._seq_btn_enable()
 
-    # listSeq 删除
+    # listSeq Delete
     def _seq_del_item(self):
         row = self.ui.listSeq.currentRow()
         cnt = self.ui.listSeq.count()
@@ -1037,7 +1037,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         item = self.ui.listSeq.item(row)
         text = item.text()
         text, ok = QtWidgets.QInputDialog.getText(
-            self, "编辑动作", "请确保修改后动作文本格式正确,否则无法识别动作", text=text
+            self, "Edit Action", "Please ensure that the action text format is correct after modification, otherwise the action cannot be recognized", text=text
         )
         if not ok:
             return
@@ -1046,15 +1046,15 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     def _seq_clear_all(self):
         ok = QtWidgets.QMessageBox.question(
             self,
-            "清空序列",
-            "确定要清空序列吗？",
+            "Clear Sequence",
+            "Are you sure you want to clear the sequence?",
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
             QtWidgets.QMessageBox.No,
         )
         if ok == QtWidgets.QMessageBox.Yes:
             self.ui.listSeq.clear()
 
-    # listSeq 右键菜单 (listSeq)
+    # listSeq Context Menu (listSeq)
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_listSeq_customContextMenuRequested(self, pos):
         row = self.ui.listSeq.currentRow()
@@ -1064,12 +1064,12 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         if row == -1:
             return
         menu = QtWidgets.QMenu()
-        menu.addAction("编辑", lambda: self._seq_edit_item())
-        menu.addAction("删除", lambda: self._seq_del_item())
-        menu.addAction("清空", lambda: self._seq_clear_all())
+        menu.addAction("Edit", lambda: self._seq_edit_item())
+        menu.addAction("Delete", lambda: self._seq_del_item())
+        menu.addAction("Clear", lambda: self._seq_clear_all())
         menu.exec_(QtGui.QCursor.pos())
 
-    # 双击修改
+    # Double-click to Edit
     @QtCore.pyqtSlot(QtWidgets.QListWidgetItem)
     def on_listSeq_itemDoubleClicked(self, item):
         self._seq_edit_item()
@@ -1078,11 +1078,11 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     def on_btnSeqDelay_clicked(self):
         row = self.ui.listSeq.currentRow()
         delay, ok = QtWidgets.QInputDialog.getInt(
-            self, "输入延时", "请输入延时时间 (ms)", 1000, 0, 100000, 1
+            self, "Enter Delay", "Enter Delay Time (ms)", 1000, 0, 100000, 1
         )
         if not ok:
             return
-        self.ui.listSeq.insertItem(row + 1, f"延时 {delay} ms")
+        self.ui.listSeq.insertItem(row + 1, f"Delay {delay} ms")
         self.ui.listSeq.setCurrentRow(row + 1)
 
     @QtCore.pyqtSlot()
@@ -1091,8 +1091,8 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         time_now_str = datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S")
         wait_time, ok = QtWidgets.QInputDialog.getText(
             self,
-            "输入等待时间",
-            "请输入等待时间 (格式: 年-月-日 时:分:秒)",
+            "Enter Wait Time",
+            "Enter Wait Time (format: YYYY-MM-DD HH:MM:SS)",
             text=time_now_str,
         )
         if not ok:
@@ -1100,33 +1100,33 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         try:
             datetime.datetime.strptime(wait_time, "%y-%m-%d %H:%M:%S")
         except ValueError:
-            QtWidgets.QMessageBox.warning(self, "错误", "时间格式错误")
+            QtWidgets.QMessageBox.warning(self, "Error", "Incorrect Time Format")
             return
         if not ok:
             return
-        self.ui.listSeq.insertItem(row + 1, f"等待 {wait_time}")
+        self.ui.listSeq.insertItem(row + 1, f"Wait {wait_time}")
         self.ui.listSeq.setCurrentRow(row + 1)
 
     @QtCore.pyqtSlot()
     def on_btnSeqVoltage_clicked(self):
         row = self.ui.listSeq.currentRow()
         voltage, ok = QtWidgets.QInputDialog.getDouble(
-            self, "输入电压", "请输入电压值 (V)", 1, 0, 30, 2
+            self, "Enter Voltage", "Enter Voltage Value (V)", 1, 0, 30, 2
         )
         if not ok:
             return
-        self.ui.listSeq.insertItem(row + 1, f"电压 {voltage:.2f} V")
+        self.ui.listSeq.insertItem(row + 1, f"Voltage {voltage:.2f} V")
         self.ui.listSeq.setCurrentRow(row + 1)
 
     @QtCore.pyqtSlot()
     def on_btnSeqCurrent_clicked(self):
         row = self.ui.listSeq.currentRow()
         current, ok = QtWidgets.QInputDialog.getDouble(
-            self, "输入电流", "请输入电流值 (A)", 1, 0, 5, 3
+            self, "Enter Current", "Enter Current Value (A)", 1, 0, 5, 3
         )
         if not ok:
             return
-        self.ui.listSeq.insertItem(row + 1, f"电流 {current:.3f} A")
+        self.ui.listSeq.insertItem(row + 1, f"Current {current:.3f} A")
         self.ui.listSeq.setCurrentRow(row + 1)
 
     def _switch_to_seq(self, index) -> bool:
@@ -1139,11 +1139,11 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         self.ui.listSeq.setCurrentRow(index)
         text = item.text()
         self._seq_type = text[:2]
-        if self._seq_type == "等待":
+        if self._seq_type == "Wait":
             self._seq_value = datetime.datetime.strptime(text[3:], "%y-%m-%d %H:%M:%S")
         else:
             self._seq_value = float(text[3:-2])  # type: ignore
-        if self._seq_type in ("延时", "等待") or self._seq_index == 0:
+        if self._seq_type in ("Delay", "Wait") or self._seq_index == 0:
             self._seq_time = time.perf_counter()
         return True
 
@@ -1156,16 +1156,16 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
 
     def _func_seq(self):
         now = time.perf_counter()
-        if self._seq_type == "延时":
+        if self._seq_type == "Delay":
             if now - self._seq_time < self._seq_value / 1000:
                 return
-        elif self._seq_type == "等待":
+        elif self._seq_type == "Wait":
             now = datetime.datetime.now()
             if now < self._seq_value:
                 return
-        elif self._seq_type == "电压":
+        elif self._seq_type == "Voltage":
             self.v_set = self._seq_value
-        elif self._seq_type == "电流":
+        elif self._seq_type == "Current":
             self.i_set = self._seq_value
         else:
             raise ValueError("Unknown seq type")
@@ -1180,9 +1180,9 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     def on_btnSeqSave_clicked(self):
         if self.ui.listSeq.count() == 0:
             return
-        # 保存到文件
+        # Save to File
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(
-            self, "保存", "", "文本文件 (*.txt)"
+            self, "Save", "", "Text File (*.txt)"
         )
         if filename == "" or filename is None:
             return
@@ -1194,9 +1194,9 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
 
     @QtCore.pyqtSlot()
     def on_btnSeqLoad_clicked(self):
-        # 从文件加载
+        # Load from File
         filename, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, "打开", "", "文本文件 (*.txt)"
+            self, "Open", "", "Text File (*.txt)"
         )
         if filename == "" or filename is None:
             return
@@ -1207,13 +1207,13 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
             try:
                 _ = line.split(" ")
                 assert len(_) == 3
-                assert _[0] in ["延时", "电压", "电流", "等待"]
-                if _[0] != "等待":
+                assert _[0] in ["Delay", "Voltage", "Current", "Wait"]
+                if _[0] != "Wait":
                     assert _[2] in ["ms", "V", "A"]
                     float(_[1])
                 self.ui.listSeq.addItem(line)
             except:
-                QtWidgets.QMessageBox.warning(self, "错误", f"数据验证错误: {line}")
+                QtWidgets.QMessageBox.warning(self, "Error", f"Data Validation Error: {line}")
                 return
 
 
@@ -1239,7 +1239,7 @@ class DP100Settings(QtWidgets.QDialog):
 
     def show(self) -> None:
         if not api.connected:
-            QtWidgets.QMessageBox.warning(self, "错误", "未连接设备")
+            QtWidgets.QMessageBox.warning(self, "Error", "Device Not Connected")
             return
         self.initValues()
         return super().show()
@@ -1255,11 +1255,11 @@ class DP100Settings(QtWidgets.QDialog):
             bool(self.ui.checkBoxAuto.isChecked()),
         )
         api.set_settings(*settings)
-        self.ui.btnSave.setText("保存成功")
+        self.ui.btnSave.setText("Save Successful")
         QtCore.QTimer.singleShot(1000, self._reset_btn_text)
 
     def _reset_btn_text(self):
-        self.ui.btnSave.setText("保存")
+        self.ui.btnSave.setText("Save")
 
 
 class DP100Graphics(QtWidgets.QDialog):
@@ -1302,15 +1302,15 @@ class DP100Graphics(QtWidgets.QDialog):
 
     def set_filter(self, _=None) -> None:
         text = self.ui.comboFilterK.currentText()
-        if text == "无":
+        if text == "None":
             self.set_filter_k_sig.emit(1)
-        elif text == "低":
+        elif text == "Low":
             self.set_filter_k_sig.emit(0.25)
-        elif text == "中":
+        elif text == "Medium":
             self.set_filter_k_sig.emit(0.1)
-        elif text == "高":
+        elif text == "High":
             self.set_filter_k_sig.emit(0.01)
-        elif text == "极高":
+        elif text == "Very High":
             self.set_filter_k_sig.emit(0.001)
 
     def _init_spin(self, length, fps):
