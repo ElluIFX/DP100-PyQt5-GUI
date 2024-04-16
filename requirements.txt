@@ -4,6 +4,7 @@ PyQt5-sip==12.8.1
 PyQt5==5.15.2
 numba==0.57.1
 numpy==1.24.4
+pyinstaller==6.6.0
 pyqtdarktheme==2.1.0
 pyqtgraph==0.13.3
 pythonnet==3.0.0.post1
