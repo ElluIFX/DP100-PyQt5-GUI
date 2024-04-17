@@ -179,9 +179,9 @@ class CustomTitleBar(TitleBar):
 
 class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     data = Data_Share()
-    data_fps = 50
-    graph_fps = 50
-    graph_max_fps = 50
+    data_fps = 100
+    graph_fps = 100
+    graph_max_fps = 100
     graph_keep_flag = False
     graph_record_flag = False
     output_state = False
