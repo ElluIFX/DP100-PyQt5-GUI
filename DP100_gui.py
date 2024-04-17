@@ -23,7 +23,7 @@ import numpy as np
 import pyqtgraph as pg
 import qdarktheme
 from PyQt5 import QtCore, QtGui, QtWidgets
-from qframelesswindow import AcrylicWindow, FramelessWindow, TitleBar
+from lib.qframelesswindow import AcrylicWindow, FramelessWindow, TitleBar
 from simple_pid import PID
 
 OPENGL_AVAILABLE = False
