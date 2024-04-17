@@ -42,11 +42,11 @@ splash = Splash(
     "booting.png",
     binaries=a.binaries,
     datas=a.datas,
-    text_pos=(110, 468),
-    text_size=12,
-    text_color="#daff6e",
+    text_pos=(25, 470),
+    text_size=10,
+    text_color="#FFFFFF",
     max_img_size=(760, 480),
-    always_on_top=False,
+    always_on_top=True,
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
