@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>图形设置</string>
+   <string>GUI Settings</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -53,7 +53,7 @@
       </size>
      </property>
      <property name="text">
-      <string>主题</string>
+      <string>Color Theme</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -64,12 +64,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="radioDark">
+    <widget class="QRadioButton" name="radioAuto">
      <property name="text">
-      <string>Dark</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
+      <string>Auto</string>
      </property>
      <attribute name="buttonGroup">
       <string notr="true">buttonGroup</string>
@@ -77,9 +74,12 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="radioAuto">
+    <widget class="QRadioButton" name="radioDark">
      <property name="text">
-      <string>Auto</string>
+      <string>Dark</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
      <attribute name="buttonGroup">
       <string notr="true">buttonGroup</string>
@@ -111,7 +111,7 @@
       </size>
      </property>
      <property name="text">
-      <string>最大绘图帧率</string>
+      <string>Plotting Frame Rate</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -126,6 +126,9 @@
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
+     <property name="suffix">
+      <string>Hz</string>
+     </property>
      <property name="decimals">
       <number>1</number>
      </property>
@@ -139,7 +142,7 @@
       <double>5.000000000000000</double>
      </property>
      <property name="value">
-      <double>60.000000000000000</double>
+      <double>120.000000000000000</double>
      </property>
     </widget>
    </item>
@@ -158,7 +161,7 @@
       </size>
      </property>
      <property name="text">
-      <string>数据点数</string>
+      <string>Data Point Count</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -202,7 +205,7 @@
       </size>
      </property>
      <property name="text">
-      <string>显示滤波系数</string>
+      <string>Display Filter Strenght</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -225,27 +228,27 @@
      </property>
      <item>
       <property name="text">
-       <string>关</string>
+       <string>Off</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>低</string>
+       <string>Low</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>中</string>
+       <string>Medium</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>高</string>
+       <string>High</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>极高</string>
+       <string>Very High</string>
       </property>
      </item>
     </widget>
@@ -253,14 +256,17 @@
    <item>
     <widget class="QCheckBox" name="checkBoxOpenGL">
      <property name="text">
-      <string>OpenGL绘图</string>
+      <string>OpenGL Plotting</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="btnClose">
      <property name="text">
-      <string>完成</string>
+      <string>Save</string>
      </property>
     </widget>
    </item>
