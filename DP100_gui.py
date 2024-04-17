@@ -513,7 +513,12 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         self.ui.widgetGraph2.setBackground(None)
         self.ui.widgetGraph1.setLabel("left", "Voltage", units="V")
         self.ui.widgetGraph2.setLabel("left", "Current", units="A")
-        self._graph_units_dict = {"Voltage": "V", "Current": "A", "Power": "W", "Impedance": "Ω"}
+        self._graph_units_dict = {
+            "Voltage": "V",
+            "Current": "A",
+            "Power": "W",
+            "Impedance": "Ω",
+        }
         self.ui.widgetGraph1.showGrid(x=True, y=True)
         self.ui.widgetGraph2.showGrid(x=True, y=True)
         self.ui.widgetGraph1.setMouseEnabled(x=False, y=False)
@@ -1037,7 +1042,10 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         item = self.ui.listSeq.item(row)
         text = item.text()
         text, ok = QtWidgets.QInputDialog.getText(
-            self, "Edit Action", "Please ensure that the action text format is correct after modification, otherwise the action cannot be recognized", text=text
+            self,
+            "Edit Action",
+            "Please ensure that the action text format is correct after modification, otherwise the action cannot be recognized",
+            text=text,
         )
         if not ok:
             return
@@ -1140,9 +1148,11 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         text = item.text()
         self._seq_type = text.split(" ")[0]
         if self._seq_type == "Wait":
-            self._seq_value = datetime.datetime.strptime(text[3:], "%y-%m-%d %H:%M:%S")
+            self._seq_value = datetime.datetime.strptime(
+                text[len(self._seq_type) + 1 :], "%y-%m-%d %H:%M:%S"
+            )
         else:
-            self._seq_value = float(text[3:-2])  # type: ignore
+            self._seq_value = float(text[len(self._seq_type) + 1 : -2])  # type: ignore
         if self._seq_type in ("Delay", "Wait") or self._seq_index == 0:
             self._seq_time = time.perf_counter()
         return True
@@ -1213,7 +1223,9 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
                     float(_[1])
                 self.ui.listSeq.addItem(line)
             except:
-                QtWidgets.QMessageBox.warning(self, "Error", f"Data Validation Error: {line}")
+                QtWidgets.QMessageBox.warning(
+                    self, "Error", f"Data Validation Error: {line}"
+                )
                 return
 
 
