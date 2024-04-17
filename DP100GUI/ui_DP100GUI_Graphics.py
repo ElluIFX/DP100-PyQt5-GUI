@@ -56,7 +56,7 @@ class Ui_DialogGraphics(object):
         self.spinMaxFps.setMinimum(1.0)
         self.spinMaxFps.setMaximum(120.0)
         self.spinMaxFps.setSingleStep(5.0)
-        self.spinMaxFps.setProperty("value", 60.0)
+        self.spinMaxFps.setProperty("value", 120.0)
         self.spinMaxFps.setObjectName("spinMaxFps")
         self.verticalLayout.addWidget(self.spinMaxFps)
         self.label_37 = QtWidgets.QLabel(DialogGraphics)
