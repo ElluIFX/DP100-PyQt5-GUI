@@ -2,6 +2,8 @@
 
 A PyQt5-based PC GUI for Aliantek DP100 digital power supply
 
+Check [ketukil's fork](https://github.com/ketukil/Alientek-DP100-PyQT5-english-gui) if you need an English gui.
+
 ## 功能
 
 - 基本参数设定、预设组管理、设置修改
