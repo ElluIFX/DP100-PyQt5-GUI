@@ -1138,7 +1138,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
         self._seq_index = index
         self.ui.listSeq.setCurrentRow(index)
         text = item.text()
-        self._seq_type = text[:2]
+        self._seq_type = text.split(" ")[0]
         if self._seq_type == "Wait":
             self._seq_value = datetime.datetime.strptime(text[3:], "%y-%m-%d %H:%M:%S")
         else:
