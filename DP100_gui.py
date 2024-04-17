@@ -1119,7 +1119,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     def on_btnSeqVoltage_clicked(self):
         row = self.ui.listSeq.currentRow()
         voltage, ok = QtWidgets.QInputDialog.getDouble(
-            self, "Enter Voltage", "Enter Voltage Value (V)", 1, 0, 30, 2
+            self, "Enter Voltage", "Enter Voltage Value [V]", 1, 0, 30, 2
         )
         if not ok:
             return
@@ -1130,7 +1130,7 @@ class DP100GUI(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     def on_btnSeqCurrent_clicked(self):
         row = self.ui.listSeq.currentRow()
         current, ok = QtWidgets.QInputDialog.getDouble(
-            self, "Enter Current", "Enter Current Value (A)", 1, 0, 5, 3
+            self, "Enter Current", "Enter Current Value [A]", 1, 0, 5, 3
         )
         if not ok:
             return
