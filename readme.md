@@ -3,6 +3,7 @@
 
 ![interface](image/readme/interface.png)
 
+
 Translated to English by utilizing ChatGPT-4. There could be errors in translation resulting in nonsensical menu names (hopefully that will not be the case).
 
 - Basic parameter setting, preset group management, setting modification
