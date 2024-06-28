@@ -54,6 +54,13 @@ When Pyinstaller packages Qt programs, it will automatically add unnecessary Qt 
 
 Written for my own use, no time to accept pr, please fork it yourself if you need it
 
+## Something interesting about OPP
+
+DP100的过功率限制实际上只做了硬件UI的限制,通过API可以设置得比限制的105W更高,具体用法可以查看[DP100API.py](./DP100API.py)最下方的example,经过测试150W可以正常工作
+
+The upper limit of over-power protection actually is performed only in the hardware UI, and can be bypassed by API, which can be set to higher than the limit of 105W. For details, see the example at the bottom of [DP100API.py](./DP100API.py).
+After testing, DP100 can work well at 150W.
+
 ## Screenshots
 
 ![1701177770319](image/readme/1701177770319.png)

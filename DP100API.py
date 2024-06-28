@@ -352,3 +352,5 @@ if __name__ == "__main__":
     api = DP100()
     api.connect()
     print(api.get_device_info())
+    api.set_settings(opp=150)  # overrided
+    print(api.get_settings())
