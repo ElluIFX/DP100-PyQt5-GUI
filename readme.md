@@ -68,7 +68,7 @@
 
 [test_main.py](./test_main.py) 测试读取示例
 
-[mdp_p906.py](.mdp_controller/mdp_p906.py) 完整API实现
+[mdp_p906.py](./mdp_controller/mdp_p906.py) 完整API实现
 
 ## TODO
 

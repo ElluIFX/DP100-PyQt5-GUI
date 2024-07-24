@@ -66,7 +66,7 @@ Refer to the code and the comments.
 
 [test_main.py](./test_main.py) for example.
 
-[mdp_p906.py](.mdp_controller/mdp_p906.py) for complete API.
+[mdp_p906.py](./mdp_controller/mdp_p906.py) for complete API.
 
 ## TODO
 
