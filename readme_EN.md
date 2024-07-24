@@ -10,7 +10,9 @@ Remote control of the power supply without the MDP-M01 display module, theoretic
 
 The protocol part used in this project is derived from  [leommxj/mdp_commander](https://github.com/leommxj/mdp_commander). Without this project, I would have had no way to test the communication protocol between M01 and P906.
 
-A lot of time was spent optimizing the communication quality based on this project, ultimately achieving stable and long-term data acquisition at up to 100fps.
+A lot of time was spent optimizing the communication quality based on this project, ultimately achieving stable and long-term data acquisition at up to 160fps.
+
+![1721847380188](image/readme/1721847380188.png)
 
 ## Features
 

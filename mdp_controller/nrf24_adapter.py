@@ -257,7 +257,6 @@ class NRF24Adapter:
                 raise NRF24AdapterError("NRF send timeout")
             else:
                 self._send_event.clear()
-        self._write(CMD.NRF_QUERY, b"")
 
     def nrf_register_recv_callback(self, callback: Callable[[bytes], None]):
         self._recv_callback = callback
