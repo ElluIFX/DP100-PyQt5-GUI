@@ -2,6 +2,8 @@
 
 Remote control of the power supply without the MDP-M01 display module, theoretically supporting P905 as well (untested).
 
+![1721844452863](image/readme/1721844452863.png)
+
 > Special thanks to Miniware for spending a year developing controller software that requires the display module to function and is so rudimentary. Although they could have delayed indefinitely, they still managed to create a toy to fool everyone.
 
 ## Acknowledgements
