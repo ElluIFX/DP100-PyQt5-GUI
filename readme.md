@@ -30,10 +30,6 @@
 
 本项目需要一个[淘宝](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.521d2e8dccjOe1)上售价为30元的USB转NRF24L01模块，如下图
 
-### 前提
-
-本项目需要一个[淘宝](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.521d2e8dccjOe1)上售价为30元的USB转NRF24L01模块，如下图
-
 ![1721840271138](image/readme/1721840271138.png)
 
 这个模块具有独立的PA功放，因此，相比于leommxj使用的Arduino RF，它能实现高达两米的通信距离，但是，该模块使用了自己的协议来实现无线串口，这与控制设备所需要的原始NRF24L01数据流并不兼容
