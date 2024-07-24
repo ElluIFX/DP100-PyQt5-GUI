@@ -56,7 +56,7 @@ Next, switch to the download page, select the firmware package I released (of co
 
 ### Modification Method 2
 
-This method is essentially the same as Method 1, except that when entering the serial bootloader via BOOT0, you may not be able to remove the read-write protection. In this case, if you have an ST-LINK, you can connect as shown in the SWD wiring diagram below, then check the box as shown in the image to remove the protection.
+This method is essentially the same as Method 1, for the situation that when entering the serial bootloader via BOOT0, you may not be able to remove the read-write protection. In this case, if you have an ST-LINK, you can connect as shown in the SWD wiring diagram below, then check the box as shown in the image to remove the protection.
 
 ![1721841339876](image/readme/1721841339876.png)
 
