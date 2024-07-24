@@ -1,0 +1,71 @@
+# Miniware MDP-P906 Digital Power Supply Controller
+
+Remote control of the power supply without the MDP-M01 display module, theoretically supporting P905 as well (untested).
+
+## Acknowledgements
+
+The protocol part used in this project is derived from  [leommxj/mdp_commander](https://github.com/leommxj/mdp_commander). Without this project, I would have had no way to test the communication protocol between M01 and P906.
+
+A lot of time was spent optimizing the communication quality based on this project, ultimately achieving stable and long-term data acquisition at up to 100fps.
+
+## Features
+
+- Set output/voltage/current
+- Reads device status
+- Real-time reading of ADC measurement values from the output
+
+## Usage Instructions
+
+### 前提
+
+This project requires a USB to NRF24L01 module, sold for $5.67 on [AliExpress](https://www.aliexpress.com/item/1005006003453078.html?spm=a2g0o.productlist.main.7.3828oWBqoWBqd6&algo_pvid=27999fdf-f812-4149-b2a8-251e95c1cc29), as shown below:
+
+![1721841880272](image/readme_EN/1721841880272.png)
+
+This module has an independent PA amplifier, allowing for a communication range of up to two meters compared to the Arduino RF used by leommxj. However, the module uses its own protocol to implement a wireless serial port, which is not compatible with the original NRF24L01 data stream required to control the device.
+
+Fortunately, the module uses a genuine STM32F030F4P6 as the main controller, allowing us to write our own programs to repurpose its hardware.
+
+### Modification Method 1
+
+Pry open the module's case and flip it over to see five test points as shown in the image below:
+
+![1721840680045](image/readme/1721840680045.png)
+
+Download [STM32 CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) and open it, setting it up as shown in the image below:
+
+![1721840819305](image/readme/1721840819305.png)
+
+Now, use a pair of tweezers to short the `BOOT0` and `3V3` test points in the image above, and **keep them shorted throughout the entire flashing process**.
+
+Insert the module into the computer, select the correct port number, and click Connect to connect. If everything goes well, you should see the image below, indicating successful removal of the read-write protection on the chip.
+
+![1721841074236](image/readme/1721841074236.png)
+
+Next, switch to the download page, select the firmware package I released (of course, you can also compile it yourself), and complete the firmware flashing.
+
+![1721841174409](image/readme/1721841174409.png)
+
+### Modification Method 2
+
+This method is essentially the same as Method 1, except that when entering the serial bootloader via BOOT0, you may not be able to remove the read-write protection. In this case, if you have an ST-LINK, you can connect as shown in the SWD wiring diagram below, then check the box as shown in the image to remove the protection.
+
+![1721841339876](image/readme/1721841339876.png)
+
+### Control
+
+Refer to the code and the comments.
+
+[test_main.py](./test_main.py) for example.
+
+[mdp_p906.py](.mdp_controller/mdp_p906.py) for complete API.
+
+## TODO
+
+Port my [DP100-PyQt5-GUI](https://github.com/ElluIFX/DP100-PyQt5-GUI) project here to create a complete control software.
+
+## References
+
+Protocol implementation from [leommxj/mdp_commander](https://github.com/leommxj/mdp_commander)
+
+NRF24L01P driver implementation from [mokhwasomssi/stm32_hal_nrf24l01p](https://github.com/mokhwasomssi/stm32_hal_nrf24l01p)

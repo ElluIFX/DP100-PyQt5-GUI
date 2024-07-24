@@ -1,0 +1,16 @@
+# dot files
+.vscode
+.idea
+
+# project out
+/build
+/bin
+/obj
+/out
+
+# eide template
+*.ept
+*.eide-template
+
+#Python
+__pycache__
