@@ -18,7 +18,13 @@ A lot of time was spent optimizing the communication quality based on this proje
 
 ## Usage Instructions
 
-### 前提
+### Prerequisite of the Prerequisite
+
+Although the following text says that this project requires buying a module, if you already have an STM32 + NRF24L01 combo, you can easily port this project to your device by simply modifying cubemx. This is the only advantage of using the HAL library.
+
+I won't include the specific circuit that I reverse-engineered here; you can directly refer to the pin definitions in cubemx.
+
+### Prerequisite
 
 This project requires a USB to NRF24L01 module, sold for $5.67 on [AliExpress](https://www.aliexpress.com/item/1005006003453078.html?spm=a2g0o.productlist.main.7.3828oWBqoWBqd6&algo_pvid=27999fdf-f812-4149-b2a8-251e95c1cc29), as shown below:
 

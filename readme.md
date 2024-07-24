@@ -20,6 +20,16 @@
 
 ## 使用方法
 
+### 前提的前提
+
+虽然下文说本项目需要买一个模块，但如果你手上正好有STM32+NRF24L01这个combo，你也可以简单的移植这个项目到你的设备上，只需要修改一下cubemx就行，HAL库就这点好
+
+我逆向出的具体电路这里就不放了，可以直接看cubemx中的引脚定义
+
+### 前提
+
+本项目需要一个[淘宝](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.521d2e8dccjOe1)上售价为30元的USB转NRF24L01模块，如下图
+
 ### 前提
 
 本项目需要一个[淘宝](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.521d2e8dccjOe1)上售价为30元的USB转NRF24L01模块，如下图
