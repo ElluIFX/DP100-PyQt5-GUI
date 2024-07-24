@@ -28,7 +28,7 @@
 
 ### 前提
 
-本项目需要一个[淘宝](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.521d2e8dccjOe1)上售价为30元的USB转NRF24L01模块，如下图
+本项目需要一个[淘宝](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.521d2e8dccjOe1&id=601004335822&_u=p23lmea03490)上售价为30元的USB转NRF24L01模块，如下图
 
 ![1721840271138](image/readme/1721840271138.png)
 
