@@ -1,7 +1,7 @@
 import time
 from copy import deepcopy
 from threading import Event
-from typing import Callable, Literal, Optional, Tuple
+from typing import Callable, List, Literal, Optional, Tuple
 
 from loguru import logger
 
@@ -83,11 +83,16 @@ class MDP_P906:
             "HVgain16": 0.0,
             "HCzero04": 0.0,
             "HCgain04": 0.0,
-            "Voltage": 0.0,
-            "Current": 0.0,
+            "SetVoltage": 0.0,
+            "SetCurrent": 0.0,
             "InputVoltage": 0.0,
             "InputCurrent": 0.0,
             "ErrFlag": 0,
+            "Locked": False,
+            "State": "off",
+            "Temperature": 0.0,
+            "RealtimeOutput4": [0.0 for _ in range(4)],
+            "RealtimeOutput9": [0.0 for _ in range(9)],
         }
 
         self._adp.nrf_register_recv_callback(self._callback)
@@ -114,39 +119,71 @@ class MDP_P906:
 
     def _callback(self, data: bytes):
         if data[0] == 7:
-            errflag, input_volt, input_curr, voltage, current = (
-                mdp_protocal.parse_type7_response(data)
+            (
+                errflag,
+                input_volt,
+                input_curr,
+                voltage,
+                current,
+                locked,
+                state,
+                temperature,
+                realtime_adc,
+            ) = mdp_protocal.parse_type7_response(
+                data,
+                self._status["HVzero16"],
+                self._status["HVgain16"],
+                self._status["HCzero04"],
+                self._status["HCgain04"],
             )
             self._status["ErrFlag"] = errflag
             self._status["InputVoltage"] = input_volt
             self._status["InputCurrent"] = input_curr
-            self._status["Voltage"] = voltage
-            self._status["Current"] = current
+            self._status["SetVoltage"] = voltage
+            self._status["SetCurrent"] = current
+            self._status["Locked"] = bool(locked)
+            self._status["State"] = {0: "off", 1: "cc", 2: "cv", 3: "on"}[state]
+            self._status["Temperature"] = temperature
+            self._status["RealtimeOutput4"] = realtime_adc
         elif data[0] == 9:
             idcode, HVzero16, HVgain16, HCzero04, HCgain04 = (
                 mdp_protocal.parse_type9_response(data)
             )
             if idcode != self._idcode:
-                logger.warning(f"ID code mismatch: {idcode}!={self._idcode}")
+                logger.warning(f"Type-9 ID code mismatch: {idcode}!={self._idcode}")
             self._status["HVzero16"] = HVzero16
             self._status["HVgain16"] = HVgain16
             self._status["HCzero04"] = HCzero04
             self._status["HCgain04"] = HCgain04
+        elif data[0] == 8:
+            errflag, values = mdp_protocal.parse_type8_response(
+                data,
+                self._status["HVzero16"],
+                self._status["HVgain16"],
+                self._status["HCzero04"],
+                self._status["HCgain04"],
+            )
+            self._status["ErrFlag"] = errflag
+            self._status["RealtimeOutput9"] = values
+            if self._rtvalue_callback is not None:
+                self._rtvalue_callback(values)
+        elif data[0] == 4:
+            self._status["SetCurrent"], self._status["SetVoltage"] = (
+                mdp_protocal.parse_type4_response(data)
+            )
+        elif data[0] == 5:
+            pass
+        elif data[0] == 6:
+            logger.info(
+                f"Dispatch device result: {mdp_protocal.parse_type6_response(data)}"
+            )
+        else:
+            logger.debug(f"Unhandled Type-{data[0]}: {data.hex(' ').upper()}")
+
         if self._transfer_waiting:
             self._transfer_data = data
             self._transfer_waiting = False
             self._transfer_event.set()
-        else:
-            if data[0] == 8 and self._rtvalue_callback is not None:
-                errflag, values = mdp_protocal.parse_type8_response(
-                    data,
-                    self._status["HVzero16"],
-                    self._status["HVgain16"],
-                    self._status["HCzero04"],
-                    self._status["HCgain04"],
-                )
-                self._status["ErrFlag"] = errflag
-                self._rtvalue_callback(values)
 
     def _transfer(
         self,
@@ -163,7 +200,14 @@ class MDP_P906:
         self._transfer_data = b""
         self._transfer_waiting = True
         self._transfer_event.clear()
-        self._adp.nrf_send(packet, timeout=self._com_timeout)
+        try:
+            self._adp.nrf_send(packet, timeout=self._com_timeout)
+        except NRF24AdapterError:
+            if _retry > 0:
+                return self._transfer(
+                    packet, wait_response, check_response_head, _retry - 1
+                )
+            raise
         if (not self._transfer_event.wait(self._com_timeout)) or (
             check_response_head and self._transfer_data[0] != packet[0]
         ):
@@ -174,86 +218,60 @@ class MDP_P906:
             raise TimeoutError("NRF24 timeout")
         return self._transfer_data
 
-    def set_led_color(self, rgb: Tuple[int, int, int]):
+    def get_status(
+        self,
+    ) -> Tuple[
+        str, bool, float, float, float, float, float, int, List[Tuple[float, float]]
+    ]:
         """
-        Set the led color of the digital wheel
-
-        Parameters
-        ----------
-        rgb
-            The color of the led, in the form of (R, G, B)
-        """
-        assert self._idcode is not None, "Please pair first"
-        rgb565 = _convert_to_rgb565(*rgb)
-        self._led_color = rgb565
-        self._transfer(
-            mdp_protocal.gen_set_led_color(
-                self._idcode, self._led_color, self._m01_channel
-            )
-        )
-
-    def get_gain_offset(self):
-        """
-        Get the gain and offset of the ADCs
-        Call by connect(), dont need to call again
-        Returns
-        -------
-            Tuple[int, int, int, int]
-        """
-        assert self._idcode is not None, "Please pair first"
-        self._transfer(
-            mdp_protocal.gen_set_led_color(
-                self._idcode, self._led_color, self._m01_channel
-            )
-        )
-        return (
-            self._status["HVzero16"],
-            self._status["HVgain16"],
-            self._status["HCzero04"],
-            self._status["HCgain04"],
-        )
-
-    def get_set_value(self):
-        """
-        Get the set value of output
-        If Voltage and Current are -1, means device is locked
+        Get the status of the device
 
         Returns
         -------
-            ErrorFlag, InputVoltage, InputCurrent, Voltage, Current
+            State: str
+                off / cc / cv / on (output unstable)
+            Locked: bool
+                True if the device is locked
+            SetVoltage: float
+            SetCurrent: float
+                The set value of output
+                If values are -1, means value is unstable yet
+            InputVoltage: float
+            InputCurrent: float
+                The input value of DC/TypeC
+            Temperature: float
+                The temperature of the device
+            ErrFlag: int
+                The error flag of the system
+            RealtimeOutput: List[Tuple[float, float]]
+                A 4-values list of (voltage/V, current/A)
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(mdp_protocal.gen_get_type7(self._idcode, self._m01_channel))
         return (
-            self._status["ErrFlag"],
+            self._status["State"],
+            self._status["Locked"],
+            self._status["SetVoltage"],
+            self._status["SetCurrent"],
             self._status["InputVoltage"],
             self._status["InputCurrent"],
-            self._status["Voltage"],
-            self._status["Current"],
+            self._status["Temperature"],
+            self._status["ErrFlag"],
+            self._status["RealtimeOutput4"],
         )
 
-    def get_realtime_value(self):
+    def get_realtime_value(self) -> List[Tuple[float, float]]:
         """
         Get the realtime values of output in sync mode
 
         Returns
         -------
-            A list of (voltage in mV, current in mA)
+            A 9-values list of (voltage/V, current/A)
         """
         assert self._idcode is not None, "Please pair first"
         try:
-            data = self._transfer(
-                mdp_protocal.gen_get_type8(self._idcode, self._m01_channel)
-            )
-            errflag, values = mdp_protocal.parse_type8_response(
-                data,
-                self._status["HVzero16"],
-                self._status["HVgain16"],
-                self._status["HCzero04"],
-                self._status["HCgain04"],
-            )
-            self._status["ErrFlag"] = errflag
-            return values
+            self._transfer(mdp_protocal.gen_get_type8(self._idcode, self._m01_channel))
+            return self._status["RealtimeOutput9"]
         except (TimeoutError, NRF24AdapterError):
             return []
 
@@ -277,7 +295,7 @@ class MDP_P906:
 
         Parameters
         ----------
-        callback
+        callback: List[Tuple[float, float]]
             A function that takes a list of (voltage in mV, current in mA) as input
         """
         self._rtvalue_callback = callback
@@ -303,7 +321,7 @@ class MDP_P906:
         Parameters
         ----------
         voltage_set
-            The voltage to be set, in V, steps 0.001V
+            The voltage to be set,/V, steps 0.001V
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(
@@ -326,6 +344,36 @@ class MDP_P906:
             wait_response=False,
         )
 
+    def get_set_voltage_current(self) -> Tuple[float, float]:
+        """
+        Get the set voltage and current of the MDP-P906
+
+        Returns
+        -------
+        A tuple of (voltage/V, current in A)
+        """
+        assert self._idcode is not None, "Please pair first"
+        self._transfer(mdp_protocal.gen_get_volt_cur())
+        return self._status["SetVoltage"], self._status["SetCurrent"]
+
+    def set_led_color(self, rgb: Tuple[int, int, int]):
+        """
+        Set the led color of the digital wheel
+
+        Parameters
+        ----------
+        rgb: Tuple[int, int, int]
+            The color of the led, in the form of (R, G, B)
+        """
+        assert self._idcode is not None, "Please pair first"
+        rgb565 = _convert_to_rgb565(*rgb)
+        self._led_color = rgb565
+        self._transfer(
+            mdp_protocal.gen_set_led_color(
+                self._idcode, self._led_color, self._m01_channel
+            )
+        )
+
     def connect(self):
         """
         Connect to the MDP-P906, and prepare information for calibration
@@ -338,18 +386,19 @@ class MDP_P906:
         assert self._idcode is not None, "Please pair first"
         for i in range(5):
             try:
-                self.get_gain_offset()
-                self.get_set_value()
+                self.update_gain_offset()
+                self.get_status()
             except (NRF24AdapterError, TimeoutError, AssertionError) as e:
                 if i == 4:
                     raise Exception("Failed to connect to MDP-P906") from e
                 time.sleep(0.1)
                 continue
             break
-        logger.debug(f"Init status: {self._status}")
+        if self._adp._debug:
+            logger.debug(f"Init status: {self._status}")
         logger.success("MDP-P906 Connected")
 
-    def auto_match(self, try_times: int = 64):
+    def auto_match(self, try_times: int = 64) -> bytes:
         """
         Auto match with the MDP-P906
 
@@ -360,8 +409,13 @@ class MDP_P906:
 
         Returns
         -------
-        bytes | None
-            The idcode of the MDP-P906, None if failed to match
+        bytes
+            The idcode of the MDP-P906
+
+        Raises
+        ------
+        Exception
+            If failed to match with the MDP-P906
         """
         setting = self._adp.nrf_get_settings()
         setting_old = deepcopy(setting)
@@ -377,18 +431,40 @@ class MDP_P906:
                 continue
             if data[0] == 0x05:
                 self._idcode = mdp_protocal.parse_type5_response(data)
-                logger.success(f"Matched device - 0x{self._idcode.hex().upper()}")
+                logger.info(f"Found device - 0x{self._idcode.hex().upper()}")
                 break
             logger.warning(f"Unhandled response - {data.hex(' ').upper()}")
-        else:
-            logger.error("Failed to match device")
-            self._idcode = None
-        if self._idcode is not None:
-            data = self._transfer(
-                mdp_protocal.gen_dispatch_ch_addr(self._address, self._freq - 2400)
-            )
-            logger.info(
-                f"Dispatched device to address 0x{self._address.hex().upper()} and freq {self._freq} Mhz"
-            )
+        if self._idcode is None:
+            raise Exception("Failed to auto match with MDP-P906")
+        data = self._transfer(
+            mdp_protocal.gen_dispatch_ch_addr(self._address, self._freq - 2400)
+        )
+        logger.info(
+            f"Dispatched device to address 0x{self._address.hex().upper()} and freq {self._freq} Mhz"
+        )
         self._adp.nrf_set_settings(setting_old)
+        logger.success(
+            f"Auto match successed with idcode 0x{self._idcode.hex().upper()}"
+        )
         return self._idcode
+
+    def update_gain_offset(self) -> Tuple[int, int, int, int]:
+        """
+        Update the gain and offset of the ADCs
+        Call by connect(), dont need to call again
+        Returns
+        -------
+            Tuple[int, int, int, int]
+        """
+        assert self._idcode is not None, "Please pair first"
+        self._transfer(
+            mdp_protocal.gen_set_led_color(
+                self._idcode, self._led_color, self._m01_channel
+            )
+        )
+        return (
+            self._status["HVzero16"],
+            self._status["HVgain16"],
+            self._status["HCzero04"],
+            self._status["HCgain04"],
+        )

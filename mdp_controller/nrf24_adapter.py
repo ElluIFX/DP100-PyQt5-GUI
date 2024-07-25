@@ -194,17 +194,17 @@ class NRF24Adapter:
         elif cmd == RESPONSE.CMD_FAILED:
             logger.warning("NRF Response: Command failed")
         elif cmd == RESPONSE.RESET_DONE:
-            logger.success("NRF Response: Setting reset success")
+            logger.info("NRF Response: Setting reset success")
             self._action_event.set()
         elif cmd == RESPONSE.BAUDRATE_SET:
-            logger.success("NRF Response: Baudrate set success")
+            logger.info("NRF Response: Baudrate set success")
             self._action_event.set()
         elif cmd == RESPONSE.NRF_SEND_OK:
             self._send_event.set()
             if self._debug:
                 logger.debug("NRF Response: NRF send success")
         elif cmd == RESPONSE.NRF_SEND_FAIL:
-            logger.warning("NRF Response: NRF send failed")
+            logger.warning("NRF Response: NRF send no ack")
         elif cmd == RESPONSE.NRF_RECV_OK:
             if self._recv_callback is not None:
                 self._recv_callback(data)
@@ -215,10 +215,10 @@ class NRF24Adapter:
         elif cmd == RESPONSE.NRF_FIFO_OVERFLOW:
             logger.warning("NRF Response: NRF FIFO overflow")
         elif cmd == RESPONSE.NRF_INIT:
-            logger.success("NRF Response: NRF init success")
+            logger.info("NRF Response: NRF configure success")
             self._action_event.set()
         elif cmd == RESPONSE.NRF_SET_SAVED:
-            logger.success("NRF Response: NRF setting saved")
+            logger.info("NRF Response: NRF setting saved")
             self._action_event.set()
         elif cmd == RESPONSE.NRF_SET_QUERY:
             self._query_data = data
@@ -226,7 +226,7 @@ class NRF24Adapter:
             if self._debug:
                 logger.debug(f"NRF Response: NRF setting {data.hex(' ')}")
         else:
-            logger.error(f"Unknown response {cmd:02X}")
+            logger.error(f"NRF Response: Unknown cmd {cmd:02X}")
 
     def reboot(self, timeout: Optional[float] = 2):
         if not self._action(CMD.REBOOT, b"", timeout):
