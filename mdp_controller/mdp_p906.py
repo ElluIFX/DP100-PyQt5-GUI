@@ -24,14 +24,19 @@ def _convert_to_rgb565(r: int, g: int, b: int) -> int:
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
 
 
+def _hex_to_bytes(s: str) -> bytes:
+    s = s.replace("0x", "").replace(":", "").replace(" ", "")
+    return bytes.fromhex(s)
+
+
 class MDP_P906:
     def __init__(
         self,
         port: Optional[str] = None,
         baudrate: int = 921600,
-        address: bytes = b"\xaa\xbb\xcc\xdd\xee",
+        address: str = "AA:BB:CC:DD:EE",
         freq: int = 2442,
-        idcode: Optional[bytes] = None,
+        idcode: Optional[str] = None,
         m01_channel: int = 0,
         led_color: Tuple[int, int, int] = (0x66, 0xCC, 0xFF),
         com_timeout: Optional[float] = 0.04,
@@ -71,8 +76,8 @@ class MDP_P906:
         """
 
         self._adp = NRF24Adapter(port=port, baudrate=baudrate, debug=debug)
-        self._address = address
-        self._idcode = idcode
+        self._address = _hex_to_bytes(address)
+        self._idcode = _hex_to_bytes(idcode) if idcode is not None else None
         self._m01_channel = m01_channel
         self._led_color = _convert_to_rgb565(*led_color)
         self._com_timeout = com_timeout
@@ -234,8 +239,8 @@ class MDP_P906:
                 True if the device is locked
             SetVoltage: float
             SetCurrent: float
-                The set value of output
-                If values are -1, means value is unstable yet
+                The set value of output,
+                if values are -1, means value is unstable yet
             InputVoltage: float
             InputCurrent: float
                 The input value of DC/TypeC
@@ -277,8 +282,8 @@ class MDP_P906:
 
     def request_realtime_value(self):
         """
-        Request the realtime values of output in async mode
-        Call register_realtime_value_callback() first
+        Request the realtime values of output in async mode,
+        should call register_realtime_value_callback() first
         """
         assert self._idcode is not None, "Please pair first"
         try:
@@ -384,13 +389,14 @@ class MDP_P906:
             If failed to connect to the MDP-P906
         """
         assert self._idcode is not None, "Please pair first"
-        for i in range(5):
+        for i in range(4):
             try:
                 self.update_gain_offset()
                 self.get_status()
             except (NRF24AdapterError, TimeoutError, AssertionError) as e:
-                if i == 4:
+                if i == 3:
                     raise Exception("Failed to connect to MDP-P906") from e
+                logger.error(f"Connect failed, retry - {i+1}/3")
                 time.sleep(0.1)
                 continue
             break
@@ -398,7 +404,7 @@ class MDP_P906:
             logger.debug(f"Init status: {self._status}")
         logger.success("MDP-P906 Connected")
 
-    def auto_match(self, try_times: int = 64) -> bytes:
+    def auto_match(self, try_times: int = 64) -> str:
         """
         Auto match with the MDP-P906
 
@@ -409,7 +415,7 @@ class MDP_P906:
 
         Returns
         -------
-        bytes
+        str
             The idcode of the MDP-P906
 
         Raises
@@ -431,7 +437,7 @@ class MDP_P906:
                 continue
             if data[0] == 0x05:
                 self._idcode = mdp_protocal.parse_type5_response(data)
-                logger.info(f"Found device - 0x{self._idcode.hex().upper()}")
+                logger.info(f"Found device - {self._idcode.hex().upper()}")
                 break
             logger.warning(f"Unhandled response - {data.hex(' ').upper()}")
         if self._idcode is None:
@@ -440,13 +446,13 @@ class MDP_P906:
             mdp_protocal.gen_dispatch_ch_addr(self._address, self._freq - 2400)
         )
         logger.info(
-            f"Dispatched device to address 0x{self._address.hex().upper()} and freq {self._freq} Mhz"
+            f"Dispatched device to address {self._address.hex(':').upper()} with freq {self._freq} Mhz"
         )
         self._adp.nrf_set_settings(setting_old)
         logger.success(
-            f"Auto match successed with idcode 0x{self._idcode.hex().upper()}"
+            f"Successfully auto matched (idcode: {self._idcode.hex().upper()})"
         )
-        return self._idcode
+        return self._idcode.hex().upper()
 
     def update_gain_offset(self) -> Tuple[int, int, int, int]:
         """

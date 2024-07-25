@@ -1,23 +1,29 @@
 import time
 
-from mdp_controller import MDP_P906, mdp_protocal
+from mdp_controller import MDP_P906
 
 if __name__ == "__main__":
     mdp = MDP_P906(
         freq=2521,
-        idcode=b"\x08\x37\x54\x34",
+        idcode="08375434",
         led_color=(0x66, 0xCC, 0xFF),
         debug=False,
         tx_output_power="4dBm",
     )
 
-    # mdp.auto_match()
+    try:
+        mdp.connect()
+    except Exception:
+        print("Connection failed, try to auto match")
+        mdp.auto_match()
+        mdp.connect()
 
-    mdp.connect()
     mdp.set_voltage(5)
     mdp.set_current(2)
     mdp.set_output(True)
+    print(mdp.get_set_voltage_current())
     print(mdp.get_status())
+    print(mdp.get_realtime_value())
 
     t0 = time.perf_counter()
     cnt = 0
