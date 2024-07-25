@@ -58,7 +58,7 @@ class NRF24AdapterSetting:
     tx_output_power: Literal[
         "7dBm", "4dBm", "3dBm", "1dBm", "0dBm", "-4dBm", "-6dBm", "-12dBm"
     ]
-    crc_length: Literal["crc8", "crc16"]
+    crc_length: Literal["disable", "crc8", "crc16"]
     payload_length: int  # 1-32
     auto_retransmit_count: int  # 0-15
     auto_retransmit_delay: int  # 250us-4000us
@@ -77,7 +77,7 @@ TOP_DICT = {
     "-6dBm": 1,
     "-12dBm": 0,
 }
-CL_DICT = {"crc8": 1, "crc16": 2}
+CL_DICT = {"disable": 0, "crc8": 1, "crc16": 2}
 
 
 def _inv_dict(d):
@@ -285,6 +285,16 @@ class NRF24Adapter:
         assert (
             isinstance(settings.address, bytes) and len(settings.address) == 5
         ), "Address must be bytes and length must be 5"
+        assert (
+            2400 <= settings.freq <= 2525
+        ), "Frequency must be between 2400 and 2525 Mhz"
+        assert (
+            1 <= settings.payload_length <= 32
+        ), "Payload length must be between 1 and 32"
+        assert (
+            0 <= settings.auto_retransmit_count <= 15
+        ), "Auto retransmit count must be between 0 and 15"
+        assert 3 <= settings.address_width <= 5, "Address width must be between 3 and 5"
         data = struct.pack(
             "<" + "B" * 13,
             settings.freq - 2400,

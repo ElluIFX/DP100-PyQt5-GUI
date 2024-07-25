@@ -1,12 +1,16 @@
 import time
 from copy import deepcopy
 from threading import Event
-from typing import Callable, Optional, Tuple
+from typing import Callable, Literal, Optional, Tuple
 
 from loguru import logger
 
 import mdp_controller.mdp_protocal as mdp_protocal
-from mdp_controller.nrf24_adapter import NRF24Adapter, NRF24AdapterError
+from mdp_controller.nrf24_adapter import (
+    NRF24Adapter,
+    NRF24AdapterError,
+    NRF24AdapterSetting,
+)
 
 try:
     import richuru
@@ -32,6 +36,9 @@ class MDP_P906:
         led_color: Tuple[int, int, int] = (0x66, 0xCC, 0xFF),
         com_timeout: Optional[float] = 0.04,
         com_retry: int = 5,
+        tx_output_power: Literal[
+            "7dBm", "4dBm", "3dBm", "1dBm", "0dBm", "-4dBm", "-6dBm", "-12dBm"
+        ] = "4dBm",
         debug: bool = False,
     ):
         """
@@ -44,7 +51,7 @@ class MDP_P906:
         baudrate
             baudrate of the nrf24l01 adapter
         address
-            wireless address of the nrf24l01 adapter, can be any you want
+            5bytes wireless address of the nrf24l01 adapter, can be any you want
         freq
             wireless frequency of the nrf24l01 adapter, 2400~2525 Mhz
         idcode
@@ -57,6 +64,8 @@ class MDP_P906:
             communication timeout in secs between P906 and the adapter
         com_retry
             communication retry times when timeout occurs
+        tx_output_power
+            singal output power of the nrf24l01 adapter
         debug
             show debug info
         """
@@ -89,15 +98,17 @@ class MDP_P906:
         self._rtvalue_callback: Optional[Callable[[list], None]] = None
 
         self._adp.wait_connected()
-        setting = self._adp.nrf_get_settings()
-        setting.freq = self._freq
-        setting.address = self._address
-        setting.air_data_rate = "2Mbps"
-        setting.tx_output_power = "7dBm"
-        setting.crc_length = "crc16"
-        setting.payload_length = 32
-        setting.auto_retransmit_count = 12
-        setting.auto_retransmit_delay = 250
+        setting = NRF24AdapterSetting(
+            freq=self._freq,
+            air_data_rate="2Mbps",
+            address_width=5,
+            address=self._address,
+            tx_output_power=tx_output_power,
+            crc_length="crc16",
+            payload_length=32,
+            auto_retransmit_count=12,
+            auto_retransmit_delay=250,
+        )
         self._adp.nrf_set_settings(setting)
         time.sleep(0.1)
 
@@ -205,6 +216,7 @@ class MDP_P906:
     def get_set_value(self):
         """
         Get the set value of output
+        If Voltage and Current are -1, means device is locked
 
         Returns
         -------
@@ -334,6 +346,7 @@ class MDP_P906:
                 time.sleep(0.1)
                 continue
             break
+        logger.debug(f"Init status: {self._status}")
         logger.success("MDP-P906 Connected")
 
     def auto_match(self, try_times: int = 64):
