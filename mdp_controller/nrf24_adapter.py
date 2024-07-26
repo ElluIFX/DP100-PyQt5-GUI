@@ -89,7 +89,7 @@ class NRF24Adapter:
         self, port: Optional[str] = None, baudrate: int = 921600, debug: bool = False
     ):
         self._port_name = port
-        if self._port_name is None:
+        if not self._port_name:
             self._port_name = _find_port_name("1A86:7523")
         if not self._port_name:
             raise Exception("NRF24-Adapter not found")
@@ -297,7 +297,7 @@ class NRF24Adapter:
         assert 3 <= settings.address_width <= 5, "Address width must be between 3 and 5"
         data = struct.pack(
             "<" + "B" * 13,
-            settings.freq - 2400,
+            int(settings.freq) - 2400,
             ADR_DICT[settings.air_data_rate],
             TOP_DICT[settings.tx_output_power],
             CL_DICT[settings.crc_length],

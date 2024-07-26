@@ -1,4 +1,5 @@
 import struct
+from functools import lru_cache
 
 
 def calc_checksum(data: bytes):
@@ -85,7 +86,7 @@ def gen_set_current(idcode: bytes, current: float, m01_channel: int = 0, blink=T
     """
     Type 7
     """
-    assert 0.0 < current < 10.0
+    assert 0.0 <= current <= 10.0
     c = "{:07.3f}".format(current).replace(".", "")
     # subtype 02 len 03
     d = "{}{:02x}{:02x}0203{}".format(idcode.hex(), m01_channel, 1 if blink else 0, c)
@@ -105,6 +106,7 @@ def gen_set_output(idcode: bytes, state: bool, m01_channel: int = 0, blink=True)
     return packet
 
 
+@lru_cache()
 def gen_get_type7(idcode: bytes, m01_channel: int = 0, blink=True):
     """
     Type 7
@@ -160,6 +162,7 @@ def parse_type7_response(
     raise RuntimeError(f"parse_type7_response: unknown data[1] {data[1]:02x}")
 
 
+@lru_cache()
 def gen_get_type8(idcode: bytes, m01_channel: int = 0, blink=True):
     """
     Type 8
@@ -194,7 +197,7 @@ def _volt_adc_correct(value: int, gain: int, offset: int) -> float:
     Correct voltage adc value to V
     """
     val = round((value * 16 - offset) * gain / 100000.0)
-    return val / 1000 if val > 0 else 0.0
+    return val / 1000 if val > 1 else 0.0
 
 
 def _curr_adc_correct(value: int, gain: int, offset: int) -> float:
@@ -202,7 +205,7 @@ def _curr_adc_correct(value: int, gain: int, offset: int) -> float:
     Correct current adc value to A
     """
     val = round((value * 4 - offset) * gain / 100000.0 * 2)
-    return val / 1000 if val > 0 else 0.0
+    return val / 1000 if val > 1 else 0.0
 
 
 def gen_set_led_color(

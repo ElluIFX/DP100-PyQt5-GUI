@@ -44,6 +44,7 @@ class MDP_P906:
         tx_output_power: Literal[
             "7dBm", "4dBm", "3dBm", "1dBm", "0dBm", "-4dBm", "-6dBm", "-12dBm"
         ] = "4dBm",
+        blink: bool = True,
         debug: bool = False,
     ):
         """
@@ -71,6 +72,8 @@ class MDP_P906:
             communication retry times when timeout occurs
         tx_output_power
             singal output power of the nrf24l01 adapter
+        blink
+            whether to blink the under-control indicator of the P906
         debug
             show debug info
         """
@@ -83,6 +86,7 @@ class MDP_P906:
         self._com_timeout = com_timeout
         self._com_retry = com_retry
         self._freq = freq
+        self._blink = blink
         self._status = {
             "HVzero16": 0.0,
             "HVgain16": 0.0,
@@ -102,7 +106,7 @@ class MDP_P906:
 
         self._adp.nrf_register_recv_callback(self._callback)
         self._transfer_data = b""
-        self._transfer_waiting = False
+        self._transfer_wait_header = -1
         self._transfer_event = Event()
 
         self._rtvalue_callback: Optional[Callable[[list], None]] = None
@@ -185,16 +189,15 @@ class MDP_P906:
         else:
             logger.debug(f"Unhandled Type-{data[0]}: {data.hex(' ').upper()}")
 
-        if self._transfer_waiting:
+        if data[0] == self._transfer_wait_header:
             self._transfer_data = data
-            self._transfer_waiting = False
+            self._transfer_wait_header = -1
             self._transfer_event.set()
 
     def _transfer(
         self,
         packet: bytes,
         wait_response: bool = True,
-        check_response_head: bool = True,
         _retry=None,
     ):
         if not wait_response:
@@ -203,25 +206,23 @@ class MDP_P906:
         if _retry is None:
             _retry = self._com_retry
         self._transfer_data = b""
-        self._transfer_waiting = True
+        self._transfer_wait_header = packet[0]
         self._transfer_event.clear()
         try:
             self._adp.nrf_send(packet, timeout=self._com_timeout)
         except NRF24AdapterError:
             if _retry > 0:
-                return self._transfer(
-                    packet, wait_response, check_response_head, _retry - 1
-                )
+                return self._transfer(packet, wait_response, _retry - 1)
             raise
-        if (not self._transfer_event.wait(self._com_timeout)) or (
-            check_response_head and self._transfer_data[0] != packet[0]
-        ):
+        if not self._transfer_event.wait(self._com_timeout):
             if _retry > 0:
-                return self._transfer(
-                    packet, wait_response, check_response_head, _retry - 1
-                )
+                return self._transfer(packet, wait_response, _retry - 1)
             raise TimeoutError("NRF24 timeout")
         return self._transfer_data
+
+    def close(self):
+        self._adp.close()
+        logger.info("MDP-P906 closed")
 
     def get_status(
         self,
@@ -252,7 +253,11 @@ class MDP_P906:
                 A 4-values list of (voltage/V, current/A)
         """
         assert self._idcode is not None, "Please pair first"
-        self._transfer(mdp_protocal.gen_get_type7(self._idcode, self._m01_channel))
+        self._transfer(
+            mdp_protocal.gen_get_type7(
+                self._idcode, self._m01_channel, blink=self._blink
+            )
+        )
         return (
             self._status["State"],
             self._status["Locked"],
@@ -275,7 +280,11 @@ class MDP_P906:
         """
         assert self._idcode is not None, "Please pair first"
         try:
-            self._transfer(mdp_protocal.gen_get_type8(self._idcode, self._m01_channel))
+            self._transfer(
+                mdp_protocal.gen_get_type8(
+                    self._idcode, self._m01_channel, blink=self._blink
+                )
+            )
             return self._status["RealtimeOutput9"]
         except (TimeoutError, NRF24AdapterError):
             return []
@@ -288,7 +297,9 @@ class MDP_P906:
         assert self._idcode is not None, "Please pair first"
         try:
             self._transfer(
-                mdp_protocal.gen_get_type8(self._idcode, self._m01_channel),
+                mdp_protocal.gen_get_type8(
+                    self._idcode, self._m01_channel, blink=self._blink
+                ),
                 wait_response=False,
             )
         except (TimeoutError, NRF24AdapterError):
@@ -316,7 +327,10 @@ class MDP_P906:
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(
-            mdp_protocal.gen_set_output(self._idcode, state, self._m01_channel)
+            mdp_protocal.gen_set_output(
+                self._idcode, state, self._m01_channel, blink=self._blink
+            ),
+            wait_response=False,
         )
 
     def set_voltage(self, voltage_set: float):
@@ -330,7 +344,9 @@ class MDP_P906:
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(
-            mdp_protocal.gen_set_voltage(self._idcode, voltage_set, self._m01_channel),
+            mdp_protocal.gen_set_voltage(
+                self._idcode, voltage_set, self._m01_channel, blink=self._blink
+            ),
             wait_response=False,
         )
 
@@ -345,7 +361,9 @@ class MDP_P906:
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(
-            mdp_protocal.gen_set_current(self._idcode, current_set, self._m01_channel),
+            mdp_protocal.gen_set_current(
+                self._idcode, current_set, self._m01_channel, blink=self._blink
+            ),
             wait_response=False,
         )
 
@@ -375,13 +393,18 @@ class MDP_P906:
         self._led_color = rgb565
         self._transfer(
             mdp_protocal.gen_set_led_color(
-                self._idcode, self._led_color, self._m01_channel
+                self._idcode, self._led_color, self._m01_channel, blink=self._blink
             )
         )
 
-    def connect(self):
+    def connect(self, retry_times: int = 3):
         """
         Connect to the MDP-P906, and prepare information for calibration
+
+        Parameters
+        ----------
+        retry_times
+            The number of times to try to connect to the MDP-P906
 
         Raises
         ------
@@ -389,14 +412,14 @@ class MDP_P906:
             If failed to connect to the MDP-P906
         """
         assert self._idcode is not None, "Please pair first"
-        for i in range(4):
+        for i in range(retry_times):
             try:
                 self.update_gain_offset()
                 self.get_status()
             except (NRF24AdapterError, TimeoutError, AssertionError) as e:
                 if i == 3:
                     raise Exception("Failed to connect to MDP-P906") from e
-                logger.error(f"Connect failed, retry - {i+1}/3")
+                logger.error(f"Connect failed, retry - {i+1}/{retry_times}")
                 time.sleep(0.1)
                 continue
             break
@@ -404,7 +427,7 @@ class MDP_P906:
             logger.debug(f"Init status: {self._status}")
         logger.success("MDP-P906 Connected")
 
-    def auto_match(self, try_times: int = 64) -> str:
+    def auto_match(self, try_times: int = 3) -> str:
         """
         Auto match with the MDP-P906
 
