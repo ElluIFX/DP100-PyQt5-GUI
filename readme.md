@@ -90,7 +90,9 @@
 
 ### GUI控制
 
-正在开发……
+在release中可以直接下载打包好的版本，开箱即用
+
+> 界面字体用了更纱黑体，记得去[微软商店](https://www.microsoft.com/store/productId/9MW0M424NCZ7?ocid=pdpshare)装一个
 
 ## TODO
 

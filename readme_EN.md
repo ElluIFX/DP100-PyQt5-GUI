@@ -4,9 +4,7 @@ Remote control of the power supply without the MDP-M01 display module, theoretic
 
 ![1721844452863](image/readme/1721844452863.png)
 
-![1721971701832](image/readme/1721971701832.png)
-
-> Special thanks to Miniware for spending a year developing controller software that requires the display module to function and is so rudimentary. Although they could have delayed indefinitely, they still managed to create a toy to fool everyone.
+![1721995272301](image/readme_EN/1721995272301.png)
 
 ## Acknowledgements
 
@@ -24,7 +22,7 @@ A lot of time was spent optimizing the communication quality based on this proje
 - Reads device status
 - Real-time reading of ADC measurement values from the output
 
-### PyQt5 GUI (WIP)
+### PyQt5 GUI
 
 - Basic parameter setting, preset group management, setting modification
 - Data acquisition, plotting, analysis and saving up to 100Hz (adjustable)
@@ -88,7 +86,9 @@ Refer to the code and the comments.
 
 ### Control by GUI
 
-Work in progress...
+I have released a PyInstaller packaged version, you can just download and run it. Everything out of the box.
+
+> The interface font uses Sarasa. Remember to install one in the [Microsoft Store](https://www.microsoft.com/store/productId/9MW0M424NCZ7?ocid=pdpshare)
 
 ## TODO
 

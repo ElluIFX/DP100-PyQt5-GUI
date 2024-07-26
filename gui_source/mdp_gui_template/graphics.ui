@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogGraphics</class>
+ <widget class="QDialog" name="DialogGraphics">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>161</width>
+    <height>395</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>图形设置</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label_36">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>999</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>显示主题</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>6</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboTheme">
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+     </property>
+     <item>
+      <property name="text">
+       <string>Dark</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Light</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Auto</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_35">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>28</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>999</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>图表最大绘图帧率</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>6</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDoubleSpinBox" name="spinMaxFps">
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string>fps</string>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>120.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>5.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>60.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_37">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>28</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>999</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>图表显示数据点数</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>6</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSpinBox" name="spinDataLength">
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string>pts</string>
+     </property>
+     <property name="prefix">
+      <string/>
+     </property>
+     <property name="minimum">
+      <number>100</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="singleStep">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>500</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_38">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>28</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>999</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>状态区数值滤波系数</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>6</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboFilterK">
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+     </property>
+     <item>
+      <property name="text">
+       <string>实时</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>低</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>中</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>高</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>极高</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_39">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>28</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>999</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>状态区电压电流插值</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>6</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboInterp">
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+     </property>
+     <item>
+      <property name="text">
+       <string>不插值</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>一位插值</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>二位插值</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>三位插值</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkBoxOpenGL">
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>开启OpenGL绘图</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkBoxAvgMode">
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>开启平滑数据模式</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnClose">
+     <property name="font">
+      <font>
+       <family>等距更纱黑体 SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>完成 / DONE</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
