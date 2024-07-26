@@ -1,10 +1,10 @@
 # Miniware MDP-P906 Digital Power Supply Controller
 
-Remote control of the power supply without the MDP-M01 display module, theoretically supporting P905 as well (untested).
-
-![1721844452863](image/readme/1721844452863.png)
+Wireless control of the power supply without the MDP-M01 display module, theoretically supporting P905 as well (untested).
 
 ![1721995272301](image/readme_EN/1721995272301.png)
+
+![1721844452863](image/readme/1721844452863.png)
 
 ## Acknowledgements
 
@@ -19,7 +19,7 @@ A lot of time was spent optimizing the communication quality based on this proje
 ### Python3 API
 
 - Set output/voltage/current
-- Reads device status
+- Read device status
 - Real-time reading of ADC measurement values from the output
 
 ### PyQt5 GUI
@@ -47,7 +47,9 @@ This project requires a USB to NRF24L01 module, sold for $5.67 on [AliExpress](h
 
 ![1721841880272](image/readme_EN/1721841880272.png)
 
-This module has an independent PA amplifier, allowing for a communication range of up to two meters compared to the Arduino RF used by leommxj. However, the module uses its own protocol to implement a wireless serial port, which is not compatible with the original NRF24L01 data stream required to control the device.
+This module has an independent PA amplifier, allowing for a communication range of up to two meters compared to the Arduino Nano RF used by leommxj. However, the module uses its own protocol to implement a wireless serial port, which is not compatible with the original NRF24L01 data stream required to control the device.
+
+![1722007003614](image/readme/1722007003614.png)
 
 Fortunately, the module uses a genuine STM32F030F4P6 as the main controller, allowing us to write our own programs to repurpose its hardware.
 
