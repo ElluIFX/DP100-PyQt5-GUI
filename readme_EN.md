@@ -31,6 +31,7 @@ A lot of time was spent optimizing the communication quality based on this proje
 - Function generator (sine/square/triangle/sawtooth/random)
 - Operation sequence (execute operations in sequence)
 - Material Design style
+- i18n support (zh-CN/en-US)
 
 ## Usage Instructions
 
