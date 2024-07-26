@@ -4,6 +4,8 @@ Remote control of the power supply without the MDP-M01 display module, theoretic
 
 ![1721844452863](image/readme/1721844452863.png)
 
+![1721971701832](image/readme/1721971701832.png)
+
 > Special thanks to Miniware for spending a year developing controller software that requires the display module to function and is so rudimentary. Although they could have delayed indefinitely, they still managed to create a toy to fool everyone.
 
 ## Acknowledgements
@@ -16,9 +18,21 @@ A lot of time was spent optimizing the communication quality based on this proje
 
 ## Features
 
+### Python3 API
+
 - Set output/voltage/current
 - Reads device status
 - Real-time reading of ADC measurement values from the output
+
+### PyQt5 GUI (WIP)
+
+- Basic parameter setting, preset group management, setting modification
+- Data acquisition, plotting, analysis and saving up to 100Hz (adjustable)
+- PID constant power control
+- Parameter scanning (voltage/current)
+- Function generator (sine/square/triangle/sawtooth/random)
+- Operation sequence (execute operations in sequence)
+- Material Design style
 
 ## Usage Instructions
 
@@ -64,7 +78,7 @@ This method is essentially the same as Method 1, for the situation that when ent
 
 ![1721841339876](image/readme/1721841339876.png)
 
-### Control
+### Control by API
 
 Refer to the code and the comments.
 
@@ -72,9 +86,13 @@ Refer to the code and the comments.
 
 [mdp_p906.py](./mdp_controller/mdp_p906.py) for complete API.
 
+### Control by GUI
+
+Work in progress...
+
 ## TODO
 
-Port my [DP100-PyQt5-GUI](https://github.com/ElluIFX/DP100-PyQt5-GUI) project here to create a complete control software.
+~~Port my [DP100-PyQt5-GUI](https://github.com/ElluIFX/DP100-PyQt5-GUI) project here to create a complete control software.~~
 
 ## References
 
