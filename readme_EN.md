@@ -69,7 +69,7 @@ Insert the module into the computer, select the correct port number, and click C
 
 ![1721841074236](image/readme/1721841074236.png)
 
-Next, switch to the download page, select the firmware package I released (of course, you can also compile it yourself), and complete the firmware flashing.
+Next, switch to the download page, select the firmware package I [released](https://github.com/ElluIFX/MDP-P906-Controller/releases/tag/image) (of course, you can also compile it yourself), and complete the firmware flashing.
 
 ![1721841174409](image/readme/1721841174409.png)
 

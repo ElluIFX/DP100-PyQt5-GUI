@@ -73,7 +73,7 @@
 
 ![1721841074236](image/readme/1721841074236.png)
 
-接下来切换到下载页，选择我发布在release中的固件包（当然，你也可以自行编译），完成固件烧录
+接下来切换到下载页，选择我发布在[release](https://github.com/ElluIFX/MDP-P906-Controller/releases/tag/image)中的固件包（当然，你也可以自行编译），完成固件烧录
 
 ![1721841174409](image/readme/1721841174409.png)
 
