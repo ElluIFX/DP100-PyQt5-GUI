@@ -93,9 +93,7 @@ I have released a PyInstaller packaged version, you can just download and run it
 
 > The interface font uses Sarasa. Remember to install one in the [Microsoft Store](https://www.microsoft.com/store/productId/9MW0M424NCZ7?ocid=pdpshare)
 
-## TODO
-
-~~Port my [DP100-PyQt5-GUI](https://github.com/ElluIFX/DP100-PyQt5-GUI) project here to create a complete control software.~~
+Set environment varible `MDP_FORCE_ENGLISH` to `1` can force the interface to be English if it failed to detect your system language.
 
 ## References
 

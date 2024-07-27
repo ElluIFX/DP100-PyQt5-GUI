@@ -203,6 +203,14 @@ class CustomTitleBar(TitleBar):
         self.fullBtn.updateStyle(style)
 
 
+def center_window(instance: QtWidgets.QWidget) -> None:
+    geo = instance.geometry()
+    scr_geo = QtWidgets.QApplication.desktop().screenGeometry()
+    center_x = (scr_geo.width() - geo.width()) // 2
+    center_y = (scr_geo.height() - geo.height()) // 2
+    instance.move(center_x, center_y)
+
+
 class Setting:
     def __init__(self) -> None:
         self.presets = {str(i): (0, 0) for i in range(1, 10)}
@@ -253,7 +261,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     locked = False
     _v_set = 0
     _i_set = 0
-    open_r = 1e6
+    open_r = 1e7
 
     def __init__(self, parent=None):
         self.api: Optional[MDP_P906] = None
@@ -295,6 +303,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.btnSeqLoop.setFont(font)
             self.ui.btnSeqSave.setFont(font)
             self.ui.btnSeqLoad.setFont(font)
+
+    def showEvent(self, a0: QtGui.QShowEvent) -> None:
+        center_window(self)
+        return super().showEvent(a0)
 
     def initTimer(self):
         self.state_request_sender_timer = QtCore.QTimer(self)
@@ -430,7 +442,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def _close_state_ui(self):
         self.ui.labelConnectState.setText(self.tr("未连接"))
-        set_color(self.ui.labelConnectState, "red")
+        set_color(self.ui.labelConnectState, None)
         self.ui.frameOutputSetting.setEnabled(False)
         self.ui.frameSystemState.setEnabled(False)
         self.ui.frameGraph.setEnabled(False)
@@ -489,6 +501,13 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         except Exception:
             self.ui.labelConnectState.setText(self.tr("连接失败"))
             set_color(self.ui.labelConnectState, "red")
+            QtCore.QTimer.singleShot(
+                2000,
+                lambda: (
+                    self.ui.labelConnectState.setText(self.tr("未连接")),
+                    set_color(self.ui.labelConnectState, None),
+                ),
+            )
             logger.exception("Failed to connect")
             return
 
@@ -557,7 +576,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             data.voltage += (v - data.voltage) * data.filter_k
             data.current += (i - data.current) * data.filter_k
             data.resistance += (r - data.resistance) * data.filter_k
-        r_text = f"{data.resistance:.3f}" if data.resistance < self.open_r - 1 else "--"
+        r_text = (
+            f"{data.resistance:.3f}" if data.resistance < self.open_r / 100 else "--"
+        )
         self.ui.lcdVoltage.display(f"{data.voltage:.{3+data.interpolation}f}")
         self.ui.lcdCurrent.display(f"{data.current:.{3+data.interpolation}f}")
         self.ui.lcdResistence.display(r_text)
@@ -676,15 +697,18 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def _get_data(self, text):
         if text == self.tr("电压"):
-            return self.data.voltages[self.data.update_count :]
+            data = self.data.voltages[self.data.update_count :]
         elif text == self.tr("电流"):
-            return self.data.currents[self.data.update_count :]
+            data = self.data.currents[self.data.update_count :]
         elif text == self.tr("功率"):
-            return self.data.powers[self.data.update_count :]
+            data = self.data.powers[self.data.update_count :]
         elif text == self.tr("阻值"):
-            return self.data.resistances[self.data.update_count :]
+            data = self.data.resistances[self.data.update_count :]
         elif text == self.tr("无"):
-            return None
+            return None, None, None, None
+        if data.size == 0:
+            return None, None, None, None
+        return data, np.max(data), np.min(data), np.mean(data)
 
     def float_str(self, value, limit=1e5):
         if value > limit:
@@ -692,39 +716,37 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         else:
             return f"{value:.3f}"
 
+    _typename_dict = None
+
     def draw_graph(self):
-        _typename_dict = {
-            self.tr("电压"): "V",
-            self.tr("电流"): "I",
-            self.tr("功率"): "P",
-            self.tr("阻值"): "R",
-        }
+        if self._typename_dict is None:
+            self._typename_dict = {
+                self.tr("电压"): "V",
+                self.tr("电流"): "I",
+                self.tr("功率"): "P",
+                self.tr("阻值"): "R",
+            }
         self.update_progressbar()
         self.ui.labelFps.setText(f"{self.fps_counter.fps:.1f}Hz")
         if self.graph_keep_flag:
             return
         type1 = self.ui.comboGraph1Data.currentText()
         type2 = self.ui.comboGraph2Data.currentText()
-        data1 = self._get_data(type1)
-        data2 = self._get_data(type2)
-        time = self.data.times[self.data.update_count :]
+        with self.data.sync_lock:
+            data1, max1, min1, avg1 = self._get_data(type1)
+            data2, max2, min2, avg2 = self._get_data(type2)
+            time = self.data.times[self.data.update_count :]
         text1 = None
         text2 = None
         if data1 is not None and data1.size > 0:
             self.curve1.setData(x=time, y=data1)
-            avg1 = np.mean(data1)
-            max1 = np.max(data1)
-            min1 = np.min(data1)
             pp1 = max1 - min1
-            _ = _typename_dict[type1]
+            _ = self._typename_dict[type1]
             text1 = f"{_}avg: {self.float_str(avg1)}  {_}max: {self.float_str(max1)}  {_}min: {self.float_str(min1)}  {_}pp: {self.float_str(pp1)}"
         if data2 is not None and data2.size > 0:
             self.curve2.setData(x=time, y=data2)
-            avg2 = np.mean(data2)
-            max2 = np.max(data2)
-            min2 = np.min(data2)
             pp2 = max2 - min2
-            _ = _typename_dict[type2]
+            _ = self._typename_dict[type2]
             text2 = f"{_}avg: {self.float_str(avg2)}  {_}max: {self.float_str(max2)}  {_}min: {self.float_str(min2)}  {_}pp: {self.float_str(pp2)}"
         if text1 and text2:
             text = text1 + "  |  " + text2
@@ -737,17 +759,13 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.labelGraphInfo.setText(text)
         if time.size != 0 and self._graph_auto_scale_flag:
             if data1 is not None:
-                max1 = np.max(data1)
-                min1 = np.min(data1)
                 if max1 != np.inf and min1 != -np.inf:
-                    add1 = max(0.02, (max1 - min1) * 0.05)
+                    add1 = max(0.01, (max1 - min1) * 0.05)
                     self.ui.widgetGraph1.setYRange(min1 - add1, max1 + add1)
                     self.ui.widgetGraph1.setXRange(time[0], time[-1])
             if data2 is not None:
-                max2 = np.max(data2)
-                min2 = np.min(data2)
                 if max2 != np.inf and min2 != -np.inf:
-                    add2 = max(0.02, (max2 - min2) * 0.05)
+                    add2 = max(0.01, (max2 - min2) * 0.05)
                     self.ui.widgetGraph2.setYRange(min2 - add2, max2 + add2)
                     self.ui.widgetGraph2.setXRange(time[0], time[-1])
 
@@ -1261,18 +1279,18 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def on_btnSeqVoltage_clicked(self):
         row = self.ui.listSeq.currentRow()
         voltage, ok = QtWidgets.QInputDialog.getDouble(
-            self, self.tr("输入电压"), self.tr("请输入电压值 (V)"), 1, 0, 30, 2
+            self, self.tr("输入电压"), self.tr("请输入电压值 (V)"), 1, 0, 30, 3
         )
         if not ok:
             return
-        self.ui.listSeq.insertItem(row + 1, f"SET-V {voltage:.2f} V")
+        self.ui.listSeq.insertItem(row + 1, f"SET-V {voltage:.3f} V")
         self.ui.listSeq.setCurrentRow(row + 1)
 
     @QtCore.pyqtSlot()
     def on_btnSeqCurrent_clicked(self):
         row = self.ui.listSeq.currentRow()
         current, ok = QtWidgets.QInputDialog.getDouble(
-            self, self.tr("输入电流"), self.tr("请输入电流值 (A)"), 1, 0, 5, 3
+            self, self.tr("输入电流"), self.tr("请输入电流值 (A)"), 1, 0, 10, 3
         )
         if not ok:
             return
@@ -1450,7 +1468,13 @@ class MDPSettings(QtWidgets.QDialog):
         self.ui.lineEditColorIndicator.setStyleSheet(
             f"background-color: {setting.color}"
         )
+        if self.isVisible():
+            self.close()
         return super().show()
+
+    def showEvent(self, a0: QtGui.QShowEvent) -> None:
+        center_window(self)
+        return super().showEvent(a0)
 
     @QtCore.pyqtSlot()
     def on_lineEditColor_editingFinished(self):
@@ -1524,7 +1548,13 @@ class MDPGraphics(QtWidgets.QDialog):
 
     def show(self) -> None:
         self.initValues()
-        return super().show()
+        if self.isVisible():
+            self.close()
+        super().show()
+
+    def showEvent(self, a0: QtGui.QShowEvent) -> None:
+        center_window(self)
+        return super().showEvent(a0)
 
     @QtCore.pyqtSlot(int)
     def on_comboTheme_currentIndexChanged(self, index):

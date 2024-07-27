@@ -5,6 +5,7 @@ from typing import Callable, List, Literal, Optional, Tuple
 
 from loguru import logger
 
+import mdp_controller
 import mdp_controller.mdp_protocal as mdp_protocal
 from mdp_controller.nrf24_adapter import (
     NRF24Adapter,
@@ -15,7 +16,7 @@ from mdp_controller.nrf24_adapter import (
 try:
     import richuru
 
-    richuru.install()
+    richuru.install(tracebacks_suppress=[mdp_controller])
 except ImportError:
     pass
 
@@ -412,12 +413,12 @@ class MDP_P906:
             If failed to connect to the MDP-P906
         """
         assert self._idcode is not None, "Please pair first"
-        for i in range(retry_times):
+        for i in range(retry_times + 1):
             try:
                 self.update_gain_offset()
                 self.get_status()
             except (NRF24AdapterError, TimeoutError, AssertionError) as e:
-                if i == 3:
+                if i == retry_times:
                     raise Exception("Failed to connect to MDP-P906") from e
                 logger.error(f"Connect failed, retry - {i+1}/{retry_times}")
                 time.sleep(0.1)

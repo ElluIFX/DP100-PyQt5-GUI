@@ -97,10 +97,6 @@
 
 > 界面字体用了更纱黑体，记得去[微软商店](https://www.microsoft.com/store/productId/9MW0M424NCZ7?ocid=pdpshare)装一个
 
-## TODO
-
-~~移植我的[DP100-PyQt5-GUI](https://github.com/ElluIFX/DP100-PyQt5-GUI)项目到这里，实现一个完整的上位机~~
-
 ## 参考
 
 [leommxj/mdp_commander](https://github.com/leommxj/mdp_commander) 中的协议实现
