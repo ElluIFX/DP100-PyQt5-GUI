@@ -621,7 +621,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.draw_graph_timer.start(int(1000 / self.graph_fps))
         self.fps_counter.clear()
 
-    def _set_graph_max_fps(self, fps):
+    def _set_graph_max_fps(self, _):
         self._set_data_fps(self.ui.comboDataFps.currentText())
 
     def _set_state_fps(self, fps):
@@ -629,12 +629,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.state_lcd_timer.stop()
             self.state_lcd_timer.start(int(1000 / fps))
 
-    def _set_data_length(self, _):
-        save = self.data.save_datas_flag
-        self.data = RealtimeData(setting.data_pts, setting.interp, setting.avgmode)
-        self.curve1.setData(x=[], y=[])
-        self.curve2.setData(x=[], y=[])
-        self.data.save_datas_flag = save
+    def _set_data_length(self, length) -> None:
+        self.data.data_length = length
+        self.on_btnGraphClear_clicked()
 
     @QtCore.pyqtSlot()
     def on_btnRecordClear_clicked(self):
@@ -785,11 +782,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def on_btnGraphClear_clicked(self):
         with self.data.sync_lock:
             self.data.save_datas_flag = False
-            self.data.voltages = np.zeros_like(self.data.voltages)
-            self.data.currents = np.zeros_like(self.data.currents)
-            self.data.powers = np.zeros_like(self.data.powers)
-            self.data.resistances = np.zeros_like(self.data.resistances)
-            self.data.times = np.zeros_like(self.data.times)
+            self.data.voltages = np.zeros(self.data.data_length, np.float64)
+            self.data.currents = np.zeros(self.data.data_length, np.float64)
+            self.data.powers = np.zeros(self.data.data_length, np.float64)
+            self.data.resistances = np.zeros(self.data.data_length, np.float64)
+            self.data.times = np.zeros(self.data.data_length, np.float64)
             self.data.update_count = self.data.data_length
             t = time.perf_counter()
             self.data.start_time = t
@@ -1597,6 +1594,7 @@ class MDPGraphics(QtWidgets.QDialog):
     def on_btnClose_clicked(self):
         try:
             setting.graph_max_fps = self.ui.spinMaxFps.value()
+            setting.state_fps = self.ui.spinStateFps.value()
             setting.data_pts = self.ui.spinDataLength.value()
             setting.interp = self.ui.comboInterp.currentIndex()
             setting.avgmode = self.ui.checkBoxAvgMode.isChecked()
