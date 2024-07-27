@@ -2833,7 +2833,7 @@
               </font>
              </property>
              <property name="text">
-              <string>数据波形 / FLOW CHART</string>
+              <string>数据波形 / LINE CHART</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>

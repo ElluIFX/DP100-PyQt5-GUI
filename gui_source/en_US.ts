@@ -945,8 +945,8 @@
     </message>
     <message>
         <location filename="mdp_gui_template/mainwindow_ui.py" line="1465"/>
-        <source>数据波形 / FLOW CHART</source>
-        <translation>FLOW CHART</translation>
+        <source>数据波形 / LINE CHART</source>
+        <translation>LINE CHART</translation>
     </message>
     <message>
         <location filename="mdp_gui_template/mainwindow_ui.py" line="1466"/>
