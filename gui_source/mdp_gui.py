@@ -81,13 +81,11 @@ class FmtAxisItem(pg.AxisItem):
 
 
 class RealtimeData:
-    def __init__(self, data_length, interp, avg_mode) -> None:
+    def __init__(self, data_length) -> None:
         self.start_time = time.perf_counter()
         self.eng_start_time = time.perf_counter()
         self.last_time = 0
         self.save_datas_flag = False
-        self.avg_mode = avg_mode
-        self.interpolation = interp
         self.voltage_tmp = []
         self.current_tmp = []
         self.energy = 0
@@ -238,6 +236,11 @@ class Setting:
         self.avgmode = 1
         self.opengl = False
 
+        self.v_offset = 0.0
+        self.i_offset = 0.0
+        self.v_threshold = 0.002
+        self.i_threshold = 0.002
+
     def save(self, filename):
         with open(filename, "w") as f:
             json.dump(self.__dict__, f, indent=4, ensure_ascii=False)
@@ -258,7 +261,7 @@ pg.setConfigOption("useOpenGL", setting.opengl)
 
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
-    data = RealtimeData(setting.data_pts, setting.interp, setting.avgmode)
+    data = RealtimeData(setting.data_pts)
     data_fps = 50
     graph_keep_flag = False
     graph_record_flag = False
@@ -508,6 +511,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         ]:
             set_color(widget, None)
             widget.setText("[N/A]")
+        self.curve1.setData(x=[], y=[])
+        self.curve2.setData(x=[], y=[])
+        self.ui.labelGraphInfo.setText("No Info")
 
     def open_state_ui(self):
         self.ui.labelConnectState.setText(self.tr("已连接"))
@@ -575,7 +581,17 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.api.request_realtime_value()
 
     def state_callback(self, rtvalues: List[Tuple[float, float]]):
+        vo, io, vt, it = (
+            setting.v_offset,
+            setting.i_offset,
+            setting.v_threshold,
+            setting.i_threshold,
+        )
         len_ = len(rtvalues)
+        rtvalues = [
+            (v + vo if v + vo > vt else 0.0, i + io if i + io > it else 0.0)
+            for v, i in rtvalues
+        ]
         t1 = time.perf_counter()
         data = self.data
         if self.graph_record_flag:
@@ -595,12 +611,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 data.voltage_tmp.append(v)
                 data.current_tmp.append(i)
             if len(rtvalues) == 9:
-                if data.avg_mode == 1:
+                if setting.avgmode == 1:
                     rtvalues = np.array(rtvalues)
                     rtvalues = np.reshape(rtvalues, [3, 3, 2])
                     rtvalues = np.mean(rtvalues, axis=(1))
                     len_ = 3
-                elif data.avg_mode == 2:
+                elif setting.avgmode == 2:
                     rtvalues = np.array(rtvalues)
                     rtvalues = np.reshape(rtvalues, [1, 9, 2])
                     rtvalues = np.mean(rtvalues, axis=(1))
@@ -617,17 +633,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 if data.update_count >= len_:
                     data.update_count -= len_
             for idx, (v, i) in enumerate(rtvalues):
-                p = v * i
-                if i != 0:
-                    r = v / i
-                else:
-                    r = self.open_r
                 data.energy += v * i * (dt / len_)
                 if data.save_datas_flag:
                     data.voltages[-len_ + idx] = v
                     data.currents[-len_ + idx] = i
-                    data.powers[-len_ + idx] = p
-                    data.resistances[-len_ + idx] = r
+                    data.powers[-len_ + idx] = v * i
+                    data.resistances[-len_ + idx] = v / i if i != 0 else self.open_r
                     data.times[-len_ + idx] = t - dt + (dt / len_) * (idx + 1)
         self.fps_counter.tick()
 
@@ -641,19 +652,23 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             data.voltage_tmp.clear()
             data.current_tmp.clear()
             self.ui.lcdAvgPower.display(
-                f"{data.energy / (data.last_time - data.eng_start_time):.{3+data.interpolation}f}"
+                f"{data.energy / (data.last_time - data.eng_start_time):.{3+setting.interp}f}"
             )
-            self.ui.lcdEnerge.display(f"{data.energy:.{3+data.interpolation}f}")
+            self.ui.lcdEnerge.display(f"{data.energy:.{3+setting.interp}f}")
         power = vavg * iavg
-        if iavg != 0:
+        if iavg >= 0.002:  # 致敬P906的愚蠢adc
             resistance = vavg / iavg
         else:
             resistance = self.open_r
-        r_text = f"{resistance:.3f}" if resistance < self.open_r / 100 else "--"
-        self.ui.lcdVoltage.display(f"{vavg:.{3+data.interpolation}f}")
-        self.ui.lcdCurrent.display(f"{iavg:.{3+data.interpolation}f}")
+        r_text = (
+            f"{resistance:.{3+setting.interp}f}"
+            if resistance < self.open_r / 100
+            else "--"
+        )
+        self.ui.lcdVoltage.display(f"{vavg:.{3+setting.interp}f}")
+        self.ui.lcdCurrent.display(f"{iavg:.{3+setting.interp}f}")
         self.ui.lcdResistence.display(r_text)
-        self.ui.lcdPower.display(f"{power:.{3+data.interpolation}f}")
+        self.ui.lcdPower.display(f"{power:.{3+setting.interp}f}")
 
         v_value = round(vavg / self.v_set * 1000) if self.v_set != 0 else 0
         i_value = round(iavg / self.i_set * 1000) if self.i_set != 0 else 0
@@ -663,16 +678,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.progressBarCurrent.update()
 
     def set_interp(self, interp):
-        self.data.interpolation = interp
         self.ui.lcdVoltage.setDigitCount(6 + interp)
         self.ui.lcdCurrent.setDigitCount(6 + interp)
         self.ui.lcdResistence.setDigitCount(6 + interp)
         self.ui.lcdPower.setDigitCount(6 + interp)
         self.ui.lcdAvgPower.setDigitCount(6 + interp)
         self.ui.lcdEnerge.setDigitCount(6 + interp)
-
-    def set_avgmode(self, avgmode):
-        self.data.avg_mode = avgmode
 
     def set_data_fps(self, text):
         if text != "":
@@ -771,11 +782,25 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             data = self.data.powers[self.data.update_count :]
         elif text == self.tr("阻值"):
             data = self.data.resistances[self.data.update_count :]
+            time = self.data.times[self.data.update_count :]
+            # find indexs that != self.open_r
+            indexs = np.where(data != self.open_r)[0]
+            data = data[indexs]
+            if data.size == 0:
+                return None, None, None, None, None
+            time = time[indexs]
+            return data, np.max(data), np.min(data), np.mean(data), time
         elif text == self.tr("无"):
-            return None, None, None, None
+            return None, None, None, None, None
         if data.size == 0:
-            return None, None, None, None
-        return data, np.max(data), np.min(data), np.mean(data)
+            return None, None, None, None, None
+        return (
+            data,
+            np.max(data),
+            np.min(data),
+            np.mean(data),
+            self.data.times[self.data.update_count :],
+        )
 
     def float_str(self, value, limit=1e5):
         if value > limit:
@@ -799,21 +824,26 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         type1 = self.ui.comboGraph1Data.currentText()
         type2 = self.ui.comboGraph2Data.currentText()
         with self.data.sync_lock:
-            data1, max1, min1, avg1 = self._get_data(type1)
-            data2, max2, min2, avg2 = self._get_data(type2)
-            timearr = self.data.times[self.data.update_count :]
+            data1, max1, min1, avg1, time1 = self._get_data(type1)
+            data2, max2, min2, avg2, time2 = self._get_data(type2)
         text1 = None
         text2 = None
+        _ = self._typename_dict[type1]
         if data1 is not None and data1.size > 0:
-            self.curve1.setData(x=timearr, y=data1)
+            self.curve1.setData(x=time1, y=data1)
             pp1 = max1 - min1
-            _ = self._typename_dict[type1]
             text1 = f"{_}avg: {self.float_str(avg1)}  {_}max: {self.float_str(max1)}  {_}min: {self.float_str(min1)}  {_}pp: {self.float_str(pp1)}"
+        else:
+            self.curve1.setData(x=[], y=[])
+            text1 = f"{_}avg: N/A  {_}max: N/A  {_}min: N/A  {_}pp: N/A"
+        _ = self._typename_dict[type2]
         if data2 is not None and data2.size > 0:
-            self.curve2.setData(x=timearr, y=data2)
+            self.curve2.setData(x=time2, y=data2)
             pp2 = max2 - min2
-            _ = self._typename_dict[type2]
             text2 = f"{_}avg: {self.float_str(avg2)}  {_}max: {self.float_str(max2)}  {_}min: {self.float_str(min2)}  {_}pp: {self.float_str(pp2)}"
+        else:
+            self.curve1.setData(x=[], y=[])
+            text2 = f"{_}avg: N/A  {_}max: N/A  {_}min: N/A  {_}pp: N/A"
         if text1 and text2:
             text = text1 + "  |  " + text2
         elif text1:
@@ -823,17 +853,17 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         else:
             text = "No Info"
         self.ui.labelGraphInfo.setText(text)
-        if timearr.size != 0 and self._graph_auto_scale_flag:
-            if data1 is not None:
+        if self._graph_auto_scale_flag:
+            if data1 is not None and time1.size != 0:
                 if max1 != np.inf and min1 != -np.inf:
                     add1 = max(0.01, (max1 - min1) * 0.05)
                     self.ui.widgetGraph1.setYRange(min1 - add1, max1 + add1)
-                    self.ui.widgetGraph1.setXRange(timearr[0], timearr[-1])
-            if data2 is not None:
+                    self.ui.widgetGraph1.setXRange(time1[0], time1[-1])
+            if data2 is not None and time2.size != 0:
                 if max2 != np.inf and min2 != -np.inf:
                     add2 = max(0.01, (max2 - min2) * 0.05)
                     self.ui.widgetGraph2.setYRange(min2 - add2, max2 + add2)
-                    self.ui.widgetGraph2.setXRange(timearr[0], timearr[-1])
+                    self.ui.widgetGraph2.setXRange(time2[0], time2[-1])
 
     def set_graph1_data(self, text):
         if text == self.tr("无"):
@@ -1595,7 +1625,6 @@ class MDPGraphics(QtWidgets.QDialog):
     state_fps_sig = QtCore.pyqtSignal(float)
     set_data_len_sig = QtCore.pyqtSignal(int)
     set_interp_sig = QtCore.pyqtSignal(int)
-    set_avgmode_sig = QtCore.pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -1605,6 +1634,11 @@ class MDPGraphics(QtWidgets.QDialog):
             self.ui.checkBoxOpenGL.setEnabled(False)
         self.ui.checkBoxOpenGL.clicked.connect(self.set_opengl)
 
+    def set_labelCali(self):
+        self.ui.labelCali.setText(
+            self.tr("校准: ") + f"{setting.v_offset:+.5f}V {setting.i_offset:+.5f}A"
+        )
+
     def initValues(self):
         self.ui.spinMaxFps.setValue(setting.graph_max_fps)
         self.ui.spinStateFps.setValue(setting.state_fps)
@@ -1612,6 +1646,9 @@ class MDPGraphics(QtWidgets.QDialog):
         self.ui.comboInterp.setCurrentIndex(setting.interp)
         self.ui.comboAvgMode.setCurrentIndex(setting.avgmode)
         self.ui.checkBoxOpenGL.setChecked(setting.opengl)
+        self.ui.spinStateVThres.setValue(setting.v_threshold)
+        self.ui.spinStateIThres.setValue(setting.i_threshold)
+        self.set_labelCali()
 
     def show(self) -> None:
         self.initValues()
@@ -1660,7 +1697,41 @@ class MDPGraphics(QtWidgets.QDialog):
     @QtCore.pyqtSlot(int)
     def on_comboAvgMode_currentIndexChanged(self, index):
         setting.avgmode = self.ui.comboAvgMode.currentIndex()
-        self.set_avgmode_sig.emit(index)
+
+    @QtCore.pyqtSlot()
+    def on_btnTear_clicked(self):
+        api = MainWindow.api
+        if api is None:
+            QtWidgets.QMessageBox.warning(
+                self,
+                self.tr("警告"),
+                self.tr("请先连接设备"),
+            )
+            return
+        try:
+            valus = api.get_realtime_value()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, self.tr("校准失败"), str(e))
+            return
+        vavg = sum([d[0] for d in valus]) / len(valus)
+        iavg = sum([d[1] for d in valus]) / len(valus)
+        setting.v_offset = -vavg
+        setting.i_offset = -iavg
+        self.set_labelCali()
+
+    @QtCore.pyqtSlot()
+    def on_btnResetTear_clicked(self):
+        setting.v_offset = 0
+        setting.i_offset = 0
+        self.set_labelCali()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinStateVThres_valueChanged(self, _=None):
+        setting.v_threshold = self.ui.spinStateVThres.value()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinStateIThres_valueChanged(self, _=None):
+        setting.i_threshold = self.ui.spinStateIThres.value()
 
     @QtCore.pyqtSlot()
     def on_btnClose_clicked(self):
@@ -1671,10 +1742,11 @@ class MDPGraphics(QtWidgets.QDialog):
             setting.interp = self.ui.comboInterp.currentIndex()
             setting.avgmode = self.ui.comboAvgMode.currentIndex()
             setting.opengl = self.ui.checkBoxOpenGL.isChecked()
+            setting.v_threshold = self.ui.spinStateVThres.value()
+            setting.i_threshold = self.ui.spinStateIThres.value()
             setting.save(SETTING_FILE)
         except Exception as e:
             logger.error(e)
-            pass
         self.close()
 
 
@@ -1686,7 +1758,6 @@ DialogGraphics.set_max_fps_sig.connect(MainWindow.set_graph_max_fps)
 DialogGraphics.state_fps_sig.connect(MainWindow.set_state_fps)
 DialogGraphics.set_data_len_sig.connect(MainWindow.set_data_length)
 DialogGraphics.set_interp_sig.connect(MainWindow.set_interp)
-DialogGraphics.set_avgmode_sig.connect(MainWindow.set_avgmode)
 app.setWindowIcon(QtGui.QIcon(ICON_PATH))
 
 qdarktheme.setup_theme()
