@@ -11,8 +11,13 @@ from typing import List, Optional, Tuple
 
 from loguru import logger
 
-os.environ["PYQTGRAPH_QT_LIB"] = "PyQt5"
+import mdp_controller
+import richuru
+from mdp_controller import MDP_P906
 
+richuru.install(tracebacks_suppress=[mdp_controller])
+
+os.environ["PYQTGRAPH_QT_LIB"] = "PyQt5"
 
 # ignore opengl runtime warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -48,7 +53,6 @@ import qdarktheme
 from serial.tools.list_ports import comports
 from simple_pid import PID
 
-from mdp_controller import MDP_P906
 from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
 
 ARG_PATH = os.path.dirname(sys.argv[0])
@@ -57,6 +61,9 @@ SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
+
+if os.environ.get("MDP_ENABLE_LOG") is not None:
+    logger.add(os.path.join(ARG_PATH, "mdp.log"))
 
 # get system language
 system_lang = QtCore.QLocale.system().name()
@@ -122,14 +129,6 @@ class RecordData:
             header="time,voltage,current",
             comments="",
         )
-
-
-def set_color(widget: QtWidgets.QWidget, rgb):
-    if rgb is None:
-        widget.setStyleSheet("")
-        return
-    color = f"rgb({rgb[0]},{rgb[1]},{rgb[2]})" if isinstance(rgb, tuple) else rgb
-    widget.setStyleSheet(f"color: {color}")
 
 
 class FPSCounter(object):
@@ -206,6 +205,21 @@ def center_window(instance: QtWidgets.QWidget) -> None:
     instance.move(center_x, center_y)
 
 
+def float_str(value, limit=1e5):
+    if value > limit:
+        return f"{value:.1e}"
+    else:
+        return f"{value:.3f}"
+
+
+def set_color(widget: QtWidgets.QWidget, rgb):
+    if rgb is None:
+        widget.setStyleSheet("")
+        return
+    color = f"rgb({rgb[0]},{rgb[1]},{rgb[2]})" if isinstance(rgb, tuple) else rgb
+    widget.setStyleSheet(f"color: {color}")
+
+
 class Setting:
     def __init__(self) -> None:
         self.presets = {
@@ -267,7 +281,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     graph_record_flag = False
     output_state = False
     locked = False
-    using_preset = False
     _v_set = 0
     _i_set = 0
     open_r = 1e7
@@ -288,8 +301,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.initGraph()
         self.initTimer()
         self.set_interp(setting.interp)
+        self.refresh_preset()
         self.get_preset("1")
-        self._refresh_preset()
         self.close_state_ui()
         self.ui.progressBarVoltage.setMaximum(1000)
         self.ui.progressBarCurrent.setMaximum(1000)
@@ -350,10 +363,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxCurrent.valueChanged.connect(self.current_changed)
         self.ui.comboWaveGenType.currentTextChanged.connect(self.set_wavegen_type)
         self.ui.spinBoxVoltage.lineEdit().cursorPositionChanged.connect(
-            lambda *args: self._set_step(self.ui.spinBoxVoltage, *args)
+            lambda *args: self.set_step(self.ui.spinBoxVoltage, *args)
         )
         self.ui.spinBoxCurrent.lineEdit().cursorPositionChanged.connect(
-            lambda *args: self._set_step(self.ui.spinBoxCurrent, *args)
+            lambda *args: self.set_step(self.ui.spinBoxCurrent, *args)
         )
 
     def startMyTimer(self):
@@ -363,9 +376,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.data.last_time = t
         self.data.energy = 0
         self.update_state_timer.start(100)
-        self.state_request_sender_timer.start(1000 // self.data_fps)
-        self.draw_graph_timer.start(1000 // min(self.data_fps, setting.graph_max_fps))
-        self.state_lcd_timer.start(1000 // min(self.data_fps, setting.state_fps))
+        self.state_request_sender_timer.start(round(1000 / self.data_fps))
+        self.draw_graph_timer.start(
+            round(1000 / min(self.data_fps, setting.graph_max_fps))
+        )
+        self.state_lcd_timer.start(round(1000 / min(self.data_fps, setting.state_fps)))
 
     def stopMyTimer(self):
         self.state_request_sender_timer.stop()
@@ -391,7 +406,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         -3: 0.1,
     }
 
-    def _set_step(self, spin: QtWidgets.QDoubleSpinBox, f, t):
+    def set_step(self, spin: QtWidgets.QDoubleSpinBox, f, t):
         if spin.lineEdit().hasSelectedText():
             return
         text = spin.lineEdit().text()
@@ -400,7 +415,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if tt == 0:
             t -= 1
         if text[t] == ".":
-            t -= 1
+            if f < t:
+                t += 1
+            else:
+                t -= 1
         if t <= 0:
             t = 0
         if spin.value() >= 10 and t == 0:
@@ -418,9 +436,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def v_set(self, value):
         if self.api is None or self.locked:
             return
-        if self.using_preset:
-            self.using_preset = False
-            self.ui.comboPreset.setCurrentText("None")
         self.api.set_voltage(value)
         self._v_set = value
         self.ui.spinBoxVoltage.setValue(value)
@@ -434,9 +449,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def i_set(self, value):
         if self.api is None or self.locked:
             return
-        if self.using_preset:
-            self.using_preset = False
-            self.ui.comboPreset.setCurrentText("None")
         self.api.set_current(value)
         self._i_set = value
         self.ui.spinBoxCurrent.setValue(value)
@@ -445,6 +457,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def update_state(self):
         if self.api is None:
             return
+        self.ui.labelComSpeed.setText(f"{self.api._adp.speed_counter.KBps:.1f}kBps")
+        errrate = self.api._adp.speed_counter.error_rate * 100
+        self.ui.labelErrRate.setText(f"CON-ERR {errrate:.0f}%")
+        clr = "red" if errrate > 50 else ("yellow" if errrate > 10 else None)
+        set_color(self.ui.labelErrRate, clr)
+        set_color(self.ui.labelComSpeed, clr)
         (
             State,
             Locked,
@@ -477,7 +495,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.labelLockState.setText("[LOCKED]" if Locked else "UNLOCKED")
         set_color(self.ui.labelLockState, "orangered" if Locked else None)
         self.ui.labelInputVals.setText(f"{InputVoltage:.2f}V {InputCurrent:.2f}A")
-        self.ui.labelTemperature.setText(f"{Temperature:.1f}℃")
+        self.ui.labelTemperature.setText(f"TEMP {Temperature:.1f}℃")
         self.ui.labelError.setText(
             f"ERROR-{ErrFlag:02X}" if ErrFlag != 0 else "NO ERROR"
         )
@@ -508,6 +526,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.labelInputVals,
             self.ui.labelTemperature,
             self.ui.labelError,
+            self.ui.labelComSpeed,
+            self.ui.labelErrRate,
         ]:
             set_color(widget, None)
             widget.setText("[N/A]")
@@ -690,16 +710,16 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.data_fps = int(text.replace("Hz", ""))
         if self.state_request_sender_timer.isActive():
             self.state_request_sender_timer.stop()
-            self.state_request_sender_timer.start(int(1000 / self.data_fps))
+            self.state_request_sender_timer.start(round(1000 / self.data_fps))
         if self.draw_graph_timer.isActive():
             self.draw_graph_timer.stop()
             self.draw_graph_timer.start(
-                int(1000 / min(self.data_fps, setting.graph_max_fps))
+                round(1000 / min(self.data_fps, setting.graph_max_fps))
             )
         if self.state_lcd_timer.isActive():
             self.state_lcd_timer.stop()
             self.state_lcd_timer.start(
-                int(1000 / min(self.data_fps, setting.state_fps))
+                round(1000 / min(self.data_fps, setting.state_fps))
             )
         self.fps_counter.clear()
 
@@ -773,7 +793,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.set_graph1_data(self.tr("电压"))
         self.set_graph2_data(self.tr("电流"))
 
-    def _get_data(self, text):
+    def get_data(self, text):
         if text == self.tr("电压"):
             data = self.data.voltages[self.data.update_count :]
         elif text == self.tr("电流"):
@@ -802,12 +822,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.data.times[self.data.update_count :],
         )
 
-    def float_str(self, value, limit=1e5):
-        if value > limit:
-            return f"{value:.1e}"
-        else:
-            return f"{value:.3f}"
-
     _typename_dict = None
 
     def draw_graph(self):
@@ -824,31 +838,27 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         type1 = self.ui.comboGraph1Data.currentText()
         type2 = self.ui.comboGraph2Data.currentText()
         with self.data.sync_lock:
-            data1, max1, min1, avg1, time1 = self._get_data(type1)
-            data2, max2, min2, avg2, time2 = self._get_data(type2)
-        text1 = None
-        text2 = None
-        _ = self._typename_dict[type1]
+            data1, max1, min1, avg1, time1 = self.get_data(type1)
+            data2, max2, min2, avg2, time2 = self.get_data(type2)
+        _ = self._typename_dict.get(type1)
         if data1 is not None and data1.size > 0:
             self.curve1.setData(x=time1, y=data1)
-            pp1 = max1 - min1
-            text1 = f"{_}avg: {self.float_str(avg1)}  {_}max: {self.float_str(max1)}  {_}min: {self.float_str(min1)}  {_}pp: {self.float_str(pp1)}"
+            text1 = f"{_}avg: {float_str(avg1)}  {_}max: {float_str(max1)}  {_}min: {float_str(min1)}  {_}pp: {float_str(max1 - min1)}"
         else:
             self.curve1.setData(x=[], y=[])
             text1 = f"{_}avg: N/A  {_}max: N/A  {_}min: N/A  {_}pp: N/A"
-        _ = self._typename_dict[type2]
+        _ = self._typename_dict.get(type2)
         if data2 is not None and data2.size > 0:
             self.curve2.setData(x=time2, y=data2)
-            pp2 = max2 - min2
-            text2 = f"{_}avg: {self.float_str(avg2)}  {_}max: {self.float_str(max2)}  {_}min: {self.float_str(min2)}  {_}pp: {self.float_str(pp2)}"
+            text2 = f"{_}avg: {float_str(avg2)}  {_}max: {float_str(max2)}  {_}min: {float_str(min2)}  {_}pp: {float_str(max2 - min2)}"
         else:
             self.curve1.setData(x=[], y=[])
             text2 = f"{_}avg: N/A  {_}max: N/A  {_}min: N/A  {_}pp: N/A"
-        if text1 and text2:
+        if data1 is not None and data2 is not None:
             text = text1 + "  |  " + text2
-        elif text1:
+        elif data1 is not None:
             text = text1
-        elif text2:
+        elif data2 is not None:
             text = text2
         else:
             text = "No Info"
@@ -950,25 +960,26 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def set_preset(self, _):
         text = self.ui.comboPreset.currentText()
-        if text == "None" or not text:
+        if not text or not text[1].isdigit():
             return
-        voltage, current = setting.presets[text[0]]
+        voltage, current = setting.presets[text[1]]
         self.v_set = voltage
         self.i_set = current
-        self.using_preset = True
+        self.ui.comboPreset.setCurrentIndex(0)
 
-    def _refresh_preset(self):
+    def refresh_preset(self):
         idx = self.ui.comboPreset.currentIndex()
         self.ui.comboPreset.clear()
-        self.ui.comboPreset.addItem("None")
+        self.ui.comboPreset.addItem("[>] " + self.tr("选择预设"))
         self.ui.comboPreset.addItems(
-            [f"{k} {v[0]:.1f}V {v[1]:.1f}A" for k, v in setting.presets.items()]
+            [f"[{k}] {v[0]:06.3f}V {v[1]:06.3f}A" for k, v in setting.presets.items()]
         )
         self.ui.comboPreset.setCurrentIndex(idx)
+        self.ui.comboPreset.setItemData(0, 0, QtCore.Qt.UserRole - 1)
         idx = self.ui.comboPresetEdit.currentIndex()
         self.ui.comboPresetEdit.clear()
         self.ui.comboPresetEdit.addItems(
-            [f"{k} {v[0]:.1f}V {v[1]:.1f}A" for k, v in setting.presets.items()]
+            [f"Preset-{k}" for k, v in setting.presets.items()]
         )
         self.ui.comboPresetEdit.setCurrentIndex(idx)
 
@@ -977,14 +988,14 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         preset = self.ui.comboPresetEdit.currentText()
         if not preset:
             return
-        preset = preset[0]
+        preset = preset.split("-")[1]
         v_set = self.ui.spinBoxPresetVoltage.value()
         i_set = self.ui.spinBoxPresetCurrent.value()
         try:
             setting.presets[preset] = [v_set, i_set]
             setting.save(SETTING_FILE)
             self.ui.btnPresetSave.setText(self.tr("保存成功"))
-            self._refresh_preset()
+            self.refresh_preset()
         except Exception:
             logger.exception(self.tr("保存预设失败"))
             self.ui.btnPresetSave.setText(self.tr("保存失败"))
@@ -993,9 +1004,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         )
 
     def get_preset(self, text):
-        if not text:
+        if "-" not in text:
             return
-        voltage, current = setting.presets[text[0]]
+        voltage, current = setting.presets[text.split("-")[1]]
         self.ui.spinBoxPresetVoltage.setValue(voltage)
         self.ui.spinBoxPresetCurrent.setValue(current)
 
@@ -1022,7 +1033,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 )
                 return
             self._sweep_temp = None
-            self.func_sweep_timer.start(int(self._sweep_delay * 1000))
+            self.func_sweep_timer.start(round(self._sweep_delay * 1000))
             self.ui.btnSweep.setText(self.tr("功能已开启"))
             if self._sweep_target == self.tr("电压"):
                 self.ui.spinBoxVoltage.setEnabled(False)
@@ -1087,7 +1098,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 )
                 return
             self._wavegen_start_time = time.perf_counter()
-            self.func_wave_gen_timer.start(int(1000 / self._wavegen_loopfreq))
+            self.func_wave_gen_timer.start(round(1000 / self._wavegen_loopfreq))
             self.ui.btnWaveGen.setText(self.tr("功能已开启"))
             self.ui.spinBoxWaveGenLoopFreq.setEnabled(False)
             self.ui.spinBoxVoltage.setEnabled(False)
@@ -1180,7 +1191,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             )
             self._keep_power_pid.output_limits = (0, self._keep_power_pid_max_v)
             self._keep_power_pid.set_auto_mode(True, last_output=self.v_set)
-            self.func_keep_power_timer.start(int(1000 / self._keep_power_loopfreq))
+            self.func_keep_power_timer.start(round(1000 / self._keep_power_loopfreq))
             self.ui.btnKeepPower.setText(self.tr("功能已开启"))
             self.ui.spinBoxVoltage.setEnabled(False)
             self.ui.spinBoxKeepPowerLoopFreq.setEnabled(False)
@@ -1463,9 +1474,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     @QtCore.pyqtSlot()
     def on_btnSeqLoad_clicked(self):
         # 从文件加载
+
         filename, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, self.tr("打开"), "", self.tr("文本文件 (*.txt)")
         )
+
         if filename == "" or filename is None:
             return
         with open(filename, "r", encoding="utf-8") as f:
@@ -1493,6 +1506,7 @@ MainWindow = MDPMainwindow()
 class MDPSettings(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+
         self.ui = Ui_DialogSettings()
         self.ui.setupUi(self)
 
@@ -1547,6 +1561,7 @@ class MDPSettings(QtWidgets.QDialog):
                 led_color=(color_rgb[0], color_rgb[1], color_rgb[2]),
                 m01_channel=int(setting.m01ch[3]),
                 tx_output_power=setting.txpower,
+                debug=os.environ.get("MDP_DEBUG_LOG") is not None,
             )
             idcode = api.auto_match()
         except Exception as e:
@@ -1632,6 +1647,7 @@ class MDPGraphics(QtWidgets.QDialog):
         self.ui.setupUi(self)
         if not OPENGL_AVAILABLE:
             self.ui.checkBoxOpenGL.setEnabled(False)
+            self.ui.checkBoxOpenGL.setCheckState(False)
         self.ui.checkBoxOpenGL.clicked.connect(self.set_opengl)
 
     def set_labelCali(self):
@@ -1645,7 +1661,8 @@ class MDPGraphics(QtWidgets.QDialog):
         self.ui.spinDataLength.setValue(setting.data_pts)
         self.ui.comboInterp.setCurrentIndex(setting.interp)
         self.ui.comboAvgMode.setCurrentIndex(setting.avgmode)
-        self.ui.checkBoxOpenGL.setChecked(setting.opengl)
+        if OPENGL_AVAILABLE:
+            self.ui.checkBoxOpenGL.setChecked(setting.opengl)
         self.ui.spinStateVThres.setValue(setting.v_threshold)
         self.ui.spinStateIThres.setValue(setting.i_threshold)
         self.set_labelCali()
@@ -1671,6 +1688,7 @@ class MDPGraphics(QtWidgets.QDialog):
         MainWindow.CustomTitleBar.set_theme(theme)
 
     def set_opengl(self, enable):
+        setting.opengl = enable
         pg.setConfigOption("useOpenGL", enable)
         logger.info(f"OpenGL {'enabled' if enable else 'disabled'}")
 
@@ -1765,6 +1783,7 @@ qdarktheme.setup_theme()
 
 def show_app():
     MainWindow.show()
+    MainWindow.activateWindow()  # bring window to front
     sys.exit(app.exec_())
 
 

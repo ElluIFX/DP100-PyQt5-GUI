@@ -999,7 +999,7 @@
                 </attribute>
                 <layout class="QVBoxLayout" name="verticalLayout_21">
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_32" stretch="1,2">
+                  <layout class="QHBoxLayout" name="horizontalLayout_32" stretch="2">
                    <property name="leftMargin">
                     <number>10</number>
                    </property>
@@ -1007,35 +1007,13 @@
                     <number>10</number>
                    </property>
                    <item>
-                    <widget class="QLabel" name="label_33">
-                     <property name="minimumSize">
+                    <widget class="QComboBox" name="comboPreset">
+                     <property name="maximumSize">
                       <size>
-                       <width>0</width>
-                       <height>24</height>
+                       <width>140</width>
+                       <height>16777215</height>
                       </size>
                      </property>
-                     <property name="font">
-                      <font>
-                       <family>等距更纱黑体 SC Semibold</family>
-                       <pointsize>9</pointsize>
-                      </font>
-                     </property>
-                     <property name="acceptDrops">
-                      <bool>false</bool>
-                     </property>
-                     <property name="text">
-                      <string>当前预设</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                     <property name="margin">
-                      <number>6</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QComboBox" name="comboPreset">
                      <property name="font">
                       <font>
                        <family>等距更纱黑体 SC Semibold</family>
@@ -1167,9 +1145,17 @@
                        </item>
                        <item>
                         <widget class="QComboBox" name="comboPresetEdit">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
                          <property name="font">
                           <font>
                            <family>等距更纱黑体 SC Semibold</family>
+                           <pointsize>9</pointsize>
+                           <bold>true</bold>
                           </font>
                          </property>
                          <item>
@@ -1249,6 +1235,12 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxPresetVoltage">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
                          <property name="font">
                           <font>
                            <family>等距更纱黑体 SC Semibold</family>
@@ -1304,6 +1296,12 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxPresetCurrent">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
                          <property name="font">
                           <font>
                            <family>等距更纱黑体 SC Semibold</family>
@@ -1401,7 +1399,7 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>146</width>
+                      <width>165</width>
                       <height>162</height>
                      </rect>
                     </property>
@@ -1416,6 +1414,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>目标功率</string>
                          </property>
@@ -1429,6 +1433,18 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxKeepPowerSet">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
@@ -1461,6 +1477,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>闭环参数</string>
                          </property>
@@ -1474,6 +1496,18 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxKeepPowerPi">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
@@ -1509,6 +1543,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>电压上限</string>
                          </property>
@@ -1522,6 +1562,18 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxKeepPowerMaxV">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
@@ -1532,7 +1584,7 @@
                           <double>0.000000000000000</double>
                          </property>
                          <property name="maximum">
-                          <double>40.000000000000000</double>
+                          <double>30.000000000000000</double>
                          </property>
                          <property name="singleStep">
                           <double>0.100000000000000</double>
@@ -1541,7 +1593,7 @@
                           <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
                          </property>
                          <property name="value">
-                          <double>20.000000000000000</double>
+                          <double>30.000000000000000</double>
                          </property>
                         </widget>
                        </item>
@@ -1557,6 +1609,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>执行频率</string>
                          </property>
@@ -1570,6 +1628,18 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxKeepPowerLoopFreq">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
@@ -1642,7 +1712,7 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>158</width>
+                      <width>165</width>
                       <height>198</height>
                      </rect>
                     </property>
@@ -1660,6 +1730,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>目标参数</string>
                          </property>
@@ -1673,6 +1749,18 @@
                        </item>
                        <item>
                         <widget class="QComboBox" name="comboSweepTarget">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="sizeAdjustPolicy">
                           <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
                          </property>
@@ -1700,6 +1788,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>起始点</string>
                          </property>
@@ -1713,11 +1807,23 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxSweepStart">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
                          <property name="decimals">
-                          <number>2</number>
+                          <number>3</number>
                          </property>
                          <property name="minimum">
                           <double>0.000000000000000</double>
@@ -1745,6 +1851,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>结束点</string>
                          </property>
@@ -1758,11 +1870,23 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxSweepStop">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
                          <property name="decimals">
-                          <number>2</number>
+                          <number>3</number>
                          </property>
                          <property name="minimum">
                           <double>0.000000000000000</double>
@@ -1775,6 +1899,9 @@
                          </property>
                          <property name="stepType">
                           <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                         </property>
+                         <property name="value">
+                          <double>5.000000000000000</double>
                          </property>
                         </widget>
                        </item>
@@ -1790,6 +1917,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>步进值</string>
                          </property>
@@ -1803,14 +1936,26 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxSweepStep">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
                          <property name="decimals">
-                          <number>2</number>
+                          <number>3</number>
                          </property>
                          <property name="minimum">
-                          <double>0.000000000000000</double>
+                          <double>0.001000000000000</double>
                          </property>
                          <property name="maximum">
                           <double>100.000000000000000</double>
@@ -1820,6 +1965,9 @@
                          </property>
                          <property name="stepType">
                           <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                         </property>
+                         <property name="value">
+                          <double>0.001000000000000</double>
                          </property>
                         </widget>
                        </item>
@@ -1835,6 +1983,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>延迟(s)</string>
                          </property>
@@ -1848,6 +2002,18 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxSweepDelay">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
@@ -1917,7 +2083,7 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>149</width>
+                      <width>165</width>
                       <height>198</height>
                      </rect>
                     </property>
@@ -1932,6 +2098,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>波形类型</string>
                          </property>
@@ -1945,6 +2117,18 @@
                        </item>
                        <item>
                         <widget class="QComboBox" name="comboWaveGenType">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <item>
                           <property name="text">
                            <string>方波</string>
@@ -1984,6 +2168,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string> 周期 </string>
                          </property>
@@ -1997,6 +2187,18 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxWaveGenPeriod">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
@@ -2014,6 +2216,9 @@
                          </property>
                          <property name="stepType">
                           <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                         </property>
+                         <property name="value">
+                          <double>1.000000000000000</double>
                          </property>
                         </widget>
                        </item>
@@ -2029,6 +2234,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>高电平</string>
                          </property>
@@ -2042,11 +2253,23 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxWaveGenHigh">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
                          <property name="decimals">
-                          <number>2</number>
+                          <number>3</number>
                          </property>
                          <property name="minimum">
                           <double>0.000000000000000</double>
@@ -2059,6 +2282,9 @@
                          </property>
                          <property name="stepType">
                           <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                         </property>
+                         <property name="value">
+                          <double>5.000000000000000</double>
                          </property>
                         </widget>
                        </item>
@@ -2074,6 +2300,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>低电平</string>
                          </property>
@@ -2087,11 +2319,23 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxWaveGenLow">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
                          <property name="decimals">
-                          <number>2</number>
+                          <number>3</number>
                          </property>
                          <property name="minimum">
                           <double>0.000000000000000</double>
@@ -2119,6 +2363,12 @@
                            <height>28</height>
                           </size>
                          </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="text">
                           <string>执行频率</string>
                          </property>
@@ -2132,6 +2382,18 @@
                        </item>
                        <item>
                         <widget class="QDoubleSpinBox" name="spinBoxWaveGenLoopFreq">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>等距更纱黑体 SC Semibold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
@@ -2242,9 +2504,16 @@
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>44</width>
+                       <width>40</width>
                        <height>16777215</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>等距更纱黑体 SC Semibold</family>
+                       <pointsize>8</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                      <property name="text">
                       <string>延迟</string>
@@ -2267,9 +2536,16 @@
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>44</width>
+                       <width>40</width>
                        <height>16777215</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>等距更纱黑体 SC Semibold</family>
+                       <pointsize>8</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                      <property name="text">
                       <string>等待</string>
@@ -2292,9 +2568,16 @@
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>44</width>
+                       <width>40</width>
                        <height>16777215</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>等距更纱黑体 SC Semibold</family>
+                       <pointsize>8</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                      <property name="text">
                       <string>电压</string>
@@ -2317,9 +2600,16 @@
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>44</width>
+                       <width>40</width>
                        <height>16777215</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>等距更纱黑体 SC Semibold</family>
+                       <pointsize>8</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                      <property name="text">
                       <string>电流</string>
@@ -2352,9 +2642,16 @@
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>44</width>
+                       <width>40</width>
                        <height>16777215</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>等距更纱黑体 SC Semibold</family>
+                       <pointsize>8</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                      <property name="text">
                       <string>保存</string>
@@ -2377,9 +2674,16 @@
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>44</width>
+                       <width>40</width>
                        <height>16777215</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>等距更纱黑体 SC Semibold</family>
+                       <pointsize>8</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                      <property name="text">
                       <string>载入</string>
@@ -2402,9 +2706,16 @@
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>44</width>
+                       <width>40</width>
                        <height>16777215</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>等距更纱黑体 SC Semibold</family>
+                       <pointsize>8</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                      <property name="text">
                       <string>单次</string>
@@ -2427,9 +2738,16 @@
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>44</width>
+                       <width>40</width>
                        <height>16777215</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>等距更纱黑体 SC Semibold</family>
+                       <pointsize>8</pointsize>
+                       <bold>true</bold>
+                      </font>
                      </property>
                      <property name="text">
                       <string>循环</string>
@@ -2501,7 +2819,7 @@
           <property name="frameShadow">
            <enum>QFrame::Plain</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_23" stretch="0,0">
+          <layout class="QVBoxLayout" name="verticalLayout_23" stretch="0">
            <property name="spacing">
             <number>3</number>
            </property>
@@ -2520,7 +2838,7 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_24">
              <property name="spacing">
-              <number>6</number>
+              <number>0</number>
              </property>
              <item>
               <widget class="QLabel" name="label_27">
@@ -2544,6 +2862,43 @@
                 <set>Qt::AlignCenter</set>
                </property>
               </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_40">
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="labelComSpeed">
+                 <property name="font">
+                  <font>
+                   <family>等距更纱黑体 SC Semibold</family>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>0kBps</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="labelErrRate">
+                 <property name="font">
+                  <font>
+                   <family>等距更纱黑体 SC Semibold</family>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>CON-ERR 0%</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_31">
@@ -2582,42 +2937,42 @@
                </item>
               </layout>
              </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_34">
-             <property name="topMargin">
-              <number>0</number>
-             </property>
              <item>
-              <widget class="QLabel" name="labelLockState">
-               <property name="font">
-                <font>
-                 <family>等距更纱黑体 SC Semibold</family>
-                </font>
+              <layout class="QHBoxLayout" name="horizontalLayout_34">
+               <property name="topMargin">
+                <number>0</number>
                </property>
-               <property name="text">
-                <string>UNLOCKED</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="labelTemperature">
-               <property name="font">
-                <font>
-                 <family>等距更纱黑体 SC Semibold</family>
-                </font>
-               </property>
-               <property name="text">
-                <string>30.0℃</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
+               <item>
+                <widget class="QLabel" name="labelLockState">
+                 <property name="font">
+                  <font>
+                   <family>等距更纱黑体 SC Semibold</family>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>UNLOCKED</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="labelTemperature">
+                 <property name="font">
+                  <font>
+                   <family>等距更纱黑体 SC Semibold</family>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>TEMP 30.0℃</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </item>

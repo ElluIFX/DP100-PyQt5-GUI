@@ -5,20 +5,12 @@ from typing import Callable, List, Literal, Optional, Tuple
 
 from loguru import logger
 
-import mdp_controller
 import mdp_controller.mdp_protocal as mdp_protocal
 from mdp_controller.nrf24_adapter import (
     NRF24Adapter,
     NRF24AdapterError,
     NRF24AdapterSetting,
 )
-
-try:
-    import richuru
-
-    richuru.install(tracebacks_suppress=[mdp_controller])
-except ImportError:
-    pass
 
 
 def _convert_to_rgb565(r: int, g: int, b: int) -> int:

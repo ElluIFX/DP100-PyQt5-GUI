@@ -84,6 +84,73 @@ def _inv_dict(d):
     return {v: k for k, v in d.items()}
 
 
+class SpeedCounter:
+    def __init__(self, refresh_interval: float = 1.0) -> None:
+        self._tick = time.perf_counter()
+        self._speed_Bps = 0.0
+        self._error_rate = 0.0
+        self._sum_data_len = 0.0
+        self._refresh_interval = refresh_interval
+        self._pending_cnt = 0
+        self._ok_cnt = 0
+        self._err_cnt = 0
+
+    def update(self, value: int, check_resp: bool = False) -> None:
+        if (now := time.perf_counter()) - self._tick > self._refresh_interval:
+            self._speed_Bps = self._sum_data_len / (now - self._tick)
+            _ = self._ok_cnt + self._err_cnt
+            if _:
+                self._error_rate = self._err_cnt / _
+            else:
+                self._error_rate = 0.0
+            self._err_cnt = 0
+            self._ok_cnt = 0
+            self._sum_data_len = 0.0
+            self._tick = now
+
+        self._sum_data_len += value
+        if check_resp:
+            self._pending_cnt += 1
+
+    def resp_ok(self):
+        if self._pending_cnt:
+            self._pending_cnt -= 1
+            self._ok_cnt += 1
+
+    def resp_err(self):
+        if self._pending_cnt:
+            self._pending_cnt -= 1
+            self._err_cnt += 1
+
+    @property
+    def bps(self) -> float:
+        return self._speed_Bps * 8
+
+    @property
+    def Bps(self) -> float:
+        return self._speed_Bps
+
+    @property
+    def Kbps(self) -> float:
+        return self.KBps * 8
+
+    @property
+    def KBps(self) -> float:
+        return self._speed_Bps / 1024
+
+    @property
+    def Mbps(self) -> float:
+        return self.MBps * 8
+
+    @property
+    def MBps(self) -> float:
+        return self._speed_Bps / 1024 / 1024
+
+    @property
+    def error_rate(self) -> float:
+        return self._error_rate
+
+
 class NRF24Adapter:
     def __init__(
         self, port: Optional[str] = None, baudrate: int = 921600, debug: bool = False
@@ -93,6 +160,7 @@ class NRF24Adapter:
             self._port_name = _find_port_name("1A86:7523")
         if not self._port_name:
             raise Exception("NRF24-Adapter not found")
+        self._counter = SpeedCounter()
         self._serial = serial.Serial(self._port_name, baudrate, timeout=None)
         self._ser_wr_lock = threading.Lock()
         self._reader = SerialReaderBuffered(
@@ -108,6 +176,10 @@ class NRF24Adapter:
         self._action_event = threading.Event()
         self._work_thread = threading.Thread(target=self._worker, daemon=True)
         self._work_thread.start()
+
+    @property
+    def speed_counter(self) -> SpeedCounter:
+        return self._counter
 
     def close(self):
         self._running = False
@@ -200,12 +272,15 @@ class NRF24Adapter:
             logger.info("NRF Response: Baudrate set success")
             self._action_event.set()
         elif cmd == RESPONSE.NRF_SEND_OK:
+            self._counter.resp_ok()
             self._send_event.set()
             if self._debug:
                 logger.debug("NRF Response: NRF send success")
         elif cmd == RESPONSE.NRF_SEND_FAIL:
+            self._counter.resp_err()
             logger.warning("NRF Response: NRF send no ack")
         elif cmd == RESPONSE.NRF_RECV_OK:
+            self._counter.update(len(data), check_resp=False)
             if self._recv_callback is not None:
                 self._recv_callback(data)
             if self._debug:
@@ -252,6 +327,7 @@ class NRF24Adapter:
         if wait_response:
             self._send_event.clear()
         self._write(CMD.NRF_TX, data)
+        self._counter.update(len(data), check_resp=True)
         if wait_response:
             if not self._send_event.wait(timeout):
                 raise NRF24AdapterError("NRF send timeout")

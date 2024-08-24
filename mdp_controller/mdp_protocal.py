@@ -197,7 +197,7 @@ def _volt_adc_correct(value: int, gain: int, offset: int) -> float:
     Correct voltage adc value to V
     """
     val = round((value * 16 - offset) * gain / 100000.0)
-    return val / 1000 if val > 1 else 0.0
+    return val / 1000 if val > 0 else 0.0
 
 
 def _curr_adc_correct(value: int, gain: int, offset: int) -> float:
@@ -205,7 +205,7 @@ def _curr_adc_correct(value: int, gain: int, offset: int) -> float:
     Correct current adc value to A
     """
     val = round((value * 4 - offset) * gain / 100000.0 * 2)
-    return val / 1000 if val > 1 else 0.0
+    return val / 1000 if val > 0 else 0.0
 
 
 def gen_set_led_color(
