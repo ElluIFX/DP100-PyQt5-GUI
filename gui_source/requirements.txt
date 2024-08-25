@@ -1,0 +1,14 @@
+PyOpenGL
+pyqt5==5.15.6
+pyqt5-qt5==5.15.2
+pyqt5-sip==12.10.1
+pyqtdarktheme==2.1.0
+pyqtgraph==0.13.7
+numba
+numpy==1.24.4
+simple-pid
+pywin32==306
+loguru
+rich
+pyserial
+pyinstaller

@@ -120,67 +120,70 @@ class MDP_P906:
         time.sleep(0.1)
 
     def _callback(self, data: bytes):
-        if data[0] == 7:
-            (
-                errflag,
-                input_volt,
-                input_curr,
-                voltage,
-                current,
-                locked,
-                state,
-                temperature,
-                realtime_adc,
-            ) = mdp_protocal.parse_type7_response(
-                data,
-                self._status["HVzero16"],
-                self._status["HVgain16"],
-                self._status["HCzero04"],
-                self._status["HCgain04"],
-            )
-            self._status["ErrFlag"] = errflag
-            self._status["InputVoltage"] = input_volt
-            self._status["InputCurrent"] = input_curr
-            self._status["SetVoltage"] = voltage
-            self._status["SetCurrent"] = current
-            self._status["Locked"] = bool(locked)
-            self._status["State"] = {0: "off", 1: "cc", 2: "cv", 3: "on"}[state]
-            self._status["Temperature"] = temperature
-            self._status["RealtimeOutput4"] = realtime_adc
-        elif data[0] == 9:
-            idcode, HVzero16, HVgain16, HCzero04, HCgain04 = (
-                mdp_protocal.parse_type9_response(data)
-            )
-            if idcode != self._idcode:
-                logger.warning(f"Type-9 ID code mismatch: {idcode}!={self._idcode}")
-            self._status["HVzero16"] = HVzero16
-            self._status["HVgain16"] = HVgain16
-            self._status["HCzero04"] = HCzero04
-            self._status["HCgain04"] = HCgain04
-        elif data[0] == 8:
-            errflag, values = mdp_protocal.parse_type8_response(
-                data,
-                self._status["HVzero16"],
-                self._status["HVgain16"],
-                self._status["HCzero04"],
-                self._status["HCgain04"],
-            )
-            self._status["ErrFlag"] = errflag
-            self._status["RealtimeOutput9"] = values
-            if self._rtvalue_callback is not None:
-                self._rtvalue_callback(values)
-        elif data[0] == 4:
-            self._status["SetCurrent"], self._status["SetVoltage"] = (
-                mdp_protocal.parse_type4_response(data)
-            )
-        elif data[0] == 5:
-            pass
-        elif data[0] == 6:
-            logger.info(
-                f"Dispatch device result: {mdp_protocal.parse_type6_response(data)}"
-            )
-        else:
-            logger.debug(f"Unhandled Type-{data[0]}: {data.hex(' ').upper()}")
+        try:
+            if data[0] == 7:
+                (
+                    errflag,
+                    input_volt,
+                    input_curr,
+                    voltage,
+                    current,
+                    locked,
+                    state,
+                    temperature,
+                    realtime_adc,
+                ) = mdp_protocal.parse_type7_response(
+                    data,
+                    self._status["HVzero16"],
+                    self._status["HVgain16"],
+                    self._status["HCzero04"],
+                    self._status["HCgain04"],
+                )
+                self._status["ErrFlag"] = errflag
+                self._status["InputVoltage"] = input_volt
+                self._status["InputCurrent"] = input_curr
+                self._status["SetVoltage"] = voltage
+                self._status["SetCurrent"] = current
+                self._status["Locked"] = bool(locked)
+                self._status["State"] = {0: "off", 1: "cc", 2: "cv", 3: "on"}[state]
+                self._status["Temperature"] = temperature
+                self._status["RealtimeOutput4"] = realtime_adc
+            elif data[0] == 9:
+                idcode, HVzero16, HVgain16, HCzero04, HCgain04 = (
+                    mdp_protocal.parse_type9_response(data)
+                )
+                if idcode != self._idcode:
+                    logger.warning(f"Type-9 ID code mismatch: {idcode}!={self._idcode}")
+                self._status["HVzero16"] = HVzero16
+                self._status["HVgain16"] = HVgain16
+                self._status["HCzero04"] = HCzero04
+                self._status["HCgain04"] = HCgain04
+            elif data[0] == 8:
+                errflag, values = mdp_protocal.parse_type8_response(
+                    data,
+                    self._status["HVzero16"],
+                    self._status["HVgain16"],
+                    self._status["HCzero04"],
+                    self._status["HCgain04"],
+                )
+                self._status["ErrFlag"] = errflag
+                self._status["RealtimeOutput9"] = values
+                if self._rtvalue_callback is not None:
+                    self._rtvalue_callback(values)
+            elif data[0] == 4:
+                self._status["SetCurrent"], self._status["SetVoltage"] = (
+                    mdp_protocal.parse_type4_response(data)
+                )
+            elif data[0] == 5:
+                pass
+            elif data[0] == 6:
+                logger.info(
+                    f"Dispatch device result: {mdp_protocal.parse_type6_response(data)}"
+                )
+            else:
+                logger.debug(f"Unhandled Type-{data[0]}: {data.hex(' ').upper()}")
+        except Exception:
+            logger.exception("Parse error")
 
         if data[0] == self._transfer_wait_header:
             self._transfer_data = data

@@ -123,7 +123,7 @@ def parse_type7_response(
     Type 7 response contains information of device
     """
     assert data[0] == 7
-    if data[1] == 0x1C or data[1] == 0x16:
+    if data[1] in (0x1C, 0x1B, 0x16, 0x15):
         errflag = data[2]
         locked = data[3]
         temp = data[4:6].hex()
@@ -233,5 +233,5 @@ def parse_type9_response(data: bytes):
     HVgain16 = int(data[9:11].hex(), 16)
     HCzero04 = int(data[11:13].hex(), 16)
     HCgain04 = int(data[13:15].hex(), 16)
-    assert data[15] == 2
+    assert data[15] == 2 or data[15] == 1  # P906
     return (idcode, HVzero16, HVgain16, HCzero04, HCgain04)

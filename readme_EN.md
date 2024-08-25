@@ -1,6 +1,6 @@
 # Miniware MDP-P906 Digital Power Supply Controller
 
-Wireless control of the power supply without the MDP-M01 display module, theoretically supporting P905 as well (untested).
+Wireless control of the power supply without the MDP-M01 display module, supporting P905 as well (tested, #1).
 
 ![1721995272301](image/readme_EN/1721995272301.png)
 
