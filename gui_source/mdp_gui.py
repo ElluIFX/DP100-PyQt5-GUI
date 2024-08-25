@@ -9,13 +9,22 @@ import warnings
 from threading import Lock
 from typing import List, Optional, Tuple
 
+import richuru
 from loguru import logger
 
 import mdp_controller
-import richuru
 from mdp_controller import MDP_P906
 
-richuru.install(tracebacks_suppress=[mdp_controller])
+ARG_PATH = os.path.dirname(sys.argv[0])
+ABS_PATH = os.path.dirname(__file__)
+
+if os.environ.get("MDP_ENABLE_LOG") is not None:
+    richuru.install()
+    logger.add(
+        os.path.join(ARG_PATH, "mdp.log"), level="TRACE", backtrace=True, diagnose=True
+    )
+else:
+    richuru.install(tracebacks_suppress=[mdp_controller])
 
 os.environ["PYQTGRAPH_QT_LIB"] = "PyQt5"
 
@@ -25,7 +34,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 from qframelesswindow import FramelessWindow, TitleBar
 
 OPENGL_AVAILABLE = False
@@ -50,20 +58,14 @@ except Exception as e:
 
 import numpy as np
 import qdarktheme
+from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
 from serial.tools.list_ports import comports
 from simple_pid import PID
 
-from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
-
-ARG_PATH = os.path.dirname(sys.argv[0])
-ABS_PATH = os.path.dirname(__file__)
 SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
-
-if os.environ.get("MDP_ENABLE_LOG") is not None:
-    logger.add(os.path.join(ARG_PATH, "mdp.log"))
 
 # get system language
 system_lang = QtCore.QLocale.system().name()
@@ -316,7 +318,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if ENGLISH:
             font = QtGui.QFont()
             font.setFamily("等距更纱黑体 SC Semibold")
-            font.setPointSize(8)
+            font.setPointSize(7)
             self.ui.btnSeqCurrent.setFont(font)
             self.ui.btnSeqCurrent.setText("I-SET")
             self.ui.btnSeqVoltage.setFont(font)
@@ -324,6 +326,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.btnSeqDelay.setFont(font)
             self.ui.btnSeqWaitTime.setFont(font)
             self.ui.btnSeqSingle.setFont(font)
+            self.ui.btnSeqSingle.setText("Once")
             self.ui.btnSeqLoop.setFont(font)
             self.ui.btnSeqSave.setFont(font)
             self.ui.btnSeqLoad.setFont(font)
@@ -852,7 +855,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.curve2.setData(x=time2, y=data2)
             text2 = f"{_}avg: {float_str(avg2)}  {_}max: {float_str(max2)}  {_}min: {float_str(min2)}  {_}pp: {float_str(max2 - min2)}"
         else:
-            self.curve1.setData(x=[], y=[])
+            self.curve2.setData(x=[], y=[])
             text2 = f"{_}avg: N/A  {_}max: N/A  {_}min: N/A  {_}pp: N/A"
         if data1 is not None and data2 is not None:
             text = text1 + "  |  " + text2
@@ -1418,7 +1421,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self._seq_type = text.split()[0]
         if self._seq_type == "WAIT":
             self._seq_value = datetime.datetime.strptime(
-                text.split()[1], "%y-%m-%d %H:%M:%S"
+                " ".join(text.split()[1:]), "%y-%m-%d %H:%M:%S"
             )
         else:
             self._seq_value = float(text.split()[1])
