@@ -9,10 +9,10 @@ import warnings
 from threading import Lock
 from typing import List, Optional, Tuple
 
-import richuru
 from loguru import logger
 
 import mdp_controller
+import richuru
 from mdp_controller import MDP_P906
 
 ARG_PATH = os.path.dirname(sys.argv[0])
@@ -34,6 +34,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 from qframelesswindow import FramelessWindow, TitleBar
 
 OPENGL_AVAILABLE = False
@@ -58,12 +59,14 @@ except Exception as e:
 
 import numpy as np
 import qdarktheme
-from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
 from serial.tools.list_ports import comports
 from simple_pid import PID
 
+from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
+
 SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
+FONT_PATH = os.path.join(ABS_PATH, "sarasa-semibold.ttc")
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -76,6 +79,12 @@ if not system_lang.startswith("zh") or os.environ.get("MDP_FORCE_ENGLISH") == "1
     trans.load(os.path.join(ABS_PATH, "en_US.qm"))
     app.installTranslator(trans)
     ENGLISH = True
+
+# load custom font
+_ = QtGui.QFontDatabase.addApplicationFont(FONT_PATH)
+fonts = QtGui.QFontDatabase.applicationFontFamilies(_)
+logger.info(f"Loaded custom {len(fonts)} fonts from {FONT_PATH}")
+logger.debug(f"Fonts: {fonts}")
 
 
 class FmtAxisItem(pg.AxisItem):
@@ -252,10 +261,13 @@ class Setting:
         self.avgmode = 1
         self.opengl = False
 
-        self.v_offset = 0.0
-        self.i_offset = 0.0
         self.v_threshold = 0.002
         self.i_threshold = 0.002
+        self.use_cali = False
+        self.v_cali_k = 1.0
+        self.v_cali_b = 0.0
+        self.i_cali_k = 1.0
+        self.i_cali_b = 0.0
 
     def save(self, filename):
         with open(filename, "w") as f:
@@ -317,7 +329,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
         if ENGLISH:
             font = QtGui.QFont()
-            font.setFamily("等距更纱黑体 SC Semibold")
+            font.setFamily("Sarasa Fixed SC Semibold")
             font.setPointSize(7)
             self.ui.btnSeqCurrent.setFont(font)
             self.ui.btnSeqCurrent.setText("I-SET")
@@ -402,14 +414,13 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         else:
             self.showFullScreen()
 
-    _step_dict = {
-        0: 0.001,
-        -1: 0.001,
-        -2: 0.01,
-        -3: 0.1,
-    }
-
     def set_step(self, spin: QtWidgets.QDoubleSpinBox, f, t):
+        STEPS = {
+            0: 0.001,
+            -1: 0.001,
+            -2: 0.01,
+            -3: 0.1,
+        }
         if spin.lineEdit().hasSelectedText():
             return
         text = spin.lineEdit().text()
@@ -427,7 +438,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if spin.value() >= 10 and t == 0:
             t = 1
         spin.lineEdit().setSelection(t, 1)
-        spin.setSingleStep(self._step_dict.get(tt, 1))
+        spin.setSingleStep(STEPS.get(tt, 1))
 
     ##########  基本功能  ##########
 
@@ -604,17 +615,17 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.api.request_realtime_value()
 
     def state_callback(self, rtvalues: List[Tuple[float, float]]):
-        vo, io, vt, it = (
-            setting.v_offset,
-            setting.i_offset,
-            setting.v_threshold,
-            setting.i_threshold,
-        )
+        vt, it = setting.v_threshold, setting.i_threshold
+        if setting.use_cali:
+            rtvalues = [
+                (
+                    v * setting.v_cali_k + setting.v_cali_b,
+                    i * setting.i_cali_k + setting.i_cali_b,
+                )
+                for v, i in rtvalues
+            ]
         len_ = len(rtvalues)
-        rtvalues = [
-            (v + vo if v + vo > vt else 0.0, i + io if i + io > it else 0.0)
-            for v, i in rtvalues
-        ]
+        rtvalues = [(v if v > vt else 0.0, i if i > it else 0.0) for v, i in rtvalues]
         t1 = time.perf_counter()
         data = self.data
         if self.graph_record_flag:
@@ -1513,6 +1524,8 @@ class MDPSettings(QtWidgets.QDialog):
         self.ui = Ui_DialogSettings()
         self.ui.setupUi(self)
 
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+
     def initValues(self):
         self.ui.spinBoxBaud.setValue(setting.baudrate)
         self.ui.lineEditAddr1.setText(setting.address.split(":")[0])
@@ -1587,7 +1600,7 @@ class MDPSettings(QtWidgets.QDialog):
         )
         if self.isVisible():
             self.close()
-        return super().show()
+        super().show()
 
     def showEvent(self, a0: QtGui.QShowEvent) -> None:
         center_window(self)
@@ -1609,7 +1622,7 @@ class MDPSettings(QtWidgets.QDialog):
 
     @QtCore.pyqtSlot()
     def on_btnSave_clicked(self):
-        setting.baudrate = self.ui.spinBoxBaud.value()
+        setting.baudrate = int(self.ui.spinBoxBaud.value())
         setting.address = ":".join(
             [
                 self.ui.lineEditAddr1.text(),
@@ -1619,11 +1632,11 @@ class MDPSettings(QtWidgets.QDialog):
                 self.ui.lineEditAddr5.text(),
             ]
         )
-        setting.freq = self.ui.spinBoxFreq.value()
+        setting.freq = int(self.ui.spinBoxFreq.value())
         setting.txpower = self.ui.comboBoxPower.currentText()
         setting.idcode = self.ui.lineEditIdcode.text()
         setting.color = self.ui.lineEditColor.text()
-        setting.m01ch = f"CH-{self.ui.spinBoxM01.value()}"
+        setting.m01ch = f"CH-{int(self.ui.spinBoxM01.value())}"
         setting.comport = (
             self.ui.comboBoxPort.currentText()
             if self.ui.comboBoxPort.currentText() != self.tr("自动")
@@ -1648,15 +1661,11 @@ class MDPGraphics(QtWidgets.QDialog):
         super().__init__(parent)
         self.ui = Ui_DialogGraphics()
         self.ui.setupUi(self)
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         if not OPENGL_AVAILABLE:
             self.ui.checkBoxOpenGL.setEnabled(False)
             self.ui.checkBoxOpenGL.setCheckState(False)
         self.ui.checkBoxOpenGL.clicked.connect(self.set_opengl)
-
-    def set_labelCali(self):
-        self.ui.labelCali.setText(
-            self.tr("校准: ") + f"{setting.v_offset:+.5f}V {setting.i_offset:+.5f}A"
-        )
 
     def initValues(self):
         self.ui.spinMaxFps.setValue(setting.graph_max_fps)
@@ -1668,7 +1677,11 @@ class MDPGraphics(QtWidgets.QDialog):
             self.ui.checkBoxOpenGL.setChecked(setting.opengl)
         self.ui.spinStateVThres.setValue(setting.v_threshold)
         self.ui.spinStateIThres.setValue(setting.i_threshold)
-        self.set_labelCali()
+        self.ui.checkBoxUseCali.setChecked(setting.use_cali)
+        self.ui.spinCaliVk.setValue(setting.v_cali_k)
+        self.ui.spinCaliVb.setValue(setting.v_cali_b)
+        self.ui.spinCaliIk.setValue(setting.i_cali_k)
+        self.ui.spinCaliIb.setValue(setting.i_cali_b)
 
     def show(self) -> None:
         self.initValues()
@@ -1719,33 +1732,6 @@ class MDPGraphics(QtWidgets.QDialog):
     def on_comboAvgMode_currentIndexChanged(self, index):
         setting.avgmode = self.ui.comboAvgMode.currentIndex()
 
-    @QtCore.pyqtSlot()
-    def on_btnTear_clicked(self):
-        api = MainWindow.api
-        if api is None:
-            QtWidgets.QMessageBox.warning(
-                self,
-                self.tr("警告"),
-                self.tr("请先连接设备"),
-            )
-            return
-        try:
-            valus = api.get_realtime_value()
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(self, self.tr("校准失败"), str(e))
-            return
-        vavg = sum([d[0] for d in valus]) / len(valus)
-        iavg = sum([d[1] for d in valus]) / len(valus)
-        setting.v_offset = -vavg
-        setting.i_offset = -iavg
-        self.set_labelCali()
-
-    @QtCore.pyqtSlot()
-    def on_btnResetTear_clicked(self):
-        setting.v_offset = 0
-        setting.i_offset = 0
-        self.set_labelCali()
-
     @QtCore.pyqtSlot(float)
     def on_spinStateVThres_valueChanged(self, _=None):
         setting.v_threshold = self.ui.spinStateVThres.value()
@@ -1753,6 +1739,26 @@ class MDPGraphics(QtWidgets.QDialog):
     @QtCore.pyqtSlot(float)
     def on_spinStateIThres_valueChanged(self, _=None):
         setting.i_threshold = self.ui.spinStateIThres.value()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinCaliVk_valueChanged(self, _=None):
+        setting.v_cali_k = self.ui.spinCaliVk.value()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinCaliVb_valueChanged(self, _=None):
+        setting.v_cali_b = self.ui.spinCaliVb.value()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinCaliIk_valueChanged(self, _=None):
+        setting.i_cali_k = self.ui.spinCaliIk.value()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinCaliIb_valueChanged(self, _=None):
+        setting.i_cali_b = self.ui.spinCaliIb.value()
+
+    @QtCore.pyqtSlot(int)
+    def on_checkBoxUseCali_stateChanged(self, state: int):
+        setting.use_cali = state == QtCore.Qt.CheckState.Checked
 
     @QtCore.pyqtSlot()
     def on_btnClose_clicked(self):
@@ -1765,6 +1771,11 @@ class MDPGraphics(QtWidgets.QDialog):
             setting.opengl = self.ui.checkBoxOpenGL.isChecked()
             setting.v_threshold = self.ui.spinStateVThres.value()
             setting.i_threshold = self.ui.spinStateIThres.value()
+            setting.use_cali = self.ui.checkBoxUseCali.isChecked()
+            setting.v_cali_k = self.ui.spinCaliVk.value()
+            setting.v_cali_b = self.ui.spinCaliVb.value()
+            setting.i_cali_k = self.ui.spinCaliIk.value()
+            setting.i_cali_b = self.ui.spinCaliIb.value()
             setting.save(SETTING_FILE)
         except Exception as e:
             logger.error(e)

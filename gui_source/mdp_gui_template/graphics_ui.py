@@ -26,7 +26,7 @@ class Ui_DialogGraphics(object):
             DialogGraphics.setObjectName(u"DialogGraphics")
         DialogGraphics.setWindowModality(Qt.WindowModal)
         DialogGraphics.setEnabled(True)
-        DialogGraphics.resize(217, 532)
+        DialogGraphics.resize(217, 568)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -43,7 +43,7 @@ class Ui_DialogGraphics(object):
         self.label_36.setMinimumSize(QSize(0, 0))
         self.label_36.setMaximumSize(QSize(999, 16777215))
         font = QFont()
-        font.setFamilies([u"\u7b49\u8ddd\u66f4\u7eb1\u9ed1\u4f53 SC Semibold"])
+        font.setFamilies([u"Sarasa Fixed SC Semibold"])
         font.setBold(True)
         self.label_36.setFont(font)
         self.label_36.setAlignment(Qt.AlignCenter)
@@ -206,8 +206,8 @@ class Ui_DialogGraphics(object):
         self.spinStateVThres.setDecimals(3)
         self.spinStateVThres.setMinimum(0.000000000000000)
         self.spinStateVThres.setMaximum(1.000000000000000)
-        self.spinStateVThres.setSingleStep(5.000000000000000)
-        self.spinStateVThres.setValue(0.001000000000000)
+        self.spinStateVThres.setSingleStep(0.001000000000000)
+        self.spinStateVThres.setValue(0.000000000000000)
 
         self.horizontalLayout_2.addWidget(self.spinStateVThres)
 
@@ -218,8 +218,8 @@ class Ui_DialogGraphics(object):
         self.spinStateIThres.setDecimals(3)
         self.spinStateIThres.setMinimum(0.000000000000000)
         self.spinStateIThres.setMaximum(1.000000000000000)
-        self.spinStateIThres.setSingleStep(5.000000000000000)
-        self.spinStateIThres.setValue(0.001000000000000)
+        self.spinStateIThres.setSingleStep(0.001000000000000)
+        self.spinStateIThres.setValue(0.000000000000000)
 
         self.horizontalLayout_2.addWidget(self.spinStateIThres)
 
@@ -236,23 +236,71 @@ class Ui_DialogGraphics(object):
 
         self.verticalLayout.addWidget(self.labelCali)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setSpacing(6)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.btnTear = QPushButton(DialogGraphics)
-        self.btnTear.setObjectName(u"btnTear")
-        self.btnTear.setFont(font)
+        self.checkBoxUseCali = QCheckBox(DialogGraphics)
+        self.checkBoxUseCali.setObjectName(u"checkBoxUseCali")
+        self.checkBoxUseCali.setFont(font)
 
-        self.horizontalLayout.addWidget(self.btnTear)
+        self.verticalLayout.addWidget(self.checkBoxUseCali)
 
-        self.btnResetTear = QPushButton(DialogGraphics)
-        self.btnResetTear.setObjectName(u"btnResetTear")
-        self.btnResetTear.setFont(font)
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setSpacing(6)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.spinCaliVk = QDoubleSpinBox(DialogGraphics)
+        self.spinCaliVk.setObjectName(u"spinCaliVk")
+        self.spinCaliVk.setFont(font)
+        self.spinCaliVk.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.spinCaliVk.setDecimals(6)
+        self.spinCaliVk.setMinimum(-100.000000000000000)
+        self.spinCaliVk.setMaximum(100.000000000000000)
+        self.spinCaliVk.setSingleStep(0.001000000000000)
+        self.spinCaliVk.setValue(1.000000000000000)
 
-        self.horizontalLayout.addWidget(self.btnResetTear)
+        self.horizontalLayout_3.addWidget(self.spinCaliVk)
+
+        self.spinCaliVb = QDoubleSpinBox(DialogGraphics)
+        self.spinCaliVb.setObjectName(u"spinCaliVb")
+        self.spinCaliVb.setFont(font)
+        self.spinCaliVb.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.spinCaliVb.setDecimals(6)
+        self.spinCaliVb.setMinimum(-100.000000000000000)
+        self.spinCaliVb.setMaximum(100.000000000000000)
+        self.spinCaliVb.setSingleStep(0.001000000000000)
+        self.spinCaliVb.setValue(0.000000000000000)
+
+        self.horizontalLayout_3.addWidget(self.spinCaliVb)
 
 
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setSpacing(6)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.spinCaliIk = QDoubleSpinBox(DialogGraphics)
+        self.spinCaliIk.setObjectName(u"spinCaliIk")
+        self.spinCaliIk.setFont(font)
+        self.spinCaliIk.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.spinCaliIk.setDecimals(6)
+        self.spinCaliIk.setMinimum(-100.000000000000000)
+        self.spinCaliIk.setMaximum(100.000000000000000)
+        self.spinCaliIk.setSingleStep(0.001000000000000)
+        self.spinCaliIk.setValue(1.000000000000000)
+
+        self.horizontalLayout_4.addWidget(self.spinCaliIk)
+
+        self.spinCaliIb = QDoubleSpinBox(DialogGraphics)
+        self.spinCaliIb.setObjectName(u"spinCaliIb")
+        self.spinCaliIb.setFont(font)
+        self.spinCaliIb.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.spinCaliIb.setDecimals(6)
+        self.spinCaliIb.setMinimum(-100.000000000000000)
+        self.spinCaliIb.setMaximum(100.000000000000000)
+        self.spinCaliIb.setSingleStep(0.001000000000000)
+        self.spinCaliIb.setValue(0.000000000000000)
+
+        self.horizontalLayout_4.addWidget(self.spinCaliIb)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
 
         self.btnClose = QPushButton(DialogGraphics)
         self.btnClose.setObjectName(u"btnClose")
@@ -296,12 +344,19 @@ class Ui_DialogGraphics(object):
         self.comboInterp.setItemText(3, QCoreApplication.translate("DialogGraphics", u"\u4e09\u4f4d\u63d2\u503c", None))
 
         self.checkBoxOpenGL.setText(QCoreApplication.translate("DialogGraphics", u"\u5f00\u542fOpenGL\u7ed8\u56fe", None))
-        self.label_42.setText(QCoreApplication.translate("DialogGraphics", u"\u539f\u59cb\u6570\u636e\u9608\u503c", None))
+        self.label_42.setText(QCoreApplication.translate("DialogGraphics", u"\u7f6e\u96f6\u9608\u503c", None))
         self.spinStateVThres.setSuffix(QCoreApplication.translate("DialogGraphics", u"V", None))
         self.spinStateIThres.setSuffix(QCoreApplication.translate("DialogGraphics", u"A", None))
-        self.labelCali.setText(QCoreApplication.translate("DialogGraphics", u"\u6821\u51c6", None))
-        self.btnTear.setText(QCoreApplication.translate("DialogGraphics", u"\u56de\u96f6", None))
-        self.btnResetTear.setText(QCoreApplication.translate("DialogGraphics", u"\u91cd\u7f6e", None))
+        self.labelCali.setText(QCoreApplication.translate("DialogGraphics", u"\u624b\u52a8\u6821\u51c6", None))
+        self.checkBoxUseCali.setText(QCoreApplication.translate("DialogGraphics", u"\u4f7f\u7528\u6821\u51c6\u53c2\u6570 (y=kx+b)", None))
+        self.spinCaliVk.setPrefix(QCoreApplication.translate("DialogGraphics", u"Vk=", None))
+        self.spinCaliVk.setSuffix("")
+        self.spinCaliVb.setPrefix(QCoreApplication.translate("DialogGraphics", u"Vb=", None))
+        self.spinCaliVb.setSuffix("")
+        self.spinCaliIk.setPrefix(QCoreApplication.translate("DialogGraphics", u"Ik=", None))
+        self.spinCaliIk.setSuffix("")
+        self.spinCaliIb.setPrefix(QCoreApplication.translate("DialogGraphics", u"Ib=", None))
+        self.spinCaliIb.setSuffix("")
         self.btnClose.setText(QCoreApplication.translate("DialogGraphics", u"\u5b8c\u6210 / DONE", None))
     # retranslateUi
 

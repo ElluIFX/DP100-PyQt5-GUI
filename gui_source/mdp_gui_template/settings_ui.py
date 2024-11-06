@@ -37,7 +37,7 @@ class Ui_DialogSettings(object):
         self.label_36.setObjectName(u"label_36")
         self.label_36.setMinimumSize(QSize(0, 28))
         font = QFont()
-        font.setFamilies([u"\u7b49\u8ddd\u66f4\u7eb1\u9ed1\u4f53 SC Semibold"])
+        font.setFamilies([u"Sarasa Fixed SC Semibold"])
         self.label_36.setFont(font)
         self.label_36.setAlignment(Qt.AlignCenter)
         self.label_36.setMargin(6)

@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>217</width>
-    <height>532</height>
+    <height>568</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -60,7 +60,7 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -79,7 +79,7 @@
     <widget class="QComboBox" name="comboTheme">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -125,7 +125,7 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -144,7 +144,7 @@
     <widget class="QDoubleSpinBox" name="spinMaxFps">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -187,7 +187,7 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -206,7 +206,7 @@
     <widget class="QSpinBox" name="spinDataLength">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -249,7 +249,7 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -268,7 +268,7 @@
     <widget class="QComboBox" name="comboAvgMode">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -317,7 +317,7 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -336,7 +336,7 @@
     <widget class="QDoubleSpinBox" name="spinStateFps">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -379,7 +379,7 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -398,7 +398,7 @@
     <widget class="QComboBox" name="comboInterp">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -440,7 +440,7 @@
     <widget class="QCheckBox" name="checkBoxOpenGL">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -472,12 +472,12 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>原始数据阈值</string>
+      <string>置零阈值</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -496,7 +496,7 @@
       <widget class="QDoubleSpinBox" name="spinStateVThres">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
          <bold>true</bold>
         </font>
        </property>
@@ -516,10 +516,10 @@
         <double>1.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>5.000000000000000</double>
+        <double>0.001000000000000</double>
        </property>
        <property name="value">
-        <double>0.001000000000000</double>
+        <double>0.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -527,7 +527,7 @@
       <widget class="QDoubleSpinBox" name="spinStateIThres">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
          <bold>true</bold>
         </font>
        </property>
@@ -547,10 +547,10 @@
         <double>1.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>5.000000000000000</double>
+        <double>0.001000000000000</double>
        </property>
        <property name="value">
-        <double>0.001000000000000</double>
+        <double>0.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -572,12 +572,12 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>校准</string>
+      <string>手动校准</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -588,33 +588,163 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <widget class="QCheckBox" name="checkBoxUseCali">
+     <property name="font">
+      <font>
+       <family>Sarasa Fixed SC Semibold</family>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>使用校准参数 (y=kx+b)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <property name="spacing">
       <number>6</number>
      </property>
      <item>
-      <widget class="QPushButton" name="btnTear">
+      <widget class="QDoubleSpinBox" name="spinCaliVk">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
          <bold>true</bold>
         </font>
        </property>
-       <property name="text">
-        <string>回零</string>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="prefix">
+        <string>Vk=</string>
+       </property>
+       <property name="suffix">
+        <string/>
+       </property>
+       <property name="decimals">
+        <number>6</number>
+       </property>
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.001000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnResetTear">
+      <widget class="QDoubleSpinBox" name="spinCaliVb">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
          <bold>true</bold>
         </font>
        </property>
-       <property name="text">
-        <string>重置</string>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="prefix">
+        <string>Vb=</string>
+       </property>
+       <property name="suffix">
+        <string/>
+       </property>
+       <property name="decimals">
+        <number>6</number>
+       </property>
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.001000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QDoubleSpinBox" name="spinCaliIk">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC Semibold</family>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="prefix">
+        <string>Ik=</string>
+       </property>
+       <property name="suffix">
+        <string/>
+       </property>
+       <property name="decimals">
+        <number>6</number>
+       </property>
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.001000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="spinCaliIb">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC Semibold</family>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="prefix">
+        <string>Ib=</string>
+       </property>
+       <property name="suffix">
+        <string/>
+       </property>
+       <property name="decimals">
+        <number>6</number>
+       </property>
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.001000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -624,7 +754,7 @@
     <widget class="QPushButton" name="btnClose">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
        <bold>true</bold>
       </font>
      </property>

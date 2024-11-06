@@ -48,7 +48,7 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
       </font>
      </property>
      <property name="text">
@@ -74,7 +74,7 @@
        </property>
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -92,7 +92,7 @@
       <widget class="QComboBox" name="comboBoxPort">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <item>
@@ -116,7 +116,7 @@
        </property>
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -134,7 +134,7 @@
       <widget class="QDoubleSpinBox" name="spinBoxBaud">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="alignment">
@@ -174,7 +174,7 @@
        </property>
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -230,7 +230,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -266,7 +266,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -290,7 +290,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -326,7 +326,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -350,7 +350,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -386,7 +386,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -410,7 +410,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -446,7 +446,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -470,7 +470,7 @@
             </property>
             <property name="font">
              <font>
-              <family>等距更纱黑体 SC Semibold</family>
+              <family>Sarasa Fixed SC Semibold</family>
              </font>
             </property>
             <property name="text">
@@ -503,7 +503,7 @@
        </property>
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -521,7 +521,7 @@
       <widget class="QDoubleSpinBox" name="spinBoxFreq">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="alignment">
@@ -564,7 +564,7 @@
        </property>
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -582,7 +582,7 @@
       <widget class="QComboBox" name="comboBoxPower">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="currentIndex">
@@ -652,7 +652,7 @@
      </property>
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
       </font>
      </property>
      <property name="text">
@@ -672,7 +672,7 @@
       <widget class="QPushButton" name="btnMatch">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -707,7 +707,7 @@
        </property>
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -761,7 +761,7 @@
        </property>
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -779,7 +779,7 @@
       <widget class="QDoubleSpinBox" name="spinBoxM01">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="alignment">
@@ -825,7 +825,7 @@
        </property>
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <property name="text">
@@ -843,7 +843,7 @@
       <widget class="QComboBox" name="comboBoxBlink">
        <property name="font">
         <font>
-         <family>等距更纱黑体 SC Semibold</family>
+         <family>Sarasa Fixed SC Semibold</family>
         </font>
        </property>
        <item>
@@ -874,7 +874,7 @@
     <widget class="QPushButton" name="btnSave">
      <property name="font">
       <font>
-       <family>等距更纱黑体 SC Semibold</family>
+       <family>Sarasa Fixed SC Semibold</family>
       </font>
      </property>
      <property name="text">

@@ -41,36 +41,22 @@ class MDP_P906:
         debug: bool = False,
     ):
         """
-        MDP-P906 Digital Power Supply Controller Class
+        Initialize MDP-P906 Digital Power Supply Controller.
 
-        Parameters
-        ----------
-        port
-            port of the nrf24l01 adapter, None to autodetect
-        baudrate
-            baudrate of the nrf24l01 adapter
-        address
-            5bytes wireless address of the nrf24l01 adapter, can be any you want
-        freq
-            wireless frequency of the nrf24l01 adapter, 2400~2525 Mhz
-        idcode
-            idcode of the MDP-P906, set to None then call auto_match() to get idcode
-        m01_channel
-            simulate the MDP-M01, this number shows on top-right of P906's LCD
-        led_color
-            the color of the digital wheel of the P906, color in RGB format
-        com_timeout
-            communication timeout in secs between P906 and the adapter
-        com_retry
-            communication retry times when timeout occurs
-        tx_output_power
-            singal output power of the nrf24l01 adapter
-        blink
-            whether to blink the under-control indicator of the P906
-        debug
-            show debug info
+        Args:
+            port (Optional[str]): Port of the nrf24l01 adapter, None to autodetect.
+            baudrate (int): Baudrate of the nrf24l01 adapter.
+            address (str): 5-byte wireless address of the nrf24l01 adapter.
+            freq (int): Wireless frequency of the nrf24l01 adapter, 2400~2525 MHz.
+            idcode (Optional[str]): ID code of the MDP-P906, set to None then call auto_match() to get idcode.
+            m01_channel (int): Simulate the MDP-M01, this number shows on top-right of P906's LCD.
+            led_color (Tuple[int, int, int]): Color of the digital wheel of the P906, in RGB format.
+            com_timeout (Optional[float]): Communication timeout in seconds between P906 and the adapter.
+            com_retry (int): Communication retry times when timeout occurs.
+            tx_output_power (Literal): Signal output power of the nrf24l01 adapter.
+            blink (bool): Whether to blink the "under-control" indicator of the P906.
+            debug (bool): Show debug info.
         """
-
         self._adp = NRF24Adapter(port=port, baudrate=baudrate, debug=debug)
         self._address = _hex_to_bytes(address)
         self._idcode = _hex_to_bytes(idcode) if idcode is not None else None
@@ -148,6 +134,7 @@ class MDP_P906:
                 self._status["State"] = {0: "off", 1: "cc", 2: "cv", 3: "on"}[state]
                 self._status["Temperature"] = temperature
                 self._status["RealtimeOutput4"] = realtime_adc
+                logger.debug(f"Type-7: {self._status}")
             elif data[0] == 9:
                 idcode, HVzero16, HVgain16, HCzero04, HCgain04 = (
                     mdp_protocal.parse_type9_response(data)
@@ -158,6 +145,7 @@ class MDP_P906:
                 self._status["HVgain16"] = HVgain16
                 self._status["HCzero04"] = HCzero04
                 self._status["HCgain04"] = HCgain04
+                logger.debug(f"Type-9: {self._status}")
             elif data[0] == 8:
                 errflag, values = mdp_protocal.parse_type8_response(
                     data,
@@ -174,6 +162,7 @@ class MDP_P906:
                 self._status["SetCurrent"], self._status["SetVoltage"] = (
                     mdp_protocal.parse_type4_response(data)
                 )
+                logger.debug(f"Type-4: {self._status}")
             elif data[0] == 5:
                 pass
             elif data[0] == 6:
@@ -181,7 +170,7 @@ class MDP_P906:
                     f"Dispatch device result: {mdp_protocal.parse_type6_response(data)}"
                 )
             else:
-                logger.debug(f"Unhandled Type-{data[0]}: {data.hex(' ').upper()}")
+                logger.warning(f"Unhandled Type-{data[0]}: {data.hex(' ').upper()}")
         except Exception:
             logger.exception("Parse error")
 
@@ -226,27 +215,22 @@ class MDP_P906:
         str, bool, float, float, float, float, float, int, List[Tuple[float, float]]
     ]:
         """
-        Get the status of the device
+        Get the status of the device.
 
-        Returns
-        -------
-            State: str
-                off / cc / cv / on (output unstable)
-            Locked: bool
-                True if the device is locked
-            SetVoltage: float
-            SetCurrent: float
-                The set value of output,
-                if values are -1, means value is unstable yet
-            InputVoltage: float
-            InputCurrent: float
-                The input value of DC/TypeC
-            Temperature: float
-                The temperature of the device
-            ErrFlag: int
-                The error flag of the system
-            RealtimeOutput: List[Tuple[float, float]]
-                A 4-values list of (voltage/V, current/A)
+        Returns:
+            Tuple containing:
+            - State (str): 'off' / 'cc' / 'cv' / 'on' (output unstable)
+            - Locked (bool): True if the device is locked
+            - SetVoltage (float): Set voltage value
+            - SetCurrent (float): Set current value
+            - InputVoltage (float): Input voltage value
+            - InputCurrent (float): Input current value
+            - Temperature (float): Device temperature
+            - ErrFlag (int): System error flag
+            - RealtimeOutput (List[Tuple[float, float]]): 4-value list of (voltage/V, current/A)
+
+        Note:
+            If SetVoltage or SetCurrent is -1, it means the value is unstable.
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(
@@ -268,11 +252,10 @@ class MDP_P906:
 
     def get_realtime_value(self) -> List[Tuple[float, float]]:
         """
-        Get the realtime values of output in sync mode
+        Get the realtime values of output in sync mode.
 
-        Returns
-        -------
-            A 9-values list of (voltage/V, current/A)
+        Returns:
+            List[Tuple[float, float]]: A 9-value list of (voltage/V, current/A)
         """
         assert self._idcode is not None, "Please pair first"
         try:
@@ -287,8 +270,10 @@ class MDP_P906:
 
     def request_realtime_value(self):
         """
-        Request the realtime values of output in async mode,
-        should call register_realtime_value_callback() first
+        Request the realtime values of output in async mode.
+
+        Note:
+            Should call register_realtime_value_callback() first.
         """
         assert self._idcode is not None, "Please pair first"
         try:
@@ -303,23 +288,19 @@ class MDP_P906:
 
     def register_realtime_value_callback(self, callback: Callable[[list], None]):
         """
-        Register a callback function to handle the realtime values of output in async mode
+        Register a callback function to handle the realtime values of output in async mode.
 
-        Parameters
-        ----------
-        callback: List[Tuple[float, float]]
-            A function that takes a list of (voltage in mV, current in mA) as input
+        Args:
+            callback (Callable[[list], None]): A function that takes a list of (voltage in mV, current in mA) as input.
         """
         self._rtvalue_callback = callback
 
     def set_output(self, state: bool):
         """
-        Set the output state of the MDP-P906
+        Set the output state of the MDP-P906.
 
-        Parameters
-        ----------
-        state
-            True for on, False for off
+        Args:
+            state (bool): True for on, False for off.
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(
@@ -331,12 +312,10 @@ class MDP_P906:
 
     def set_voltage(self, voltage_set: float):
         """
-        Set the output voltage of the MDP-P906
+        Set the output voltage of the MDP-P906.
 
-        Parameters
-        ----------
-        voltage_set
-            The voltage to be set,/V, steps 0.001V
+        Args:
+            voltage_set (float): The voltage to be set, in V, steps of 0.001V.
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(
@@ -348,12 +327,10 @@ class MDP_P906:
 
     def set_current(self, current_set: float):
         """
-        Set the output current of the MDP-P906
+        Set the output current of the MDP-P906.
 
-        Parameters
-        ----------
-        current_set
-            The current to be set, in A, steps 0.001A
+        Args:
+            current_set (float): The current to be set, in A, steps of 0.001A.
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(
@@ -365,11 +342,10 @@ class MDP_P906:
 
     def get_set_voltage_current(self) -> Tuple[float, float]:
         """
-        Get the set voltage and current of the MDP-P906
+        Get the set voltage and current of the MDP-P906.
 
-        Returns
-        -------
-        A tuple of (voltage/V, current in A)
+        Returns:
+            Tuple[float, float]: A tuple of (voltage/V, current/A).
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(mdp_protocal.gen_get_volt_cur())
@@ -377,12 +353,10 @@ class MDP_P906:
 
     def set_led_color(self, rgb: Tuple[int, int, int]):
         """
-        Set the led color of the digital wheel
+        Set the LED color of the digital wheel.
 
-        Parameters
-        ----------
-        rgb: Tuple[int, int, int]
-            The color of the led, in the form of (R, G, B)
+        Args:
+            rgb (Tuple[int, int, int]): The color of the LED, in the form of (R, G, B).
         """
         assert self._idcode is not None, "Please pair first"
         rgb565 = _convert_to_rgb565(*rgb)
@@ -395,17 +369,13 @@ class MDP_P906:
 
     def connect(self, retry_times: int = 3):
         """
-        Connect to the MDP-P906, and prepare information for calibration
+        Connect to the MDP-P906 and prepare information for calibration.
 
-        Parameters
-        ----------
-        retry_times
-            The number of times to try to connect to the MDP-P906
+        Args:
+            retry_times (int): The number of times to try to connect to the MDP-P906.
 
-        Raises
-        ------
-        Exception
-            If failed to connect to the MDP-P906
+        Raises:
+            Exception: If failed to connect to the MDP-P906.
         """
         assert self._idcode is not None, "Please pair first"
         for i in range(retry_times + 1):
@@ -425,22 +395,16 @@ class MDP_P906:
 
     def auto_match(self, try_times: int = 3) -> str:
         """
-        Auto match with the MDP-P906
+        Auto match with the MDP-P906.
 
-        Parameters
-        ----------
-        try_times
-            The number of times to try to match with the MDP-P906
+        Args:
+            try_times (int): The number of times to try to match with the MDP-P906.
 
-        Returns
-        -------
-        str
-            The idcode of the MDP-P906
+        Returns:
+            str: The ID code of the MDP-P906.
 
-        Raises
-        ------
-        Exception
-            If failed to match with the MDP-P906
+        Raises:
+            Exception: If failed to match with the MDP-P906.
         """
         setting = self._adp.nrf_get_settings()
         setting_old = deepcopy(setting)
@@ -475,11 +439,13 @@ class MDP_P906:
 
     def update_gain_offset(self) -> Tuple[int, int, int, int]:
         """
-        Update the gain and offset of the ADCs
-        Call by connect(), dont need to call again
-        Returns
-        -------
-            Tuple[int, int, int, int]
+        Update the gain and offset of the ADCs.
+
+        Note:
+            Called by connect(), doesn't need to be called again.
+
+        Returns:
+            Tuple[int, int, int, int]: A tuple containing HVzero16, HVgain16, HCzero04, HCgain04.
         """
         assert self._idcode is not None, "Please pair first"
         self._transfer(

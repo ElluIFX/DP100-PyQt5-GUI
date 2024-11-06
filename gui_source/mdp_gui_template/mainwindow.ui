@@ -31,7 +31,7 @@
       </property>
       <property name="font">
        <font>
-        <family>等距更纱黑体 SC Semibold</family>
+        <family>Sarasa Fixed SC Semibold</family>
        </font>
       </property>
       <property name="text">
@@ -43,7 +43,7 @@
      <widget class="QFrame" name="frameLcd">
       <property name="font">
        <font>
-        <family>等距更纱黑体 SC Semibold</family>
+        <family>Sarasa Fixed SC Semibold</family>
        </font>
       </property>
       <property name="frameShape">
@@ -90,7 +90,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>14</pointsize>
                 </font>
                </property>
@@ -127,7 +127,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <bold>false</bold>
                 </font>
                </property>
@@ -171,7 +171,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>14</pointsize>
                 </font>
                </property>
@@ -205,7 +205,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="frameShape">
@@ -246,7 +246,7 @@
               <widget class="QLabel" name="label_3">
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>14</pointsize>
                 </font>
                </property>
@@ -280,7 +280,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="frameShape">
@@ -314,7 +314,7 @@
               <widget class="QLabel" name="label_4">
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>14</pointsize>
                 </font>
                </property>
@@ -351,7 +351,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="frameShape">
@@ -392,7 +392,7 @@
               <widget class="QLabel" name="label_5">
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>14</pointsize>
                 </font>
                </property>
@@ -426,7 +426,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="frameShape">
@@ -460,7 +460,7 @@
               <widget class="QLabel" name="label_6">
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>14</pointsize>
                 </font>
                </property>
@@ -494,7 +494,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="frameShape">
@@ -546,7 +546,7 @@
           </property>
           <property name="font">
            <font>
-            <family>等距更纱黑体 SC Semibold</family>
+            <family>Sarasa Fixed SC Semibold</family>
            </font>
           </property>
           <property name="frameShape">
@@ -583,7 +583,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>10</pointsize>
                  <italic>false</italic>
                 </font>
@@ -616,7 +616,7 @@
                    </property>
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                      <pointsize>10</pointsize>
                     </font>
                    </property>
@@ -635,7 +635,7 @@
                   <widget class="QCheckBox" name="checkBoxQuickset">
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                     </font>
                    </property>
                    <property name="toolTip">
@@ -662,7 +662,7 @@
                    </property>
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                      <pointsize>11</pointsize>
                      <bold>true</bold>
                     </font>
@@ -686,7 +686,7 @@
                    </property>
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                      <pointsize>10</pointsize>
                     </font>
                    </property>
@@ -717,7 +717,7 @@
                    </property>
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                      <pointsize>10</pointsize>
                     </font>
                    </property>
@@ -758,7 +758,7 @@
                    </property>
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                      <pointsize>10</pointsize>
                     </font>
                    </property>
@@ -786,7 +786,7 @@
                    </property>
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                      <pointsize>10</pointsize>
                     </font>
                    </property>
@@ -845,7 +845,7 @@
                    </property>
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -906,7 +906,7 @@
                    </property>
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -953,7 +953,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>10</pointsize>
                 </font>
                </property>
@@ -972,7 +972,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="tabPosition">
@@ -1016,7 +1016,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                       </font>
                      </property>
                      <item>
@@ -1077,7 +1077,7 @@
                   <widget class="Line" name="line">
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                     </font>
                    </property>
                    <property name="frameShadow">
@@ -1095,7 +1095,7 @@
                   <widget class="QScrollArea" name="scrollArea_4">
                    <property name="font">
                     <font>
-                     <family>等距更纱黑体 SC Semibold</family>
+                     <family>Sarasa Fixed SC Semibold</family>
                     </font>
                    </property>
                    <property name="frameShape">
@@ -1129,7 +1129,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                           </font>
                          </property>
                          <property name="text">
@@ -1153,7 +1153,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <pointsize>9</pointsize>
                            <bold>true</bold>
                           </font>
@@ -1219,7 +1219,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                           </font>
                          </property>
                          <property name="text">
@@ -1243,7 +1243,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                           </font>
                          </property>
                          <property name="alignment">
@@ -1280,7 +1280,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                           </font>
                          </property>
                          <property name="text">
@@ -1304,7 +1304,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                           </font>
                          </property>
                          <property name="alignment">
@@ -1336,7 +1336,7 @@
                       <widget class="QPushButton" name="btnPresetSave">
                        <property name="font">
                         <font>
-                         <family>等距更纱黑体 SC Semibold</family>
+                         <family>Sarasa Fixed SC Semibold</family>
                         </font>
                        </property>
                        <property name="text">
@@ -1348,7 +1348,7 @@
                       <spacer name="verticalSpacer_4">
                        <property name="font">
                         <font>
-                         <family>等距更纱黑体 SC Semibold</family>
+                         <family>Sarasa Fixed SC Semibold</family>
                         </font>
                        </property>
                        <property name="orientation">
@@ -1416,7 +1416,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1441,7 +1441,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1479,7 +1479,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1504,7 +1504,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1545,7 +1545,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1570,7 +1570,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1611,7 +1611,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1636,7 +1636,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1732,7 +1732,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1757,7 +1757,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1790,7 +1790,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1815,7 +1815,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1853,7 +1853,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1878,7 +1878,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1919,7 +1919,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1944,7 +1944,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -1985,7 +1985,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2010,7 +2010,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2100,7 +2100,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2125,7 +2125,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2170,7 +2170,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2195,7 +2195,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2236,7 +2236,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2261,7 +2261,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2302,7 +2302,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2327,7 +2327,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2365,7 +2365,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2390,7 +2390,7 @@
                          </property>
                          <property name="font">
                           <font>
-                           <family>等距更纱黑体 SC Semibold</family>
+                           <family>Sarasa Fixed SC Semibold</family>
                            <bold>true</bold>
                           </font>
                          </property>
@@ -2510,7 +2510,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                        <pointsize>8</pointsize>
                        <bold>true</bold>
                       </font>
@@ -2542,7 +2542,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                        <pointsize>8</pointsize>
                        <bold>true</bold>
                       </font>
@@ -2574,7 +2574,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                        <pointsize>8</pointsize>
                        <bold>true</bold>
                       </font>
@@ -2606,7 +2606,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                        <pointsize>8</pointsize>
                        <bold>true</bold>
                       </font>
@@ -2648,7 +2648,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                        <pointsize>8</pointsize>
                        <bold>true</bold>
                       </font>
@@ -2680,7 +2680,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                        <pointsize>8</pointsize>
                        <bold>true</bold>
                       </font>
@@ -2712,7 +2712,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                        <pointsize>8</pointsize>
                        <bold>true</bold>
                       </font>
@@ -2744,7 +2744,7 @@
                      </property>
                      <property name="font">
                       <font>
-                       <family>等距更纱黑体 SC Semibold</family>
+                       <family>Sarasa Fixed SC Semibold</family>
                        <pointsize>8</pointsize>
                        <bold>true</bold>
                       </font>
@@ -2810,7 +2810,7 @@
           </property>
           <property name="font">
            <font>
-            <family>等距更纱黑体 SC Semibold</family>
+            <family>Sarasa Fixed SC Semibold</family>
            </font>
           </property>
           <property name="frameShape">
@@ -2850,7 +2850,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>10</pointsize>
                  <italic>false</italic>
                 </font>
@@ -2872,7 +2872,7 @@
                 <widget class="QLabel" name="labelComSpeed">
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -2887,7 +2887,7 @@
                 <widget class="QLabel" name="labelErrRate">
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -2909,7 +2909,7 @@
                 <widget class="QLabel" name="labelError">
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -2924,7 +2924,7 @@
                 <widget class="QLabel" name="labelInputVals">
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -2946,7 +2946,7 @@
                 <widget class="QLabel" name="labelLockState">
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -2961,7 +2961,7 @@
                 <widget class="QLabel" name="labelTemperature">
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -2989,7 +2989,7 @@
           </property>
           <property name="font">
            <font>
-            <family>等距更纱黑体 SC Semibold</family>
+            <family>Sarasa Fixed SC Semibold</family>
            </font>
           </property>
           <property name="frameShape">
@@ -3037,7 +3037,7 @@
                  </property>
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -3061,7 +3061,7 @@
                  </property>
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -3077,7 +3077,7 @@
                 <widget class="QLabel" name="labelConnectState">
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                    <italic>false</italic>
                    <bold>false</bold>
                   </font>
@@ -3106,7 +3106,7 @@
                  </property>
                  <property name="font">
                   <font>
-                   <family>等距更纱黑体 SC Semibold</family>
+                   <family>Sarasa Fixed SC Semibold</family>
                   </font>
                  </property>
                  <property name="text">
@@ -3130,7 +3130,7 @@
         </property>
         <property name="font">
          <font>
-          <family>等距更纱黑体 SC Semibold</family>
+          <family>Sarasa Fixed SC Semibold</family>
          </font>
         </property>
         <property name="frameShape">
@@ -3182,7 +3182,7 @@
              </property>
              <property name="font">
               <font>
-               <family>等距更纱黑体 SC Semibold</family>
+               <family>Sarasa Fixed SC Semibold</family>
                <pointsize>10</pointsize>
                <italic>false</italic>
               </font>
@@ -3207,7 +3207,7 @@
               <widget class="QLabel" name="label_13">
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="text">
@@ -3234,7 +3234,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <item>
@@ -3280,7 +3280,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="currentIndex">
@@ -3323,7 +3323,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="text">
@@ -3350,7 +3350,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="currentIndex">
@@ -3418,7 +3418,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="text">
@@ -3433,7 +3433,7 @@
               <spacer name="horizontalSpacer">
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="orientation">
@@ -3457,7 +3457,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="text">
@@ -3475,7 +3475,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="text">
@@ -3493,7 +3493,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="text">
@@ -3511,7 +3511,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="text">
@@ -3529,7 +3529,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                 </font>
                </property>
                <property name="text">
@@ -3549,7 +3549,7 @@
              </property>
              <property name="font">
               <font>
-               <family>等距更纱黑体 SC Semibold</family>
+               <family>Sarasa Fixed SC Semibold</family>
               </font>
              </property>
             </widget>
@@ -3558,7 +3558,7 @@
             <widget class="PlotWidget" name="widgetGraph2" native="true">
              <property name="font">
               <font>
-               <family>等距更纱黑体 SC Semibold</family>
+               <family>Sarasa Fixed SC Semibold</family>
               </font>
              </property>
             </widget>
@@ -3567,7 +3567,7 @@
             <spacer name="verticalSpacer_5">
              <property name="font">
               <font>
-               <family>等距更纱黑体 SC Semibold</family>
+               <family>Sarasa Fixed SC Semibold</family>
               </font>
              </property>
              <property name="orientation">
@@ -3605,7 +3605,7 @@
                </property>
                <property name="font">
                 <font>
-                 <family>等距更纱黑体 SC Semibold</family>
+                 <family>Sarasa Fixed SC Semibold</family>
                  <pointsize>10</pointsize>
                  <italic>false</italic>
                  <bold>true</bold>
