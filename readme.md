@@ -2,7 +2,7 @@
 
 **[English Version](./readme_EN.md)**
 
-不需要MDP-M01显控模块即可对电源进行无线控制，同时支持P905(已测试, [#1](https://github.com/ElluIFX/MDP-P906-Controller/issues/1))
+不需要MDP-M01显控模块即可对电源进行无线控制，同时支持P905(已测试, 但可能需要校准, 见[#1](https://github.com/ElluIFX/MDP-P906-Controller/issues/1)和[#2](https://github.com/ElluIFX/MDP-P906-Controller/issues/2))
 
 ![1721971701832](image/readme/1721971701832.png)
 

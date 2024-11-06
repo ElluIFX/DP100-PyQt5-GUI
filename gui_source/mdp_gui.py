@@ -548,6 +548,15 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.curve1.setData(x=[], y=[])
         self.curve2.setData(x=[], y=[])
         self.ui.labelGraphInfo.setText("No Info")
+        for widget in [
+            self.ui.lcdVoltage,
+            self.ui.lcdCurrent,
+            self.ui.lcdResistence,
+            self.ui.lcdPower,
+            self.ui.lcdAvgPower,
+            self.ui.lcdEnerge,
+        ]:
+            widget.display("")
 
     def open_state_ui(self):
         self.ui.labelConnectState.setText(self.tr("已连接"))
