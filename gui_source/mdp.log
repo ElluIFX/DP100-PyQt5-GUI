@@ -1,0 +1,24 @@
+2024-11-07 16:16:11.953 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 16:16:11.990 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 16:16:12.313 | INFO     | __main__:<module>:52 - OpenGL successfully enabled
+2024-11-07 16:16:12.750 | INFO     | __main__:<module>:62 - Numba successfully enabled
+2024-11-07 16:16:12.889 | INFO     | __main__:<module>:82 - System language: zh_CN
+2024-11-07 16:16:13.008 | INFO     | __main__:<module>:93 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 16:16:13.010 | DEBUG    | __main__:<module>:94 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 16:16:13.013 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: False
+2024-11-07 16:16:18.217 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: False
+2024-11-07 16:16:20.639 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: True
+2024-11-07 16:16:23.280 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: False
+2024-11-07 16:16:23.586 | INFO     | __main__:update_hardware_setting:303 - Antialias: False, OpenGL: False
+2024-11-07 16:17:07.189 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 16:17:07.207 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 16:17:07.386 | INFO     | __main__:<module>:52 - OpenGL successfully enabled
+2024-11-07 16:17:07.592 | INFO     | __main__:<module>:62 - Numba successfully enabled
+2024-11-07 16:17:07.655 | INFO     | __main__:<module>:82 - System language: zh_CN
+2024-11-07 16:17:07.710 | INFO     | __main__:<module>:93 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 16:17:07.715 | DEBUG    | __main__:<module>:94 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 16:17:07.717 | INFO     | __main__:update_hardware_setting:303 - Antialias: False, OpenGL: False
+2024-11-07 16:17:14.033 | INFO     | __main__:update_hardware_setting:303 - Antialias: False, OpenGL: True
+2024-11-07 16:17:14.428 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: True
+2024-11-07 16:17:15.742 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: False
+2024-11-07 16:17:16.040 | INFO     | __main__:update_hardware_setting:303 - Antialias: False, OpenGL: False

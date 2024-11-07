@@ -450,7 +450,52 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="checkBoxOpenGL">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="checkBoxOpenGL">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>OpenGL加速</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBoxAntialias">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>曲线抗锯齿</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="labelNumba">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>999</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <family>Sarasa Fixed SC SemiBold</family>
@@ -458,7 +503,13 @@
       </font>
      </property>
      <property name="text">
-      <string>开启OpenGL绘图</string>
+      <string>Numba 加速已启用</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>6</number>
      </property>
     </widget>
    </item>

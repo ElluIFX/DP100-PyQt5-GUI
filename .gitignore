@@ -5,6 +5,7 @@
 
 # project out
 build
+build-opengl
 dist
 
 # eide template

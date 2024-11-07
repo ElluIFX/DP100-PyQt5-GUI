@@ -41,22 +41,26 @@ import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
 from qframelesswindow import FramelessWindow, TitleBar
 
-OPENGL_AVAILABLE = False
+OPENGL_AVALIABLE = False
 try:
     import OpenGL  # noqa: F401
 
-    OPENGL_AVAILABLE = True
-    pg.setConfigOption("enableExperimental", True)
-    pg.setConfigOption("antialias", True)
+    # pg.setConfigOption("antialias", True)
+    # pg.setConfigOption("enableExperimental", True)
+    # pg.setConfigOption("useOpenGL", True)
+    OPENGL_AVALIABLE = True
     logger.info("OpenGL successfully enabled")
 except Exception as e:
     logger.warning(f"Enabling OpenGL failed with {e}.")
 
+NUMBA_ENABLED = False
 try:
+    import llvmlite  # noqa: F401
     import numba as nb  # noqa: F401
 
     pg.setConfigOption("useNumba", True)
     logger.info("Numba successfully enabled")
+    NUMBA_ENABLED = True
 except Exception as e:
     logger.warning(f"Enabling Numba failed with {e}.")
 
@@ -262,7 +266,8 @@ class Setting:
         self.state_fps = 15
         self.interp = 1
         self.avgmode = 1
-        self.opengl = False
+        self.opengl = OPENGL_AVALIABLE
+        self.antialias = True
 
         self.v_threshold = 0.002
         self.i_threshold = 0.002
@@ -288,7 +293,17 @@ class Setting:
 
 setting = Setting()
 setting.load(SETTING_FILE)
-pg.setConfigOption("useOpenGL", setting.opengl)
+
+
+def update_hardware_setting():
+    pg.setConfigOption("antialias", setting.antialias)
+    if OPENGL_AVALIABLE:
+        pg.setConfigOption("enableExperimental", setting.opengl)
+        pg.setConfigOption("useOpenGL", setting.opengl)
+    logger.info(f"Antialias: {setting.antialias}, OpenGL: {setting.opengl}")
+
+
+update_hardware_setting()
 
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
@@ -309,7 +324,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.fps_counter = FPSCounter()
-        self.CustomTitleBar = CustomTitleBar(self, self.tr("MDP-P906 数控电源上位机"))
+        self.CustomTitleBar = CustomTitleBar(
+            self,
+            self.tr("MDP-P906 数控电源上位机"),
+        )
         self.CustomTitleBar.set_theme("dark")
         self.ui.comboDataFps.setCurrentText(f"{self.data_fps}Hz")
         self.setTitleBar(self.CustomTitleBar)
@@ -1703,10 +1721,15 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.CustomTitleBar.set_close_btn_enabled(False)
         self.setTitleBar(self.CustomTitleBar)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        if not OPENGL_AVAILABLE:
+        if NUMBA_ENABLED:
+            self.ui.labelNumba.setVisible(True)
+            set_color(self.ui.labelNumba, "#9DD285")
+        else:
+            self.ui.labelNumba.setVisible(False)
+
+        if not OPENGL_AVALIABLE:
             self.ui.checkBoxOpenGL.setEnabled(False)
-            self.ui.checkBoxOpenGL.setCheckState(False)
-        self.ui.checkBoxOpenGL.clicked.connect(self.set_opengl)
+            self.ui.checkBoxOpenGL.setChecked(False)
 
     def initValues(self):
         self.ui.spinMaxFps.setValue(setting.graph_max_fps)
@@ -1714,8 +1737,6 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.ui.spinDataLength.setValue(setting.data_pts)
         self.ui.comboInterp.setCurrentIndex(setting.interp)
         self.ui.comboAvgMode.setCurrentIndex(setting.avgmode)
-        if OPENGL_AVAILABLE:
-            self.ui.checkBoxOpenGL.setChecked(setting.opengl)
         self.ui.spinStateVThres.setValue(setting.v_threshold)
         self.ui.spinStateIThres.setValue(setting.i_threshold)
         self.ui.checkBoxUseCali.setChecked(setting.use_cali)
@@ -1723,6 +1744,8 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.ui.spinCaliVb.setValue(setting.v_cali_b)
         self.ui.spinCaliIk.setValue(setting.i_cali_k)
         self.ui.spinCaliIb.setValue(setting.i_cali_b)
+        self.ui.checkBoxAntialias.setChecked(setting.antialias)
+        self.ui.checkBoxOpenGL.setChecked(setting.opengl)
 
     def show(self) -> None:
         self.initValues()
@@ -1746,10 +1769,15 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         DialogSettings.CustomTitleBar.set_theme(theme)
         DialogGraphics.CustomTitleBar.set_theme(theme)
 
-    def set_opengl(self, enable):
-        setting.opengl = enable
-        pg.setConfigOption("useOpenGL", enable)
-        logger.info(f"OpenGL {'enabled' if enable else 'disabled'}")
+    @QtCore.pyqtSlot(int)
+    def on_checkBoxAntialias_stateChanged(self, state: int):
+        setting.antialias = state == QtCore.Qt.CheckState.Checked
+        update_hardware_setting()
+
+    @QtCore.pyqtSlot(int)
+    def on_checkBoxOpenGL_stateChanged(self, state: int):
+        setting.opengl = state == QtCore.Qt.CheckState.Checked
+        update_hardware_setting()
 
     @QtCore.pyqtSlot(float)
     def on_spinMaxFps_valueChanged(self, _=None):
@@ -1811,7 +1839,6 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
             setting.data_pts = self.ui.spinDataLength.value()
             setting.interp = self.ui.comboInterp.currentIndex()
             setting.avgmode = self.ui.comboAvgMode.currentIndex()
-            setting.opengl = self.ui.checkBoxOpenGL.isChecked()
             setting.v_threshold = self.ui.spinStateVThres.value()
             setting.i_threshold = self.ui.spinStateIThres.value()
             setting.use_cali = self.ui.checkBoxUseCali.isChecked()
@@ -1819,6 +1846,8 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
             setting.v_cali_b = self.ui.spinCaliVb.value()
             setting.i_cali_k = self.ui.spinCaliIk.value()
             setting.i_cali_b = self.ui.spinCaliIb.value()
+            setting.antialias = self.ui.checkBoxAntialias.isChecked()
+            setting.opengl = self.ui.checkBoxOpenGL.isChecked()
             setting.save(SETTING_FILE)
         except Exception as e:
             logger.error(e)

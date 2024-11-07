@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Code\stm32\MDP_Adapter\mdp_gui_template\graphics.ui'
+# Form implementation generated from reading ui file 'c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui_template\graphics.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -17,9 +17,7 @@ class Ui_DialogGraphics(object):
         DialogGraphics.setWindowModality(QtCore.Qt.WindowModal)
         DialogGraphics.setEnabled(True)
         DialogGraphics.resize(217, 595)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(DialogGraphics.sizePolicy().hasHeightForWidth())
@@ -52,9 +50,7 @@ class Ui_DialogGraphics(object):
         self.comboTheme.setFont(font)
         self.comboTheme.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.comboTheme.setEditable(False)
-        self.comboTheme.setSizeAdjustPolicy(
-            QtWidgets.QComboBox.AdjustToContentsOnFirstShow
-        )
+        self.comboTheme.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContentsOnFirstShow)
         self.comboTheme.setObjectName("comboTheme")
         self.comboTheme.addItem("")
         self.comboTheme.addItem("")
@@ -75,9 +71,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinMaxFps.setFont(font)
-        self.spinMaxFps.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinMaxFps.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinMaxFps.setDecimals(1)
         self.spinMaxFps.setMinimum(1.0)
         self.spinMaxFps.setMaximum(120.0)
@@ -100,9 +94,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinDataLength.setFont(font)
-        self.spinDataLength.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinDataLength.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinDataLength.setPrefix("")
         self.spinDataLength.setMinimum(100)
         self.spinDataLength.setMaximum(10000)
@@ -127,9 +119,7 @@ class Ui_DialogGraphics(object):
         self.comboAvgMode.setFont(font)
         self.comboAvgMode.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.comboAvgMode.setEditable(False)
-        self.comboAvgMode.setSizeAdjustPolicy(
-            QtWidgets.QComboBox.AdjustToContentsOnFirstShow
-        )
+        self.comboAvgMode.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContentsOnFirstShow)
         self.comboAvgMode.setObjectName("comboAvgMode")
         self.comboAvgMode.addItem("")
         self.comboAvgMode.addItem("")
@@ -150,9 +140,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinStateFps.setFont(font)
-        self.spinStateFps.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinStateFps.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinStateFps.setDecimals(1)
         self.spinStateFps.setMinimum(1.0)
         self.spinStateFps.setMaximum(120.0)
@@ -177,22 +165,41 @@ class Ui_DialogGraphics(object):
         self.comboInterp.setFont(font)
         self.comboInterp.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.comboInterp.setEditable(False)
-        self.comboInterp.setSizeAdjustPolicy(
-            QtWidgets.QComboBox.AdjustToContentsOnFirstShow
-        )
+        self.comboInterp.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContentsOnFirstShow)
         self.comboInterp.setObjectName("comboInterp")
         self.comboInterp.addItem("")
         self.comboInterp.addItem("")
         self.comboInterp.addItem("")
         self.comboInterp.addItem("")
         self.verticalLayout.addWidget(self.comboInterp)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setSpacing(6)
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.checkBoxOpenGL = QtWidgets.QCheckBox(DialogGraphics)
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.checkBoxOpenGL.setFont(font)
         self.checkBoxOpenGL.setObjectName("checkBoxOpenGL")
-        self.verticalLayout.addWidget(self.checkBoxOpenGL)
+        self.horizontalLayout_5.addWidget(self.checkBoxOpenGL)
+        self.checkBoxAntialias = QtWidgets.QCheckBox(DialogGraphics)
+        font = QtGui.QFont()
+        font.setFamily("Sarasa Fixed SC SemiBold")
+        font.setBold(True)
+        self.checkBoxAntialias.setFont(font)
+        self.checkBoxAntialias.setObjectName("checkBoxAntialias")
+        self.horizontalLayout_5.addWidget(self.checkBoxAntialias)
+        self.verticalLayout.addLayout(self.horizontalLayout_5)
+        self.labelNumba = QtWidgets.QLabel(DialogGraphics)
+        self.labelNumba.setMinimumSize(QtCore.QSize(0, 24))
+        self.labelNumba.setMaximumSize(QtCore.QSize(999, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Sarasa Fixed SC SemiBold")
+        font.setBold(True)
+        self.labelNumba.setFont(font)
+        self.labelNumba.setAlignment(QtCore.Qt.AlignCenter)
+        self.labelNumba.setObjectName("labelNumba")
+        self.verticalLayout.addWidget(self.labelNumba)
         self.line = QtWidgets.QFrame(DialogGraphics)
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -216,9 +223,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinStateVThres.setFont(font)
-        self.spinStateVThres.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinStateVThres.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinStateVThres.setDecimals(3)
         self.spinStateVThres.setMinimum(0.0)
         self.spinStateVThres.setMaximum(1.0)
@@ -231,9 +236,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinStateIThres.setFont(font)
-        self.spinStateIThres.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinStateIThres.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinStateIThres.setDecimals(3)
         self.spinStateIThres.setMinimum(0.0)
         self.spinStateIThres.setMaximum(1.0)
@@ -267,9 +270,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinCaliVk.setFont(font)
-        self.spinCaliVk.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinCaliVk.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinCaliVk.setSuffix("")
         self.spinCaliVk.setDecimals(6)
         self.spinCaliVk.setMinimum(-100.0)
@@ -283,9 +284,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinCaliVb.setFont(font)
-        self.spinCaliVb.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinCaliVb.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinCaliVb.setSuffix("")
         self.spinCaliVb.setDecimals(6)
         self.spinCaliVb.setMinimum(-100.0)
@@ -303,9 +302,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinCaliIk.setFont(font)
-        self.spinCaliIk.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinCaliIk.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinCaliIk.setSuffix("")
         self.spinCaliIk.setDecimals(6)
         self.spinCaliIk.setMinimum(-100.0)
@@ -319,9 +316,7 @@ class Ui_DialogGraphics(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.spinCaliIb.setFont(font)
-        self.spinCaliIb.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.spinCaliIb.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.spinCaliIb.setSuffix("")
         self.spinCaliIb.setDecimals(6)
         self.spinCaliIb.setMinimum(-100.0)
@@ -366,14 +361,14 @@ class Ui_DialogGraphics(object):
         self.comboInterp.setItemText(1, _translate("DialogGraphics", "一位插值"))
         self.comboInterp.setItemText(2, _translate("DialogGraphics", "二位插值"))
         self.comboInterp.setItemText(3, _translate("DialogGraphics", "三位插值"))
-        self.checkBoxOpenGL.setText(_translate("DialogGraphics", "开启OpenGL绘图"))
+        self.checkBoxOpenGL.setText(_translate("DialogGraphics", "OpenGL加速"))
+        self.checkBoxAntialias.setText(_translate("DialogGraphics", "曲线抗锯齿"))
+        self.labelNumba.setText(_translate("DialogGraphics", "Numba 加速已启用"))
         self.label_42.setText(_translate("DialogGraphics", "置零阈值"))
         self.spinStateVThres.setSuffix(_translate("DialogGraphics", "V"))
         self.spinStateIThres.setSuffix(_translate("DialogGraphics", "A"))
         self.labelCali.setText(_translate("DialogGraphics", "手动校准"))
-        self.checkBoxUseCali.setText(
-            _translate("DialogGraphics", "使用校准参数 (y=kx+b)")
-        )
+        self.checkBoxUseCali.setText(_translate("DialogGraphics", "使用校准参数 (y=kx+b)"))
         self.spinCaliVk.setPrefix(_translate("DialogGraphics", "Vk="))
         self.spinCaliVb.setPrefix(_translate("DialogGraphics", "Vb="))
         self.spinCaliIk.setPrefix(_translate("DialogGraphics", "Ik="))
