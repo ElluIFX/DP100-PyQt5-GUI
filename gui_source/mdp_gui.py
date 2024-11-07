@@ -23,14 +23,14 @@ from mdp_controller import MDP_P906
 ARG_PATH = os.path.dirname(sys.argv[0])
 ABS_PATH = os.path.dirname(__file__)
 
-if os.environ.get("MDP_ENABLE_LOG") is not None:
+if os.environ.get("MDP_ENABLE_LOG") is not None or "--debug" in sys.argv:
     richuru.install()
     logger.add(
         os.path.join(ARG_PATH, "mdp.log"), level="TRACE", backtrace=True, diagnose=True
     )
     DEBUG = True
 else:
-    richuru.install(tracebacks_suppress=[mdp_controller])
+    richuru.install(tracebacks_suppress=[mdp_controller], level="INFO")
     DEBUG = False
 
 logger.info("---- NEW SESSION ----")
@@ -82,7 +82,11 @@ app = QtWidgets.QApplication(sys.argv)
 system_lang = QtCore.QLocale.system().name()
 logger.info(f"System language: {system_lang}")
 ENGLISH = False
-if not system_lang.startswith("zh") or os.environ.get("MDP_FORCE_ENGLISH") == "1":
+if (
+    not system_lang.startswith("zh")
+    or os.environ.get("MDP_FORCE_ENGLISH") == "1"
+    or "--english" in sys.argv
+):
     trans = QtCore.QTranslator()
     trans.load(os.path.join(ABS_PATH, "en_US.qm"))
     app.installTranslator(trans)
@@ -120,7 +124,7 @@ class RealtimeData:
         self.powers = np.zeros(data_length, np.float64)
         self.resistances = np.zeros(data_length, np.float64)
         self.times = np.zeros(data_length, np.float64)
-        self.update_count = data_length
+        self.update_count = 0
         self.data_length = data_length
 
 
@@ -757,22 +761,28 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             t = t1 - data.start_time
             dt = t1 - data.last_time
             data.last_time = t1
-            if data.save_datas_flag:
-                data.voltages = np.roll(data.voltages, -len_)
-                data.currents = np.roll(data.currents, -len_)
-                data.powers = np.roll(data.powers, -len_)
-                data.resistances = np.roll(data.resistances, -len_)
-                data.times = np.roll(data.times, -len_)
-                if data.update_count >= len_:
-                    data.update_count -= len_
             for idx, (v, i) in enumerate(rtvalues):
                 data.energy += v * i * (dt / len_)
-                if data.save_datas_flag:
-                    data.voltages[-len_ + idx] = v
-                    data.currents[-len_ + idx] = i
-                    data.powers[-len_ + idx] = v * i
-                    data.resistances[-len_ + idx] = v / i if i != 0 else self.open_r
-                    data.times[-len_ + idx] = t - dt + (dt / len_) * (idx + 1)
+            if data.save_datas_flag:
+                if data.update_count + len_ > data.data_length:
+                    offset = data.update_count + len_ - data.data_length
+                    data.voltages = np.roll(data.voltages, -offset)
+                    data.currents = np.roll(data.currents, -offset)
+                    data.powers = np.roll(data.powers, -offset)
+                    data.resistances = np.roll(data.resistances, -offset)
+                    data.times = np.roll(data.times, -offset)
+                    data.update_count -= offset
+                for idx, (v, i) in enumerate(rtvalues):
+                    data.voltages[data.update_count + idx] = v
+                    data.currents[data.update_count + idx] = i
+                    data.powers[data.update_count + idx] = v * i
+                    data.resistances[data.update_count + idx] = (
+                        v / i if i != 0 else self.open_r
+                    )
+                    data.times[data.update_count + idx] = (
+                        t - dt + (dt / len_) * (idx + 1)
+                    )
+                data.update_count += len_
         self.fps_counter.tick()
 
     def update_state_lcd(self):
@@ -916,14 +926,14 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def get_data(self, text: str, display_pts: int):
         if text == self.tr("电压"):
-            data = self.data.voltages[self.data.update_count :]
+            data = self.data.voltages[: self.data.update_count]
         elif text == self.tr("电流"):
-            data = self.data.currents[self.data.update_count :]
+            data = self.data.currents[: self.data.update_count]
         elif text == self.tr("功率"):
-            data = self.data.powers[self.data.update_count :]
+            data = self.data.powers[: self.data.update_count]
         elif text == self.tr("阻值"):
-            data = self.data.resistances[self.data.update_count :]
-            time = self.data.times[self.data.update_count :]
+            data = self.data.resistances[: self.data.update_count]
+            time = self.data.times[: self.data.update_count]
             # find indexs that != self.open_r
             indexs = np.where(data != self.open_r)[0]
             data = data[indexs]
@@ -948,7 +958,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         eval_data = data[start_index:]
         return (
             data,
-            self.data.times[self.data.update_count :],
+            self.data.times[: self.data.update_count],
             start_index,
             np.max(eval_data),
             np.min(eval_data),
@@ -1035,7 +1045,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.data.powers = np.zeros(self.data.data_length, np.float64)
             self.data.resistances = np.zeros(self.data.data_length, np.float64)
             self.data.times = np.zeros(self.data.data_length, np.float64)
-            self.data.update_count = self.data.data_length
+            self.data.update_count = 0
             t = time.perf_counter()
             self.data.start_time = t
             self.data.last_time = t

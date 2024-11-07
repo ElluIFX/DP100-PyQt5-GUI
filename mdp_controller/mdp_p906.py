@@ -275,6 +275,9 @@ class MDP_P906:
 
         Returns:
             List[Tuple[float, float]]: A 9-value list of (voltage/V, current/A)
+
+        Note:
+            return [] if failed.
         """
         assert self._idcode is not None, "Please pair first"
         try:
@@ -287,12 +290,15 @@ class MDP_P906:
         except (TimeoutError, NRF24AdapterError):
             return []
 
-    def request_realtime_value(self):
+    def request_realtime_value(self) -> bool:
         """
         Request the realtime values of output in async mode.
 
         Note:
             Should call register_realtime_value_callback() first.
+
+        Returns:
+            bool: True if success, False if failed.
         """
         assert self._idcode is not None, "Please pair first"
         try:
@@ -302,8 +308,9 @@ class MDP_P906:
                 ),
                 wait_response=False,
             )
+            return True
         except (TimeoutError, NRF24AdapterError):
-            pass
+            return False
 
     def register_realtime_value_callback(self, callback: Callable[[list], None]):
         """
@@ -311,6 +318,9 @@ class MDP_P906:
 
         Args:
             callback (Callable[[list], None]): A function that takes a list of (voltage in mV, current in mA) as input.
+
+        Note:
+            The callback will be called in a separate thread. get_realtime_value() will also trigger the callback like request_realtime_value(), but in blocking mode.
         """
         self._rtvalue_callback = callback
 
