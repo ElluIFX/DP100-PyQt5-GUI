@@ -260,7 +260,8 @@ class Setting:
         self.m01ch = "CH-0"
         self.blink = False
 
-        self.data_pts = 1000
+        self.data_pts = 50000
+        self.display_pts = 1000
         self.graph_max_fps = 50
         self.state_fps = 15
         self.interp = 1
@@ -276,7 +277,10 @@ class Setting:
         self.v_cali_b = 0.0
         self.i_cali_k = 1.0
         self.i_cali_b = 0.0
-
+        self.vset_cali_k = 1.0
+        self.vset_cali_b = 0.0
+        self.iset_cali_k = 1.0
+        self.iset_cali_b = 0.0
         self.theme = "dark"
         self.color_palette = {
             "dark": {
@@ -503,6 +507,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxVoltage.setValue(value)
         if self.api is None or self.locked:
             return
+        if setting.use_cali:
+            value = value * setting.vset_cali_k + setting.vset_cali_b
         self.api.set_voltage(value)
         self._last_state_change_t = time.perf_counter()
 
@@ -516,6 +522,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxCurrent.setValue(value)
         if self.api is None or self.locked:
             return
+        if setting.use_cali:
+            value = value * setting.iset_cali_k + setting.iset_cali_b
         self.api.set_current(value)
         self._last_state_change_t = time.perf_counter()
 
@@ -567,10 +575,14 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.locked = Locked
         self.ui.frameOutputSetting.setEnabled(not Locked)
         if SetVoltage >= 0:
+            if setting.use_cali:
+                SetVoltage = (SetVoltage - setting.vset_cali_b) / setting.vset_cali_k
             self._v_set = SetVoltage
             if not self.ui.spinBoxVoltage.hasFocus():
                 self.ui.spinBoxVoltage.setValue(SetVoltage)
         if SetCurrent >= 0:
+            if setting.use_cali:
+                SetCurrent = (SetCurrent - setting.iset_cali_b) / setting.iset_cali_k
             self._i_set = SetCurrent
             if not self.ui.spinBoxCurrent.hasFocus():
                 self.ui.spinBoxCurrent.setValue(SetCurrent)
@@ -902,7 +914,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.pen1.setColor(QtGui.QColor(setting.color_palette[setting.theme]["line1"]))
         self.pen2.setColor(QtGui.QColor(setting.color_palette[setting.theme]["line2"]))
 
-    def get_data(self, text):
+    def get_data(self, text: str, display_pts: int):
         if text == self.tr("电压"):
             data = self.data.voltages[self.data.update_count :]
         elif text == self.tr("电流"):
@@ -916,19 +928,31 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             indexs = np.where(data != self.open_r)[0]
             data = data[indexs]
             if data.size == 0:
-                return None, None, None, None, None
+                return None, None, None, None, None, None
             time = time[indexs]
-            return data, np.max(data), np.min(data), np.mean(data), time
+            start_index = max(0, len(data) - display_pts)
+            eval_data = data[start_index:]
+            return (
+                data,
+                time,
+                start_index,
+                np.max(eval_data),
+                np.min(eval_data),
+                np.mean(eval_data),
+            )
         elif text == self.tr("无"):
-            return None, None, None, None, None
+            return None, None, None, None, None, None
         if data.size == 0:
-            return None, None, None, None, None
+            return None, None, None, None, None, None
+        start_index = max(0, len(data) - display_pts)
+        eval_data = data[start_index:]
         return (
             data,
-            np.max(data),
-            np.min(data),
-            np.mean(data),
             self.data.times[self.data.update_count :],
+            start_index,
+            np.max(eval_data),
+            np.min(eval_data),
+            np.mean(eval_data),
         )
 
     _typename_dict = None
@@ -947,8 +971,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         type1 = self.ui.comboGraph1Data.currentText()
         type2 = self.ui.comboGraph2Data.currentText()
         with self.data.sync_lock:
-            data1, max1, min1, avg1, time1 = self.get_data(type1)
-            data2, max2, min2, avg2, time2 = self.get_data(type2)
+            data1, time1, start_index1, max1, min1, avg1 = self.get_data(
+                type1, setting.display_pts
+            )
+            data2, time2, start_index2, max2, min2, avg2 = self.get_data(
+                type2, setting.display_pts
+            )
         _ = self._typename_dict.get(type1)
         if data1 is not None and data1.size > 0:
             self.curve1.setData(x=time1, y=data1)
@@ -977,12 +1005,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 if max1 != np.inf and min1 != -np.inf:
                     add1 = max(0.01, (max1 - min1) * 0.05)
                     self.ui.widgetGraph1.setYRange(min1 - add1, max1 + add1)
-                    self.ui.widgetGraph1.setXRange(time1[0], time1[-1])
+                    self.ui.widgetGraph1.setXRange(time1[start_index1], time1[-1])
             if data2 is not None and time2.size != 0:
                 if max2 != np.inf and min2 != -np.inf:
                     add2 = max(0.01, (max2 - min2) * 0.05)
                     self.ui.widgetGraph2.setYRange(min2 - add2, max2 + add2)
-                    self.ui.widgetGraph2.setXRange(time2[0], time2[-1])
+                    self.ui.widgetGraph2.setXRange(time2[start_index2], time2[-1])
 
     def set_graph1_data(self, text):
         if text == self.tr("无"):
@@ -1795,6 +1823,8 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.ui.spinMaxFps.setValue(setting.graph_max_fps)
         self.ui.spinStateFps.setValue(setting.state_fps)
         self.ui.spinDataLength.setValue(setting.data_pts)
+        self.ui.spinDisplayLength.setMaximum(setting.data_pts)
+        self.ui.spinDisplayLength.setValue(setting.display_pts)
         self.ui.comboInterp.setCurrentIndex(setting.interp)
         self.ui.comboAvgMode.setCurrentIndex(setting.avgmode)
         self.ui.spinStateVThres.setValue(setting.v_threshold)
@@ -1804,6 +1834,10 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.ui.spinCaliVb.setValue(setting.v_cali_b)
         self.ui.spinCaliIk.setValue(setting.i_cali_k)
         self.ui.spinCaliIb.setValue(setting.i_cali_b)
+        self.ui.spinCaliVk_2.setValue(setting.vset_cali_k)
+        self.ui.spinCaliVb_2.setValue(setting.vset_cali_b)
+        self.ui.spinCaliIk_2.setValue(setting.iset_cali_k)
+        self.ui.spinCaliIb_2.setValue(setting.iset_cali_b)
         self.ui.checkBoxAntialias.setChecked(setting.antialias)
         self.ui.checkBoxOpenGL.setChecked(setting.opengl)
         self.ui.comboTheme.setCurrentIndex(
@@ -1851,8 +1885,16 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
 
     @QtCore.pyqtSlot()
     def on_spinDataLength_editingFinished(self):
-        setting.data_pts = self.ui.spinDataLength.value()
-        self.set_data_len_sig.emit(self.ui.spinDataLength.value())
+        value = self.ui.spinDataLength.value()
+        if value == setting.data_pts:
+            return
+        setting.data_pts = value
+        self.set_data_len_sig.emit(value)
+        self.ui.spinDisplayLength.setMaximum(value)
+
+    @QtCore.pyqtSlot()
+    def on_spinDisplayLength_editingFinished(self):
+        setting.display_pts = self.ui.spinDisplayLength.value()
 
     @QtCore.pyqtSlot(int)
     def on_comboInterp_currentIndexChanged(self, index):
@@ -1887,6 +1929,22 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
     def on_spinCaliIb_valueChanged(self, _=None):
         setting.i_cali_b = self.ui.spinCaliIb.value()
 
+    @QtCore.pyqtSlot(float)
+    def on_spinCaliVk_2_valueChanged(self, _=None):
+        setting.vset_cali_k = self.ui.spinCaliVk_2.value()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinCaliVb_2_valueChanged(self, _=None):
+        setting.vset_cali_b = self.ui.spinCaliVb_2.value()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinCaliIk_2_valueChanged(self, _=None):
+        setting.iset_cali_k = self.ui.spinCaliIk_2.value()
+
+    @QtCore.pyqtSlot(float)
+    def on_spinCaliIb_2_valueChanged(self, _=None):
+        setting.iset_cali_b = self.ui.spinCaliIb_2.value()
+
     @QtCore.pyqtSlot(int)
     def on_checkBoxUseCali_stateChanged(self, state: int):
         setting.use_cali = state == QtCore.Qt.CheckState.Checked
@@ -1897,6 +1955,7 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
             setting.graph_max_fps = self.ui.spinMaxFps.value()
             setting.state_fps = self.ui.spinStateFps.value()
             setting.data_pts = self.ui.spinDataLength.value()
+            setting.display_pts = self.ui.spinDisplayLength.value()
             setting.interp = self.ui.comboInterp.currentIndex()
             setting.avgmode = self.ui.comboAvgMode.currentIndex()
             setting.v_threshold = self.ui.spinStateVThres.value()
@@ -1906,6 +1965,10 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
             setting.v_cali_b = self.ui.spinCaliVb.value()
             setting.i_cali_k = self.ui.spinCaliIk.value()
             setting.i_cali_b = self.ui.spinCaliIb.value()
+            setting.vset_cali_k = self.ui.spinCaliVk_2.value()
+            setting.vset_cali_b = self.ui.spinCaliVb_2.value()
+            setting.iset_cali_k = self.ui.spinCaliIk_2.value()
+            setting.iset_cali_b = self.ui.spinCaliIb_2.value()
             setting.antialias = self.ui.checkBoxAntialias.isChecked()
             setting.opengl = self.ui.checkBoxOpenGL.isChecked()
             setting.bitadjust = self.ui.comboInput.currentIndex() == 0
