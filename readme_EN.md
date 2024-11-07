@@ -93,8 +93,10 @@ I have released a PyInstaller packaged version, you can just download and run it
 
 > Set environment varible `MDP_FORCE_ENGLISH` to `1` can force the interface to be English if it failed to detect your system language.
 
-## References
+## References (Thanks)
 
 Protocol implementation from [leommxj/mdp_commander](https://github.com/leommxj/mdp_commander)
 
 NRF24L01P driver implementation from [mokhwasomssi/stm32_hal_nrf24l01p](https://github.com/mokhwasomssi/stm32_hal_nrf24l01p)
+
+Font from [be5invis/Sarasa-Gothic](https://github.com/be5invis/Sarasa-Gothic)

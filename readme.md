@@ -93,8 +93,10 @@
 
 在release中可以直接下载打包好的版本，开箱即用
 
-## 参考
+## References (Thanks)
 
 [leommxj/mdp_commander](https://github.com/leommxj/mdp_commander) 中的协议实现
 
 [mokhwasomssi/stm32_hal_nrf24l01p](https://github.com/mokhwasomssi/stm32_hal_nrf24l01p) 中的NRF24L01P驱动实现
+
+[be5invis/Sarasa-Gothic](https://github.com/be5invis/Sarasa-Gothic) 中的更纱黑体
