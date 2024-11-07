@@ -1,6 +1,6 @@
 # Miniware MDP-P906 Digital Power Supply Controller
 
-Wireless control of the power supply without the MDP-M01 display module, supporting P905 as well (tested, but may need calibration, see [#1](https://github.com/ElluIFX/MDP-P906-Controller/issues/1) and [#2](https://github.com/ElluIFX/MDP-P906-Controller/issues/2)).
+Wireless control of the power supply without the MDP-M01 display module, supporting P905 as well (tested, see [#1](https://github.com/ElluIFX/MDP-P906-Controller/issues/1) and [#2](https://github.com/ElluIFX/MDP-P906-Controller/issues/2)).
 
 ![1721995272301](image/readme_EN/1721995272301.png)
 
