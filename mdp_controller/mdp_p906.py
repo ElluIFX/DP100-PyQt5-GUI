@@ -66,7 +66,9 @@ class MDP_P906:
         self._com_retry = com_retry
         self._freq = freq
         self._blink = blink
+        self._debug = debug
         self._status = {
+            "Model": "Unknown",
             "HVzero16": 0.0,
             "HVgain16": 0.0,
             "HCzero04": 0.0,
@@ -90,7 +92,9 @@ class MDP_P906:
 
         self._rtvalue_callback: Optional[Callable[[list], None]] = None
 
-        self._adp.wait_connected()
+        if not self._adp.wait_connected():
+            self.close()
+            raise Exception("NRF24-Adapter wait connection timeout")
         setting = NRF24AdapterSetting(
             freq=self._freq,
             air_data_rate="2Mbps",
@@ -134,9 +138,8 @@ class MDP_P906:
                 self._status["State"] = {0: "off", 1: "cc", 2: "cv", 3: "on"}[state]
                 self._status["Temperature"] = temperature
                 self._status["RealtimeOutput4"] = realtime_adc
-                logger.debug(f"Type-7: {self._status}")
             elif data[0] == 9:
-                idcode, HVzero16, HVgain16, HCzero04, HCgain04 = (
+                idcode, HVzero16, HVgain16, HCzero04, HCgain04, model = (
                     mdp_protocal.parse_type9_response(data)
                 )
                 if idcode != self._idcode:
@@ -145,7 +148,7 @@ class MDP_P906:
                 self._status["HVgain16"] = HVgain16
                 self._status["HCzero04"] = HCzero04
                 self._status["HCgain04"] = HCgain04
-                logger.debug(f"Type-9: {self._status}")
+                self._status["Model"] = {1: "P905", 2: "P906"}.get(model, "Unknown")
             elif data[0] == 8:
                 errflag, values = mdp_protocal.parse_type8_response(
                     data,
@@ -162,7 +165,6 @@ class MDP_P906:
                 self._status["SetCurrent"], self._status["SetVoltage"] = (
                     mdp_protocal.parse_type4_response(data)
                 )
-                logger.debug(f"Type-4: {self._status}")
             elif data[0] == 5:
                 pass
             elif data[0] == 6:
@@ -171,6 +173,12 @@ class MDP_P906:
                 )
             else:
                 logger.warning(f"Unhandled Type-{data[0]}: {data.hex(' ').upper()}")
+
+            if self._debug:
+                logger.debug(
+                    f"Type-{data[0]}: {data.hex(' ').upper()} -> {self._status}"
+                )
+
         except Exception:
             logger.exception("Parse error")
 
@@ -212,7 +220,16 @@ class MDP_P906:
     def get_status(
         self,
     ) -> Tuple[
-        str, bool, float, float, float, float, float, int, List[Tuple[float, float]]
+        str,
+        bool,
+        float,
+        float,
+        float,
+        float,
+        float,
+        int,
+        List[Tuple[float, float]],
+        str,
     ]:
         """
         Get the status of the device.
@@ -228,6 +245,7 @@ class MDP_P906:
             - Temperature (float): Device temperature
             - ErrFlag (int): System error flag
             - RealtimeOutput (List[Tuple[float, float]]): 4-value list of (voltage/V, current/A)
+            - Model (str): "P905" / "P906" / "Unknown"
 
         Note:
             If SetVoltage or SetCurrent is -1, it means the value is unstable.
@@ -248,6 +266,7 @@ class MDP_P906:
             self._status["Temperature"],
             self._status["ErrFlag"],
             self._status["RealtimeOutput4"],
+            self._status["Model"],
         )
 
     def get_realtime_value(self) -> List[Tuple[float, float]]:
@@ -318,6 +337,7 @@ class MDP_P906:
             voltage_set (float): The voltage to be set, in V, steps of 0.001V.
         """
         assert self._idcode is not None, "Please pair first"
+        assert 0 <= voltage_set <= 30, "Voltage limit is 0~30V"
         self._transfer(
             mdp_protocal.gen_set_voltage(
                 self._idcode, voltage_set, self._m01_channel, blink=self._blink
@@ -333,6 +353,10 @@ class MDP_P906:
             current_set (float): The current to be set, in A, steps of 0.001A.
         """
         assert self._idcode is not None, "Please pair first"
+        if self._status["Model"] == "P905":
+            assert 0 <= current_set <= 5, "P905 current limit is 0~5A"
+        elif self._status["Model"] == "P906":
+            assert 0 <= current_set <= 10, "P906 current limit is 0~10A"
         self._transfer(
             mdp_protocal.gen_set_current(
                 self._idcode, current_set, self._m01_channel, blink=self._blink

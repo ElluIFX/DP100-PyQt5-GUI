@@ -1,24 +1,276 @@
-2024-11-07 16:16:11.953 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
-2024-11-07 16:16:11.990 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
-2024-11-07 16:16:12.313 | INFO     | __main__:<module>:52 - OpenGL successfully enabled
-2024-11-07 16:16:12.750 | INFO     | __main__:<module>:62 - Numba successfully enabled
-2024-11-07 16:16:12.889 | INFO     | __main__:<module>:82 - System language: zh_CN
-2024-11-07 16:16:13.008 | INFO     | __main__:<module>:93 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
-2024-11-07 16:16:13.010 | DEBUG    | __main__:<module>:94 - Fonts: ['Sarasa Fixed SC SemiBold']
-2024-11-07 16:16:13.013 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: False
-2024-11-07 16:16:18.217 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: False
-2024-11-07 16:16:20.639 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: True
-2024-11-07 16:16:23.280 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: False
-2024-11-07 16:16:23.586 | INFO     | __main__:update_hardware_setting:303 - Antialias: False, OpenGL: False
-2024-11-07 16:17:07.189 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
-2024-11-07 16:17:07.207 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
-2024-11-07 16:17:07.386 | INFO     | __main__:<module>:52 - OpenGL successfully enabled
-2024-11-07 16:17:07.592 | INFO     | __main__:<module>:62 - Numba successfully enabled
-2024-11-07 16:17:07.655 | INFO     | __main__:<module>:82 - System language: zh_CN
-2024-11-07 16:17:07.710 | INFO     | __main__:<module>:93 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
-2024-11-07 16:17:07.715 | DEBUG    | __main__:<module>:94 - Fonts: ['Sarasa Fixed SC SemiBold']
-2024-11-07 16:17:07.717 | INFO     | __main__:update_hardware_setting:303 - Antialias: False, OpenGL: False
-2024-11-07 16:17:14.033 | INFO     | __main__:update_hardware_setting:303 - Antialias: False, OpenGL: True
-2024-11-07 16:17:14.428 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: True
-2024-11-07 16:17:15.742 | INFO     | __main__:update_hardware_setting:303 - Antialias: True, OpenGL: False
-2024-11-07 16:17:16.040 | INFO     | __main__:update_hardware_setting:303 - Antialias: False, OpenGL: False
+2024-11-07 19:00:23.640 | INFO     | __main__:<module>:36 - ---- NEW SESSION ----
+2024-11-07 19:00:23.786 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:00:23.787 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:00:23.788 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:00:23.789 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:00:23.893 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 19:00:23.902 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 19:00:24.048 | INFO     | __main__:<module>:53 - OpenGL successfully enabled
+2024-11-07 19:00:24.217 | INFO     | __main__:<module>:63 - Numba successfully enabled
+2024-11-07 19:00:24.243 | INFO     | __main__:<module>:83 - System language: zh_CN
+2024-11-07 19:00:24.280 | INFO     | __main__:<module>:94 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 19:00:24.281 | DEBUG    | __main__:<module>:95 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 19:00:24.282 | INFO     | __main__:update_hardware_setting:304 - Antialias: False, OpenGL: False
+2024-11-07 19:00:31.483 | ERROR    | __main__:on_btnConnect_clicked:626 - Failed to connect
+Traceback (most recent call last):
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1879, in <module>
+    show_app()
+    └ <function show_app at 0x000001E1DCB82340>
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1875, in show_app
+    sys.exit(app.exec_())
+    │   │    │   └ <built-in method exec_>
+    │   │    └ <PyQt5.QtWidgets.QApplication object at 0x000001E1DC99F5B0>
+    │   └ <built-in function exit>
+    └ <module 'sys' (built-in)>
+
+> File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 610, in on_btnConnect_clicked
+    api = MDP_P906(
+          └ <class 'mdp_controller.mdp_p906.MDP_P906'>
+
+  File "C:\Code\git\mdp_p906_pc_controller\gui_source\..\mdp_controller\mdp_p906.py", line 60, in __init__
+    self._adp = NRF24Adapter(port=port, baudrate=baudrate, debug=debug)
+    │           │                 │              │               └ True
+    │           │                 │              └ 921600
+    │           │                 └ ''
+    │           └ <class 'mdp_controller.nrf24_adapter.NRF24Adapter'>
+    └ <mdp_controller.mdp_p906.MDP_P906 object at 0x000001E1DEF98E10>
+
+  File "C:\Code\git\mdp_p906_pc_controller\gui_source\..\mdp_controller\nrf24_adapter.py", line 162, in __init__
+    raise Exception("NRF24-Adapter not found")
+
+Exception: NRF24-Adapter not found
+2024-11-07 19:00:36.696 | INFO     | mdp_controller.nrf24_adapter:_worker:227 - NRF24-Adapter thread started
+2024-11-07 19:00:37.698 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:38.700 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:38.711 | ERROR    | __main__:on_btnConnect_clicked:626 - Failed to connect
+Traceback (most recent call last):
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1879, in <module>
+    show_app()
+    └ <function show_app at 0x000001E1DCB82340>
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1875, in show_app
+    sys.exit(app.exec_())
+    │   │    │   └ <built-in method exec_>
+    │   │    └ <PyQt5.QtWidgets.QApplication object at 0x000001E1DC99F5B0>
+    │   └ <built-in function exit>
+    └ <module 'sys' (built-in)>
+
+> File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 610, in on_btnConnect_clicked
+    api = MDP_P906(
+          └ <class 'mdp_controller.mdp_p906.MDP_P906'>
+
+  File "C:\Code\git\mdp_p906_pc_controller\gui_source\..\mdp_controller\mdp_p906.py", line 94, in __init__
+    self._adp.wait_connected()
+    │    │    └ <function NRF24Adapter.wait_connected at 0x000001E1BBC6EB60>
+    │    └ <mdp_controller.nrf24_adapter.NRF24Adapter object at 0x000001E1DCC2AF10>
+    └ <mdp_controller.mdp_p906.MDP_P906 object at 0x000001E1DEFD2A10>
+
+  File "C:\Code\git\mdp_p906_pc_controller\gui_source\..\mdp_controller\nrf24_adapter.py", line 192, in wait_connected
+    raise Exception("NRF24-Adapter wait timeout")
+
+Exception: NRF24-Adapter wait timeout
+2024-11-07 19:00:39.702 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:40.705 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:41.707 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:42.709 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:43.711 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:44.713 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:45.716 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:46.717 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:47.719 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:48.721 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:49.724 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:50.727 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:00:51.729 | DEBUG    | mdp_controller.nrf24_adapter:_write:203 - Sent aa 55 ff 00
+2024-11-07 19:03:19.005 | INFO     | __main__:<module>:36 - ---- NEW SESSION ----
+2024-11-07 19:03:19.120 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:03:19.121 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:03:19.121 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:03:19.123 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:03:19.209 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 19:03:19.219 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 19:03:19.356 | INFO     | __main__:<module>:53 - OpenGL successfully enabled
+2024-11-07 19:03:19.501 | INFO     | __main__:<module>:63 - Numba successfully enabled
+2024-11-07 19:03:19.527 | INFO     | __main__:<module>:83 - System language: zh_CN
+2024-11-07 19:03:19.568 | INFO     | __main__:<module>:94 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 19:03:19.570 | DEBUG    | __main__:<module>:95 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 19:03:19.571 | INFO     | __main__:update_hardware_setting:304 - Antialias: False, OpenGL: False
+2024-11-07 19:03:21.729 | INFO     | mdp_controller.nrf24_adapter:_worker:228 - NRF24-Adapter thread started
+2024-11-07 19:03:22.731 | DEBUG    | mdp_controller.nrf24_adapter:_write:204 - Sent aa 55 ff 00
+2024-11-07 19:03:23.733 | DEBUG    | mdp_controller.nrf24_adapter:_write:204 - Sent aa 55 ff 00
+2024-11-07 19:03:23.756 | INFO     | mdp_controller.mdp_p906:close:216 - MDP-P906 closed
+2024-11-07 19:03:23.757 | ERROR    | __main__:on_btnConnect_clicked:626 - Failed to connect
+Traceback (most recent call last):
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1882, in <module>
+    show_app()
+    └ <function show_app at 0x000002B050022520>
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1878, in show_app
+    sys.exit(app.exec_())
+    │   │    │   └ <built-in method exec_>
+    │   │    └ <PyQt5.QtWidgets.QApplication object at 0x000002B04FDBB6D0>
+    │   └ <built-in function exit>
+    └ <module 'sys' (built-in)>
+
+> File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 610, in on_btnConnect_clicked
+    api = MDP_P906(
+          └ <class 'mdp_controller.mdp_p906.MDP_P906'>
+
+  File "C:\Code\git\mdp_p906_pc_controller\gui_source\..\mdp_controller\mdp_p906.py", line 96, in __init__
+    raise Exception("NRF24-Adapter wait connection timeout")
+
+Exception: NRF24-Adapter wait connection timeout
+2024-11-07 19:12:36.436 | INFO     | __main__:<module>:36 - ---- NEW SESSION ----
+2024-11-07 19:12:36.564 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:12:36.566 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:12:36.567 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:12:36.568 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:12:36.674 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 19:12:36.687 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 19:12:36.845 | INFO     | __main__:<module>:53 - OpenGL successfully enabled
+2024-11-07 19:12:37.022 | INFO     | __main__:<module>:63 - Numba successfully enabled
+2024-11-07 19:12:37.051 | INFO     | __main__:<module>:83 - System language: zh_CN
+2024-11-07 19:12:37.111 | INFO     | __main__:<module>:94 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 19:12:37.113 | DEBUG    | __main__:<module>:95 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 19:12:37.115 | INFO     | __main__:update_hardware_setting:321 - Antialias: False, OpenGL: False
+2024-11-07 19:27:33.259 | INFO     | __main__:<module>:36 - ---- NEW SESSION ----
+2024-11-07 19:27:33.594 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:27:33.596 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:27:33.597 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:27:33.598 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:27:33.733 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 19:27:33.750 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 19:27:33.942 | INFO     | __main__:<module>:53 - OpenGL successfully enabled
+2024-11-07 19:27:34.229 | INFO     | __main__:<module>:63 - Numba successfully enabled
+2024-11-07 19:27:34.303 | INFO     | __main__:<module>:83 - System language: zh_CN
+2024-11-07 19:27:34.374 | INFO     | __main__:<module>:94 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 19:27:34.376 | DEBUG    | __main__:<module>:95 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 19:27:34.378 | INFO     | __main__:update_hardware_setting:301 - Antialias: False, OpenGL: False
+2024-11-07 19:27:36.293 | CRITICAL | richuru:loguru_exc_hook:129 - Unhandled exception occurred
+Traceback (most recent call last):
+
+> File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1557, in <module>
+    MainWindow = MDPMainwindow()
+                 └ <class '__main__.MDPMainwindow'>
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 334, in __init__
+    self.initGraph()
+    │    └ <function MDPMainwindow.initGraph at 0x000001C59C259260>
+    └ <__main__.MDPMainwindow object at 0x000001C59C214C10>
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 831, in initGraph
+    self.pen1 = pg.mkPen(color=color_palette[setting.theme]["line1"], width=1)
+    │           │  │                         │       └ 'dark'
+    │           │  │                         └ Setting({'presets': {'1': [3.3, 2], '2': [3.3, 5], '3': [5, 2], '4': [5, 5], '5': [9, 5], '6': [12, 5], '7': [20, 5], '8': [2...
+    │           │  └ <function mkPen at 0x000001C5FFD65580>
+    │           └ <module 'pyqtgraph' from 'C:\\Users\\Ellu\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pyqtgraph\\__init...
+    └ <__main__.MDPMainwindow object at 0x000001C59C214C10>
+
+NameError: name 'color_palette' is not defined
+2024-11-07 19:27:53.158 | INFO     | __main__:<module>:36 - ---- NEW SESSION ----
+2024-11-07 19:27:53.267 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:27:53.268 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:27:53.269 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:27:53.271 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:27:53.340 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 19:27:53.348 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 19:27:53.481 | INFO     | __main__:<module>:53 - OpenGL successfully enabled
+2024-11-07 19:27:53.610 | INFO     | __main__:<module>:63 - Numba successfully enabled
+2024-11-07 19:27:53.634 | INFO     | __main__:<module>:83 - System language: zh_CN
+2024-11-07 19:27:53.669 | INFO     | __main__:<module>:94 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 19:27:53.671 | DEBUG    | __main__:<module>:95 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 19:27:53.672 | INFO     | __main__:update_hardware_setting:327 - Antialias: False, OpenGL: False
+2024-11-07 19:27:54.809 | CRITICAL | richuru:loguru_exc_hook:129 - Unhandled exception occurred
+Traceback (most recent call last):
+
+> File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1910, in <module>
+    set_theme(setting.theme)
+    │         │       └ 'dark'
+    │         └ Setting({'presets': {'1': [3.3, 2], '2': [3.3, 5], '3': [5, 2], '4': [5, 5], '5': [9, 5], '6': [12, 5], '7': [20, 5], '8': [2...
+    └ <function set_theme at 0x0000024EE1554AE0>
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1907, in set_theme
+    MainWindow.update_pen()
+    │          └ <function MDPMainwindow.update_pen at 0x0000024EE14F5300>
+    └ <__main__.MDPMainwindow object at 0x0000024EE14A4C10>
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 873, in update_pen
+    self.pen1.setColor(color_palette[setting.theme]["line1"])
+    │    │    │        │             │       └ 'dark'
+    │    │    │        │             └ Setting({'presets': {'1': [3.3, 2], '2': [3.3, 5], '3': [5, 2], '4': [5, 5], '5': [9, 5], '6': [12, 5], '7': [20, 5], '8': [2...
+    │    │    │        └ {'dark': {'off': 'khaki', 'on': 'lightgreen', 'cv': 'skyblue', 'cc': 'tomato', 'general_green': 'mediumspringgreen', 'general...
+    │    │    └ <built-in method setColor>
+    │    └ <PyQt5.QtGui.QPen object at 0x0000024EE12C2730>
+    └ <__main__.MDPMainwindow object at 0x0000024EE14A4C10>
+
+TypeError: setColor(self, Union[QColor, Qt.GlobalColor, QGradient]): argument 1 has unexpected type 'str'
+2024-11-07 19:29:25.191 | INFO     | __main__:<module>:36 - ---- NEW SESSION ----
+2024-11-07 19:29:25.302 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:29:25.304 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:29:25.306 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:29:25.306 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:29:25.374 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 19:29:25.382 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 19:29:25.511 | INFO     | __main__:<module>:53 - OpenGL successfully enabled
+2024-11-07 19:29:25.642 | INFO     | __main__:<module>:63 - Numba successfully enabled
+2024-11-07 19:29:25.667 | INFO     | __main__:<module>:83 - System language: zh_CN
+2024-11-07 19:29:25.701 | INFO     | __main__:<module>:94 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 19:29:25.702 | DEBUG    | __main__:<module>:95 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 19:29:25.704 | INFO     | __main__:update_hardware_setting:327 - Antialias: False, OpenGL: False
+2024-11-07 19:29:46.508 | INFO     | mdp_controller.nrf24_adapter:_worker:229 - NRF24-Adapter thread started
+2024-11-07 19:29:47.510 | DEBUG    | mdp_controller.nrf24_adapter:_write:205 - Sent aa 55 ff 00
+2024-11-07 19:29:48.512 | WARNING  | mdp_controller.nrf24_adapter:wait_connected:192 - NRF24-Adapter wait connection timeout
+2024-11-07 19:29:48.512 | DEBUG    | mdp_controller.nrf24_adapter:_write:205 - Sent aa 55 ff 00
+2024-11-07 19:29:48.528 | INFO     | mdp_controller.mdp_p906:close:216 - MDP-P906 closed
+2024-11-07 19:29:48.529 | ERROR    | __main__:on_btnConnect_clicked:658 - Failed to connect
+Traceback (most recent call last):
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1920, in <module>
+    show_app()
+    └ <function show_app at 0x0000028FAFBF2340>
+
+  File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 1916, in show_app
+    sys.exit(app.exec_())
+    │   │    │   └ <built-in method exec_>
+    │   │    └ <PyQt5.QtWidgets.QApplication object at 0x0000028FAF9B7760>
+    │   └ <built-in function exit>
+    └ <module 'sys' (built-in)>
+
+> File "c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui.py", line 642, in on_btnConnect_clicked
+    api = MDP_P906(
+          └ <class 'mdp_controller.mdp_p906.MDP_P906'>
+
+  File "C:\Code\git\mdp_p906_pc_controller\gui_source\..\mdp_controller\mdp_p906.py", line 96, in __init__
+    raise Exception("NRF24-Adapter wait connection timeout")
+
+Exception: NRF24-Adapter wait connection timeout
+2024-11-07 19:30:40.025 | INFO     | __main__:<module>:36 - ---- NEW SESSION ----
+2024-11-07 19:30:40.153 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:30:40.155 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:30:40.157 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:30:40.157 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:30:40.235 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 19:30:40.244 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 19:30:40.378 | INFO     | __main__:<module>:53 - OpenGL successfully enabled
+2024-11-07 19:30:40.508 | INFO     | __main__:<module>:63 - Numba successfully enabled
+2024-11-07 19:30:40.535 | INFO     | __main__:<module>:83 - System language: zh_CN
+2024-11-07 19:30:40.567 | INFO     | __main__:<module>:94 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 19:30:40.568 | DEBUG    | __main__:<module>:95 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 19:30:40.570 | INFO     | __main__:update_hardware_setting:327 - Antialias: False, OpenGL: False
+2024-11-07 19:31:15.248 | INFO     | __main__:<module>:36 - ---- NEW SESSION ----
+2024-11-07 19:31:15.364 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:31:15.366 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:31:15.367 | DEBUG    | logging:callHandlers:1706 - Creating converter from 7 to 5
+2024-11-07 19:31:15.368 | DEBUG    | logging:callHandlers:1706 - Creating converter from 5 to 7
+2024-11-07 19:31:15.434 | DEBUG    | logging:callHandlers:1706 - OpenGL_accelerate module loaded
+2024-11-07 19:31:15.444 | DEBUG    | logging:callHandlers:1706 - Using accelerated ArrayDatatype
+2024-11-07 19:31:15.604 | INFO     | __main__:<module>:53 - OpenGL successfully enabled
+2024-11-07 19:31:15.751 | INFO     | __main__:<module>:63 - Numba successfully enabled
+2024-11-07 19:31:15.780 | INFO     | __main__:<module>:83 - System language: zh_CN
+2024-11-07 19:31:15.814 | INFO     | __main__:<module>:94 - Loaded custom 1 fonts from c:\Code\git\mdp_p906_pc_controller\gui_source\SarasaFixedSC-SemiBold.ttf
+2024-11-07 19:31:15.816 | DEBUG    | __main__:<module>:95 - Fonts: ['Sarasa Fixed SC SemiBold']
+2024-11-07 19:31:15.818 | INFO     | __main__:update_hardware_setting:327 - Antialias: False, OpenGL: False

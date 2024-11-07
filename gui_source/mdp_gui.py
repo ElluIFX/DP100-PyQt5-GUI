@@ -28,8 +28,12 @@ if os.environ.get("MDP_ENABLE_LOG") is not None:
     logger.add(
         os.path.join(ARG_PATH, "mdp.log"), level="TRACE", backtrace=True, diagnose=True
     )
+    DEBUG = True
 else:
     richuru.install(tracebacks_suppress=[mdp_controller])
+    DEBUG = False
+
+logger.info("---- NEW SESSION ----")
 
 os.environ["PYQTGRAPH_QT_LIB"] = "PyQt5"
 
@@ -45,9 +49,6 @@ OPENGL_AVALIABLE = False
 try:
     import OpenGL  # noqa: F401
 
-    # pg.setConfigOption("antialias", True)
-    # pg.setConfigOption("enableExperimental", True)
-    # pg.setConfigOption("useOpenGL", True)
     OPENGL_AVALIABLE = True
     logger.info("OpenGL successfully enabled")
 except Exception as e:
@@ -90,8 +91,7 @@ if not system_lang.startswith("zh") or os.environ.get("MDP_FORCE_ENGLISH") == "1
 # load custom font
 _ = QtGui.QFontDatabase.addApplicationFont(FONT_PATH)
 fonts = QtGui.QFontDatabase.applicationFontFamilies(_)
-logger.info(f"Loaded custom {len(fonts)} fonts from {FONT_PATH}")
-logger.debug(f"Fonts: {fonts}")
+logger.info(f"Loaded custom fonts: {fonts}")
 
 
 class FmtAxisItem(pg.AxisItem):
@@ -201,11 +201,10 @@ class CustomTitleBar(TitleBar):
                 "color": (20, 20, 20),
             }
         }
-        self.autoStyle = {
-            "normal": {
-                "color": (140, 140, 140),
-            }
-        }
+
+    def set_name(self, name):
+        self.label.setText(name)
+        self.label.adjustSize()
 
     def set_theme(self, theme):
         style = getattr(self, f"{theme}Style")
@@ -268,6 +267,7 @@ class Setting:
         self.avgmode = 1
         self.opengl = OPENGL_AVALIABLE
         self.antialias = True
+        self.bitadjust = True
 
         self.v_threshold = 0.002
         self.i_threshold = 0.002
@@ -276,6 +276,32 @@ class Setting:
         self.v_cali_b = 0.0
         self.i_cali_k = 1.0
         self.i_cali_b = 0.0
+
+        self.theme = "dark"
+        self.color_palette = {
+            "dark": {
+                "off": "khaki",
+                "on": "lightgreen",
+                "cv": "skyblue",
+                "cc": "tomato",
+                "general_green": "mediumaquamarine",
+                "general_red": "orangered",
+                "general_yellow": "yellow",
+                "line1": "salmon",
+                "line2": "turquoise",
+            },
+            "light": {
+                "off": "darkgoldenrod",
+                "on": "darkgreen",
+                "cv": "darkblue",
+                "cc": "darkred",
+                "general_green": "forestgreen",
+                "general_red": "firebrick",
+                "general_yellow": "goldenrod",
+                "line1": "orangered",
+                "line2": "darkcyan",
+            },
+        }
 
     def save(self, filename):
         with open(filename, "w") as f:
@@ -293,6 +319,7 @@ class Setting:
 
 setting = Setting()
 setting.load(SETTING_FILE)
+setting.save(SETTING_FILE)
 
 
 def update_hardware_setting():
@@ -313,9 +340,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     graph_record_flag = False
     output_state = False
     locked = False
-    _v_set = 0
-    _i_set = 0
+    _v_set = 0.0
+    _i_set = 0.0
     open_r = 1e7
+    model = "Unknown"
 
     def __init__(self, parent=None):
         self.api: Optional[MDP_P906] = None
@@ -436,6 +464,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.showFullScreen()
 
     def set_step(self, spin: QtWidgets.QDoubleSpinBox, f, t):
+        if not setting.bitadjust:
+            return
         STEPS = {
             0: 0.001,
             -1: 0.001,
@@ -469,11 +499,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     @v_set.setter
     def v_set(self, value):
+        self._v_set = value
+        self.ui.spinBoxVoltage.setValue(value)
         if self.api is None or self.locked:
             return
         self.api.set_voltage(value)
-        self._v_set = value
-        self.ui.spinBoxVoltage.setValue(value)
         self._last_state_change_t = time.perf_counter()
 
     @property
@@ -482,11 +512,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     @i_set.setter
     def i_set(self, value):
+        self._i_set = value
+        self.ui.spinBoxCurrent.setValue(value)
         if self.api is None or self.locked:
             return
         self.api.set_current(value)
-        self._i_set = value
-        self.ui.spinBoxCurrent.setValue(value)
         self._last_state_change_t = time.perf_counter()
 
     def update_state(self):
@@ -495,7 +525,15 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.labelComSpeed.setText(f"{self.api._adp.speed_counter.KBps:.1f}kBps")
         errrate = self.api._adp.speed_counter.error_rate * 100
         self.ui.labelErrRate.setText(f"CON-ERR {errrate:.0f}%")
-        clr = "red" if errrate > 50 else ("yellow" if errrate > 10 else None)
+        clr = (
+            setting.color_palette[setting.theme]["general_red"]
+            if errrate > 50
+            else (
+                setting.color_palette[setting.theme]["general_yellow"]
+                if errrate > 10
+                else None
+            )
+        )
         set_color(self.ui.labelErrRate, clr)
         set_color(self.ui.labelComSpeed, clr)
         (
@@ -508,13 +546,22 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             Temperature,
             ErrFlag,
             _,
+            Model,
         ) = self.api.get_status()
+        if Model != self.model:
+            self.model = Model
+            if Model == "P905":
+                self.ui.spinBoxCurrent.setRange(0, 5)
+                self.CustomTitleBar.set_name(
+                    self.tr("MDP-P906 数控电源上位机") + " - P905 Mode"
+                )
+            elif Model == "P906":
+                self.ui.spinBoxCurrent.setRange(0, 10)
+                self.CustomTitleBar.set_name(self.tr("MDP-P906 数控电源上位机"))
         self.ui.btnOutput.setText(f"-  {State.upper()}  -")
         set_color(
             self.ui.btnOutput,
-            {"off": "khaki", "on": "lightgreen", "cv": "skyblue", "cc": "tomato"}[
-                State
-            ],
+            setting.color_palette[setting.theme][State],
         )
         self.output_state = State != "off"
         self.locked = Locked
@@ -528,7 +575,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             if not self.ui.spinBoxCurrent.hasFocus():
                 self.ui.spinBoxCurrent.setValue(SetCurrent)
         self.ui.labelLockState.setText("[LOCKED]" if Locked else "UNLOCKED")
-        set_color(self.ui.labelLockState, "orangered" if Locked else None)
+        set_color(
+            self.ui.labelLockState,
+            setting.color_palette[setting.theme]["general_red"] if Locked else None,
+        )
         self.ui.labelInputVals.setText(f"{InputVoltage:.2f}V {InputCurrent:.2f}A")
         self.ui.labelTemperature.setText(f"TEMP {Temperature:.1f}℃")
         self.ui.labelError.setText(
@@ -581,7 +631,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def open_state_ui(self):
         self.ui.labelConnectState.setText(self.tr("已连接"))
-        set_color(self.ui.labelConnectState, "lightgreen")
+        set_color(
+            self.ui.labelConnectState,
+            setting.color_palette[setting.theme]["general_green"],
+        )
         self.ui.frameOutputSetting.setEnabled(True)
         self.ui.frameGraph.setEnabled(True)
         self.ui.frameSystemState.setEnabled(True)
@@ -595,6 +648,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 api = self.api
                 self.api = None
                 api.close()
+                self.v_set = 0.0
+                self.i_set = 0.0
+                self.model = "Unknown"
+                self.ui.spinBoxCurrent.setRange(0, 10)
+                self.CustomTitleBar.set_name(self.tr("MDP-P906 数控电源上位机"))
             else:
                 if not setting.idcode:
                     QtWidgets.QMessageBox.warning(
@@ -616,6 +674,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                         led_color=(color_rgb[0], color_rgb[1], color_rgb[2]),
                         m01_channel=int(setting.m01ch[3]),
                         tx_output_power=setting.txpower,
+                        debug=DEBUG,
                     )
                     api.connect(retry_times=2)
                 except Exception as e:
@@ -631,15 +690,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.open_state_ui()
                 self.ui.btnGraphClear.clicked.emit()
         except Exception as e:
-            #     self.ui.labelConnectState.setText(self.tr("连接失败"))
-            #     set_color(self.ui.labelConnectState, "red")
-            #     QtCore.QTimer.singleShot(
-            #         2000,
-            #         lambda: (
-            #             self.ui.labelConnectState.setText(self.tr("未连接")),
-            #             set_color(self.ui.labelConnectState, None),
-            #         ),
-            #     )
             QtWidgets.QMessageBox.warning(
                 self,
                 self.tr("连接失败"),
@@ -829,8 +879,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.widgetGraph2.showGrid(x=True, y=True)
         self.ui.widgetGraph1.setMouseEnabled(x=False, y=False)
         self.ui.widgetGraph2.setMouseEnabled(x=False, y=False)
-        self.pen1 = pg.mkPen(color="salmon", width=1)
-        self.pen2 = pg.mkPen(color="turquoise", width=1)
+        self.pen1 = pg.mkPen(
+            color=setting.color_palette[setting.theme]["line1"], width=1
+        )
+        self.pen2 = pg.mkPen(
+            color=setting.color_palette[setting.theme]["line2"], width=1
+        )
         self.curve1 = self.ui.widgetGraph1.plot(pen=self.pen1, clear=True)
         self.curve2 = self.ui.widgetGraph2.plot(pen=self.pen2, clear=True)
         self.data.save_datas_flag = True
@@ -843,6 +897,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         )
         self.set_graph1_data(self.tr("电压"))
         self.set_graph2_data(self.tr("电流"))
+
+    def update_pen(self):
+        self.pen1.setColor(QtGui.QColor(setting.color_palette[setting.theme]["line1"]))
+        self.pen2.setColor(QtGui.QColor(setting.color_palette[setting.theme]["line2"]))
 
     def get_data(self, text):
         if text == self.tr("电压"):
@@ -1621,15 +1679,18 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
                 led_color=(color_rgb[0], color_rgb[1], color_rgb[2]),
                 m01_channel=int(setting.m01ch[3]),
                 tx_output_power=setting.txpower,
-                debug=os.environ.get("MDP_DEBUG_LOG") is not None,
+                debug=DEBUG,
             )
             idcode = api.auto_match()
         except Exception as e:
             logger.exception(self.tr("自动配对失败"))
             QtWidgets.QMessageBox.warning(self, self.tr("自动配对失败"), str(e))
+            try:
+                api.close()
+            except Exception:
+                pass
             return
-        finally:
-            api.close()
+        api.close()
         QtWidgets.QMessageBox.information(
             self, self.tr("自动配对成功"), f"IDCODE: {idcode}"
         )
@@ -1723,7 +1784,6 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         if NUMBA_ENABLED:
             self.ui.labelNumba.setVisible(True)
-            set_color(self.ui.labelNumba, "#9DD285")
         else:
             self.ui.labelNumba.setVisible(False)
 
@@ -1746,6 +1806,10 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.ui.spinCaliIb.setValue(setting.i_cali_b)
         self.ui.checkBoxAntialias.setChecked(setting.antialias)
         self.ui.checkBoxOpenGL.setChecked(setting.opengl)
+        self.ui.comboTheme.setCurrentIndex(
+            {"light": 1, "dark": 0}.get(setting.theme, 0)
+        )
+        self.ui.comboInput.setCurrentIndex(int(not setting.bitadjust))
 
     def show(self) -> None:
         self.initValues()
@@ -1758,16 +1822,12 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         return super().showEvent(a0)
 
     @QtCore.pyqtSlot(int)
-    def on_comboTheme_currentIndexChanged(self, index):
-        self.set_theme(self.ui.comboTheme.currentText().lower())
+    def on_comboInput_currentIndexChanged(self, index):
+        setting.bitadjust = index == 0
 
-    def set_theme(self, theme):
-        qdarktheme.setup_theme(theme)
-        MainWindow.ui.widgetGraph1.setBackground(None)
-        MainWindow.ui.widgetGraph2.setBackground(None)
-        MainWindow.CustomTitleBar.set_theme(theme)
-        DialogSettings.CustomTitleBar.set_theme(theme)
-        DialogGraphics.CustomTitleBar.set_theme(theme)
+    @QtCore.pyqtSlot(int)
+    def on_comboTheme_currentIndexChanged(self, index):
+        set_theme({0: "dark", 1: "light"}[index])
 
     @QtCore.pyqtSlot(int)
     def on_checkBoxAntialias_stateChanged(self, state: int):
@@ -1848,6 +1908,7 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
             setting.i_cali_b = self.ui.spinCaliIb.value()
             setting.antialias = self.ui.checkBoxAntialias.isChecked()
             setting.opengl = self.ui.checkBoxOpenGL.isChecked()
+            setting.bitadjust = self.ui.comboInput.currentIndex() == 0
             setting.save(SETTING_FILE)
         except Exception as e:
             logger.error(e)
@@ -1864,7 +1925,28 @@ DialogGraphics.set_data_len_sig.connect(MainWindow.set_data_length)
 DialogGraphics.set_interp_sig.connect(MainWindow.set_interp)
 app.setWindowIcon(QtGui.QIcon(ICON_PATH))
 
-qdarktheme.setup_theme()
+
+def set_theme(theme):
+    setting.theme = theme
+    qdarktheme.setup_theme(theme)
+    MainWindow.ui.widgetGraph1.setBackground(None)
+    MainWindow.ui.widgetGraph2.setBackground(None)
+    MainWindow.CustomTitleBar.set_theme(theme)
+    DialogSettings.CustomTitleBar.set_theme(theme)
+    DialogGraphics.CustomTitleBar.set_theme(theme)
+    set_color(
+        DialogGraphics.ui.labelNumba,
+        setting.color_palette[setting.theme]["general_green"],
+    )
+    if MainWindow.api is not None:
+        set_color(
+            MainWindow.ui.labelConnectState,
+            setting.color_palette[setting.theme]["general_green"],
+        )
+    MainWindow.update_pen()
+
+
+set_theme(setting.theme)
 
 
 def show_app():

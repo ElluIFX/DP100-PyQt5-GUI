@@ -189,7 +189,9 @@ class NRF24Adapter:
     def wait_connected(self, timeout: Optional[float] = 2):
         self._connect_event.clear()
         if not self._connect_event.wait(timeout):
-            raise Exception("NRF24-Adapter wait timeout")
+            logger.warning("NRF24-Adapter wait connection timeout")
+            return False
+        return True
 
     @property
     def connected(self):

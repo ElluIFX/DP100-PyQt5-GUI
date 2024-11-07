@@ -17,3 +17,4 @@ __pycache__
 
 settings.json
 *.psd
+*.log

@@ -141,11 +141,16 @@ def parse_type7_response(
             v = _volt_adc_correct(sv, HVgain16, HVzero16)
             c = _curr_adc_correct(sc, HCgain04, HCzero04)
             realtime_adc.append((v, c))
-        if data[1] in (0x1C, 0x1B):
+        if data[1] == 0x1C:
             voltage = data[24:27].hex()
             voltage = float(voltage[0:3] + "." + voltage[3:])
             current = data[27:30].hex()
             current = float(current[0:3] + "." + current[3:])
+        elif data[1] == 0x1B:
+            voltage = data[24:27].hex()
+            voltage = float(voltage[0:3] + "." + voltage[3:])
+            current = data[27:29].hex()
+            current = float(current[0] + "." + current[1:])
         else:
             voltage = current = -1
         return (
@@ -223,17 +228,18 @@ def gen_set_led_color(
 
 def parse_type9_response(data: bytes):
     """
-    Type 9 response have id and ADC calibration vals HVzero16/HVgain16/HCzero04/HCgain04
+    Type 9 response have id and ADC calibration vals HVzero16/HVgain16/HCzero04/HCgain04/model, P906 model=2, P905 model=1
     """
     assert data[0] == 9
     assert data[1] == 14
     assert data[15] in (2, 1)  # P906 / P905
     idcode = data[2:6]
+    model = data[15]
     # unk1 = data[6] # ?
     HVzero16 = int(data[7:9].hex(), 16)
     HVgain16 = int(data[9:11].hex(), 16)
     HCzero04 = int(data[11:13].hex(), 16)
     HCgain04 = int(data[13:15].hex(), 16)
-    if data[15] == 2:
+    if model == 2:
         HCgain04 *= 2  # P906
-    return (idcode, HVzero16, HVgain16, HCzero04, HCgain04)
+    return (idcode, HVzero16, HVgain16, HCzero04, HCgain04, model)
