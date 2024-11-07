@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>217</width>
-    <height>568</height>
+    <height>595</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,13 +25,13 @@
   <property name="minimumSize">
    <size>
     <width>217</width>
-    <height>532</height>
+    <height>595</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>217</width>
-    <height>568</height>
+    <width>242</width>
+    <height>632</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -44,6 +44,19 @@
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QLabel" name="label_36">
      <property name="minimumSize">
@@ -60,7 +73,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -79,7 +92,7 @@
     <widget class="QComboBox" name="comboTheme">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -125,7 +138,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -144,7 +157,7 @@
     <widget class="QDoubleSpinBox" name="spinMaxFps">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -187,7 +200,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -206,7 +219,7 @@
     <widget class="QSpinBox" name="spinDataLength">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -249,7 +262,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -268,7 +281,7 @@
     <widget class="QComboBox" name="comboAvgMode">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -317,7 +330,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -336,7 +349,7 @@
     <widget class="QDoubleSpinBox" name="spinStateFps">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -379,7 +392,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -398,7 +411,7 @@
     <widget class="QComboBox" name="comboInterp">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -440,7 +453,7 @@
     <widget class="QCheckBox" name="checkBoxOpenGL">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -472,7 +485,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -496,7 +509,7 @@
       <widget class="QDoubleSpinBox" name="spinStateVThres">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
          <bold>true</bold>
         </font>
        </property>
@@ -527,7 +540,7 @@
       <widget class="QDoubleSpinBox" name="spinStateIThres">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
          <bold>true</bold>
         </font>
        </property>
@@ -572,7 +585,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -591,7 +604,7 @@
     <widget class="QCheckBox" name="checkBoxUseCali">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
@@ -609,7 +622,7 @@
       <widget class="QDoubleSpinBox" name="spinCaliVk">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
          <bold>true</bold>
         </font>
        </property>
@@ -643,7 +656,7 @@
       <widget class="QDoubleSpinBox" name="spinCaliVb">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
          <bold>true</bold>
         </font>
        </property>
@@ -684,7 +697,7 @@
       <widget class="QDoubleSpinBox" name="spinCaliIk">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
          <bold>true</bold>
         </font>
        </property>
@@ -718,7 +731,7 @@
       <widget class="QDoubleSpinBox" name="spinCaliIb">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
          <bold>true</bold>
         </font>
        </property>
@@ -754,12 +767,12 @@
     <widget class="QPushButton" name="btnClose">
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>完成 / DONE</string>
+      <string>确定 / OK</string>
      </property>
     </widget>
    </item>

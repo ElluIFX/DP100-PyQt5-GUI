@@ -66,7 +66,7 @@ from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
 
 SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
-FONT_PATH = os.path.join(ABS_PATH, "sarasa-semibold.ttc")
+FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -177,9 +177,9 @@ class FPSCounter(object):
 
 
 class CustomTitleBar(TitleBar):
-    def __init__(self, parent):
+    def __init__(self, parent, name):
         super().__init__(parent)
-        self.label = QtWidgets.QLabel(self.tr("MDP-P906 数控电源上位机"), self)
+        self.label = QtWidgets.QLabel(name, self)
         self.label.setStyleSheet(
             "QLabel{font: 13px 'Microsoft YaHei UI'; margin: 10px}"
         )
@@ -306,7 +306,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.fps_counter = FPSCounter()
-        self.CustomTitleBar = CustomTitleBar(self)
+        self.CustomTitleBar = CustomTitleBar(self, self.tr("MDP-P906 数控电源上位机"))
         self.CustomTitleBar.set_theme("dark")
         self.ui.comboDataFps.setCurrentText(f"{self.data_fps}Hz")
         self.setTitleBar(self.CustomTitleBar)
@@ -329,7 +329,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
         if ENGLISH:
             font = QtGui.QFont()
-            font.setFamily("Sarasa Fixed SC Semibold")
+            font.setFamily("Sarasa Fixed SC SemiBold")
             font.setPointSize(7)
             self.ui.btnSeqCurrent.setFont(font)
             self.ui.btnSeqCurrent.setText("I-SET")
@@ -583,6 +583,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                     )
                     return
                 color_rgb = bytes.fromhex(setting.color.lstrip("#"))
+                api = None
                 try:
                     api = MDP_P906(
                         port=setting.comport,
@@ -595,9 +596,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                         m01_channel=int(setting.m01ch[3]),
                         tx_output_power=setting.txpower,
                     )
-                    api.connect(retry_times=1)
+                    api.connect(retry_times=2)
                 except Exception as e:
-                    api.close()
+                    if api is not None:
+                        api.close()
+                    logger.exception("Failed to connect")
                     raise e
                 self.api = api
                 self.api.register_realtime_value_callback(self.state_callback)
@@ -606,17 +609,21 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.update_state()
                 self.open_state_ui()
                 self.ui.btnGraphClear.clicked.emit()
-        except Exception:
-            self.ui.labelConnectState.setText(self.tr("连接失败"))
-            set_color(self.ui.labelConnectState, "red")
-            QtCore.QTimer.singleShot(
-                2000,
-                lambda: (
-                    self.ui.labelConnectState.setText(self.tr("未连接")),
-                    set_color(self.ui.labelConnectState, None),
-                ),
+        except Exception as e:
+            #     self.ui.labelConnectState.setText(self.tr("连接失败"))
+            #     set_color(self.ui.labelConnectState, "red")
+            #     QtCore.QTimer.singleShot(
+            #         2000,
+            #         lambda: (
+            #             self.ui.labelConnectState.setText(self.tr("未连接")),
+            #             set_color(self.ui.labelConnectState, None),
+            #         ),
+            #     )
+            QtWidgets.QMessageBox.warning(
+                self,
+                self.tr("连接失败"),
+                str(e),
             )
-            logger.exception("Failed to connect")
             return
 
     def request_state(self):
@@ -1233,7 +1240,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         else:
             if not self._keep_power_pid.auto_mode:
                 self._keep_power_pid.set_auto_mode(True, last_output=self.v_set)
-            voltage = self._keep_power_pid(self.data.power)
+            voltage = self._keep_power_pid(self.data.powers[-1])
         self.v_set = voltage
 
     @QtCore.pyqtSlot()
@@ -1526,13 +1533,20 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 MainWindow = MDPMainwindow()
 
 
-class MDPSettings(QtWidgets.QDialog):
+class MDPSettings(QtWidgets.QDialog, FramelessWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self.ui = Ui_DialogSettings()
         self.ui.setupUi(self)
-
+        self.CustomTitleBar = CustomTitleBar(self, self.tr("连接设置"))
+        self.CustomTitleBar.set_theme("dark")
+        self.CustomTitleBar.set_allow_double_toggle_max(False)
+        self.CustomTitleBar.set_min_btn_enabled(False)
+        self.CustomTitleBar.set_max_btn_enabled(False)
+        self.CustomTitleBar.set_full_btn_enabled(False)
+        self.CustomTitleBar.set_close_btn_enabled(False)
+        self.setTitleBar(self.CustomTitleBar)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
 
     def initValues(self):
@@ -1629,8 +1643,7 @@ class MDPSettings(QtWidgets.QDialog):
             )
             self.ui.lineEditColor.setText(setting.color)
 
-    @QtCore.pyqtSlot()
-    def on_btnSave_clicked(self):
+    def save_settings(self):
         setting.baudrate = int(self.ui.spinBoxBaud.value())
         setting.address = ":".join(
             [
@@ -1653,14 +1666,22 @@ class MDPSettings(QtWidgets.QDialog):
         )
         setting.blink = self.ui.comboBoxBlink.currentText() == self.tr("闪烁")
         setting.save(SETTING_FILE)
-        self.ui.btnSave.setText(self.tr("保存成功, 重新连接生效"))
+
+    @QtCore.pyqtSlot()
+    def on_btnSave_clicked(self):
+        self.ui.btnSave.setText(self.tr("重新连接生效"))
         QtCore.QTimer.singleShot(1000, self._reset_btn_text)
 
     def _reset_btn_text(self):
-        self.ui.btnSave.setText(self.tr("保存"))
+        self.ui.btnSave.setText(self.tr("应用 / Apply"))
+
+    @QtCore.pyqtSlot()
+    def on_btnOk_clicked(self):
+        self.save_settings()
+        self.close()
 
 
-class MDPGraphics(QtWidgets.QDialog):
+class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
     set_max_fps_sig = QtCore.pyqtSignal(float)
     state_fps_sig = QtCore.pyqtSignal(float)
     set_data_len_sig = QtCore.pyqtSignal(int)
@@ -1670,6 +1691,14 @@ class MDPGraphics(QtWidgets.QDialog):
         super().__init__(parent)
         self.ui = Ui_DialogGraphics()
         self.ui.setupUi(self)
+        self.CustomTitleBar = CustomTitleBar(self, self.tr("图形设置"))
+        self.CustomTitleBar.set_theme("dark")
+        self.CustomTitleBar.set_allow_double_toggle_max(False)
+        self.CustomTitleBar.set_min_btn_enabled(False)
+        self.CustomTitleBar.set_max_btn_enabled(False)
+        self.CustomTitleBar.set_full_btn_enabled(False)
+        self.CustomTitleBar.set_close_btn_enabled(False)
+        self.setTitleBar(self.CustomTitleBar)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         if not OPENGL_AVAILABLE:
             self.ui.checkBoxOpenGL.setEnabled(False)
@@ -1711,6 +1740,8 @@ class MDPGraphics(QtWidgets.QDialog):
         MainWindow.ui.widgetGraph1.setBackground(None)
         MainWindow.ui.widgetGraph2.setBackground(None)
         MainWindow.CustomTitleBar.set_theme(theme)
+        DialogSettings.CustomTitleBar.set_theme(theme)
+        DialogGraphics.CustomTitleBar.set_theme(theme)
 
     def set_opengl(self, enable):
         setting.opengl = enable

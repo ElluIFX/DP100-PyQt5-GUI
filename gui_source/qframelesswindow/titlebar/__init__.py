@@ -7,9 +7,9 @@ from PyQt5.QtWidgets import QHBoxLayout, QWidget
 from ..utils import startSystemMove
 from .title_bar_buttons import (
     CloseButton,
+    FullscreenButton,
     MaximizeButton,
     MinimizeButton,
-    FullscreenButton,
 )
 
 
@@ -41,8 +41,44 @@ class TitleBar(QWidget):
         self.maxBtn.clicked.connect(self.__toggleMaxState)
         self.closeBtn.clicked.connect(self.window().close)
         self.fullBtn.clicked.connect(self._toggleFullScreen)
+        self.minBtnEnabled = True
+        self.maxBtnEnabled = True
+        self.closeBtnEnabled = True
+        self.fullBtnEnabled = True
+        self.allowDoubleToggleMax = True
 
         self.window().installEventFilter(self)
+
+    def set_close_btn_enabled(self, enabled):
+        self.closeBtnEnabled = enabled
+        if not enabled:
+            self.closeBtn.hide()
+        else:
+            self.closeBtn.show()
+
+    def set_full_btn_enabled(self, enabled):
+        self.fullBtnEnabled = enabled
+        if not enabled:
+            self.fullBtn.hide()
+        else:
+            self.fullBtn.show()
+
+    def set_min_btn_enabled(self, enabled):
+        self.minBtnEnabled = enabled
+        if not enabled:
+            self.minBtn.hide()
+        else:
+            self.minBtn.show()
+
+    def set_max_btn_enabled(self, enabled):
+        self.maxBtnEnabled = enabled
+        if not enabled:
+            self.maxBtn.hide()
+        else:
+            self.maxBtn.show()
+
+    def set_allow_double_toggle_max(self, allow):
+        self.allowDoubleToggleMax = allow
 
     def eventFilter(self, obj, e):
         if obj is self.window():
@@ -54,7 +90,7 @@ class TitleBar(QWidget):
 
     def mouseDoubleClickEvent(self, event):
         """Toggles the maximization state of the window"""
-        if event.button() != Qt.LeftButton:
+        if event.button() != Qt.LeftButton or not self.allowDoubleToggleMax:
             return
 
         self.__toggleMaxState()
@@ -91,8 +127,10 @@ class TitleBar(QWidget):
         if self.window().isFullScreen():
             self.window().showNormal()
             self.fullBtn.setFullscreenState(False)
-            self.maxBtn.show()
-            self.minBtn.show()
+            if self.maxBtnEnabled:
+                self.maxBtn.show()
+            if self.minBtnEnabled:
+                self.minBtn.show()
         else:
             self.window().showFullScreen()
             self.fullBtn.setFullscreenState(True)

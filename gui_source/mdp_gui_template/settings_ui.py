@@ -26,18 +26,25 @@ class Ui_DialogSettings(object):
             DialogSettings.setObjectName(u"DialogSettings")
         DialogSettings.setWindowModality(Qt.WindowModal)
         DialogSettings.setEnabled(True)
-        DialogSettings.resize(335, 413)
-        DialogSettings.setMinimumSize(QSize(335, 413))
+        DialogSettings.resize(335, 434)
+        DialogSettings.setMinimumSize(QSize(335, 434))
         DialogSettings.setMaximumSize(QSize(335, 448))
         DialogSettings.setSizeGripEnabled(False)
         DialogSettings.setModal(True)
         self.verticalLayout = QVBoxLayout(DialogSettings)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.label = QLabel(DialogSettings)
+        self.label.setObjectName(u"label")
+        self.label.setMinimumSize(QSize(0, 20))
+        self.label.setMaximumSize(QSize(16777215, 20))
+
+        self.verticalLayout.addWidget(self.label)
+
         self.label_36 = QLabel(DialogSettings)
         self.label_36.setObjectName(u"label_36")
         self.label_36.setMinimumSize(QSize(0, 28))
         font = QFont()
-        font.setFamilies([u"Sarasa Fixed SC Semibold"])
+        font.setFamilies([u"Sarasa Fixed SC SemiBold"])
         self.label_36.setFont(font)
         self.label_36.setAlignment(Qt.AlignCenter)
         self.label_36.setMargin(6)
@@ -403,11 +410,26 @@ class Ui_DialogSettings(object):
 
         self.verticalLayout.addWidget(self.line_2)
 
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setSpacing(6)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_3.setContentsMargins(-1, -1, -1, 0)
         self.btnSave = QPushButton(DialogSettings)
         self.btnSave.setObjectName(u"btnSave")
         self.btnSave.setFont(font)
 
-        self.verticalLayout.addWidget(self.btnSave)
+        self.horizontalLayout_3.addWidget(self.btnSave)
+
+        self.btnOk = QPushButton(DialogSettings)
+        self.btnOk.setObjectName(u"btnOk")
+        self.btnOk.setFont(font)
+
+        self.horizontalLayout_3.addWidget(self.btnOk)
+
+        self.horizontalLayout_3.setStretch(0, 2)
+        self.horizontalLayout_3.setStretch(1, 1)
+
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
 
 
         self.retranslateUi(DialogSettings)
@@ -420,6 +442,7 @@ class Ui_DialogSettings(object):
 
     def retranslateUi(self, DialogSettings):
         DialogSettings.setWindowTitle(QCoreApplication.translate("DialogSettings", u"\u8fde\u63a5\u8bbe\u7f6e", None))
+        self.label.setText("")
         self.label_36.setText(QCoreApplication.translate("DialogSettings", u"- NRF24L01 Adapter -", None))
         self.label_34.setText(QCoreApplication.translate("DialogSettings", u"\u4e32\u53e3\u53f7", None))
         self.comboBoxPort.setItemText(0, QCoreApplication.translate("DialogSettings", u"\u81ea\u52a8", None))
@@ -461,6 +484,7 @@ class Ui_DialogSettings(object):
         self.comboBoxBlink.setItemText(0, QCoreApplication.translate("DialogSettings", u"\u5e38\u4eae", None))
         self.comboBoxBlink.setItemText(1, QCoreApplication.translate("DialogSettings", u"\u95ea\u70c1", None))
 
-        self.btnSave.setText(QCoreApplication.translate("DialogSettings", u"\u4fdd\u5b58 / SAVE", None))
+        self.btnSave.setText(QCoreApplication.translate("DialogSettings", u"\u5e94\u7528 / Apply", None))
+        self.btnOk.setText(QCoreApplication.translate("DialogSettings", u"\u786e\u5b9a / OK", None))
     # retranslateUi
 

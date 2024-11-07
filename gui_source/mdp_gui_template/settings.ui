@@ -13,13 +13,13 @@
     <x>0</x>
     <y>0</y>
     <width>335</width>
-    <height>413</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>335</width>
-    <height>413</height>
+    <height>434</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -39,6 +39,25 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QLabel" name="label">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="label_36">
      <property name="minimumSize">
       <size>
@@ -48,7 +67,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
       </font>
      </property>
      <property name="text">
@@ -74,7 +93,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -92,7 +111,7 @@
       <widget class="QComboBox" name="comboBoxPort">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <item>
@@ -116,7 +135,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -134,7 +153,7 @@
       <widget class="QDoubleSpinBox" name="spinBoxBaud">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="alignment">
@@ -174,7 +193,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -230,7 +249,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -266,7 +285,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -290,7 +309,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -326,7 +345,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -350,7 +369,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -386,7 +405,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -410,7 +429,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -446,7 +465,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -470,7 +489,7 @@
             </property>
             <property name="font">
              <font>
-              <family>Sarasa Fixed SC Semibold</family>
+              <family>Sarasa Fixed SC SemiBold</family>
              </font>
             </property>
             <property name="text">
@@ -503,7 +522,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -521,7 +540,7 @@
       <widget class="QDoubleSpinBox" name="spinBoxFreq">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="alignment">
@@ -564,7 +583,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -582,7 +601,7 @@
       <widget class="QComboBox" name="comboBoxPower">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="currentIndex">
@@ -652,7 +671,7 @@
      </property>
      <property name="font">
       <font>
-       <family>Sarasa Fixed SC Semibold</family>
+       <family>Sarasa Fixed SC SemiBold</family>
       </font>
      </property>
      <property name="text">
@@ -672,7 +691,7 @@
       <widget class="QPushButton" name="btnMatch">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -707,7 +726,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -761,7 +780,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -779,7 +798,7 @@
       <widget class="QDoubleSpinBox" name="spinBoxM01">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="alignment">
@@ -825,7 +844,7 @@
        </property>
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <property name="text">
@@ -843,7 +862,7 @@
       <widget class="QComboBox" name="comboBoxBlink">
        <property name="font">
         <font>
-         <family>Sarasa Fixed SC Semibold</family>
+         <family>Sarasa Fixed SC SemiBold</family>
         </font>
        </property>
        <item>
@@ -871,16 +890,38 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnSave">
-     <property name="font">
-      <font>
-       <family>Sarasa Fixed SC Semibold</family>
-      </font>
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1">
+     <property name="spacing">
+      <number>6</number>
      </property>
-     <property name="text">
-      <string>保存 / SAVE</string>
+     <property name="bottomMargin">
+      <number>0</number>
      </property>
-    </widget>
+     <item>
+      <widget class="QPushButton" name="btnSave">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>应用 / Apply</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnOk">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>确定 / OK</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -141,7 +141,7 @@ def parse_type7_response(
             v = _volt_adc_correct(sv, HVgain16, HVzero16)
             c = _curr_adc_correct(sc, HCgain04, HCzero04)
             realtime_adc.append((v, c))
-        if data[1] == 0x1C:
+        if data[1] in (0x1C, 0x1B):
             voltage = data[24:27].hex()
             voltage = float(voltage[0:3] + "." + voltage[3:])
             current = data[27:30].hex()
@@ -204,7 +204,7 @@ def _curr_adc_correct(value: int, gain: int, offset: int) -> float:
     """
     Correct current adc value to A
     """
-    val = round((value * 4 - offset) * gain / 100000.0 * 2)
+    val = round((value * 4 - offset) * gain / 100000.0)
     return val / 1000 if val > 0 else 0.0
 
 
@@ -227,11 +227,13 @@ def parse_type9_response(data: bytes):
     """
     assert data[0] == 9
     assert data[1] == 14
+    assert data[15] in (2, 1)  # P906 / P905
     idcode = data[2:6]
     # unk1 = data[6] # ?
     HVzero16 = int(data[7:9].hex(), 16)
     HVgain16 = int(data[9:11].hex(), 16)
     HCzero04 = int(data[11:13].hex(), 16)
     HCgain04 = int(data[13:15].hex(), 16)
-    assert data[15] == 2 or data[15] == 1  # P906
+    if data[15] == 2:
+        HCgain04 *= 2  # P906
     return (idcode, HVzero16, HVgain16, HCzero04, HCgain04)

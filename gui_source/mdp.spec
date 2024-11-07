@@ -11,7 +11,7 @@ a = Analysis(
     datas=[
         (".\\icon.ico", "."),
         (".\\en_US.qm", "."),
-        (".\\sarasa-semibold.ttc", "."),
+        (".\\SarasaFixedSC-SemiBold.ttf", "."),
     ],
     hiddenimports=["pyi_splash"],
     hookspath=[],
