@@ -1,13 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
-import sys
-sys.path.append("../")
 
 block_cipher = None
 
 
 a = Analysis(
     ["mdp_main.py", "mdp_gui.py"],
-    pathex=[],
+    pathex=[".."],
     binaries=[],
     datas=[
         (".\\icon.ico", "."),

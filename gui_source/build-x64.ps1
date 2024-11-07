@@ -1,1 +1,1 @@
-.venv\Scripts\pyinstaller.exe .\mdp.spec --noconfirm --upx-dir="C:\upx"
+.venv\Scripts\pyinstaller.exe --noconfirm --upx-dir C:\Toolchains\upx .\mdp.spec
