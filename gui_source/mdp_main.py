@@ -1,8 +1,3 @@
-import sys
-
-sys.path.append("../")
-
-
 def main():
     try:
         import pyi_splash  # only available when packaged with pyinstaller # type: ignore

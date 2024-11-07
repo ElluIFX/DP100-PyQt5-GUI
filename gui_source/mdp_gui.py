@@ -9,10 +9,15 @@ import warnings
 from threading import Lock
 from typing import List, Optional, Tuple
 
+import richuru
 from loguru import logger
 
-import mdp_controller
-import richuru
+try:
+    import mdp_controller
+except ImportError:
+    sys.path.append("../")
+    import mdp_controller
+
 from mdp_controller import MDP_P906
 
 ARG_PATH = os.path.dirname(sys.argv[0])
@@ -34,7 +39,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 from qframelesswindow import FramelessWindow, TitleBar
 
 OPENGL_AVAILABLE = False
@@ -59,10 +63,9 @@ except Exception as e:
 
 import numpy as np
 import qdarktheme
+from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
 from serial.tools.list_ports import comports
 from simple_pid import PID
-
-from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
 
 SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
