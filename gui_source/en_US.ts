@@ -761,7 +761,7 @@
     <message>
         <location filename="mdp_gui.py" line="1563"/>
         <source>连接设置</source>
-        <translation>Connection settings</translation>
+        <translation>Connection Settings</translation>
     </message>
     <message>
         <location filename="mdp_gui.py" line="1693"/>
