@@ -715,7 +715,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_40" stretch="4,5,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_40" stretch="2,3">
      <item>
       <widget class="QLabel" name="label_46">
        <property name="minimumSize">
@@ -741,30 +741,34 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditColor">
-       <property name="text">
-        <string>#66CCFF</string>
-       </property>
-       <property name="placeholderText">
-        <string>#RRGGBB</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEditColorIndicator">
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_39" stretch="5,1">
+       <item>
+        <widget class="QLineEdit" name="lineEditColor">
+         <property name="text">
+          <string>#66CCFF</string>
+         </property>
+         <property name="placeholderText">
+          <string>#RRGGBB</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditColorIndicator">
+         <property name="minimumSize">
+          <size>
+           <width>1</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="frame">
+          <bool>false</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

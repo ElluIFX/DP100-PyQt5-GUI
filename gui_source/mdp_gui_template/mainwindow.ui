@@ -71,7 +71,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1,1">
          <property name="spacing">
-          <number>8</number>
+          <number>0</number>
          </property>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -645,7 +645,7 @@
                     </font>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>快速设定：当设定电压/电流变化时立刻提交</string>
                    </property>
                    <property name="text">
                     <string/>
@@ -1411,7 +1411,7 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
+                      <width>152</width>
                       <height>162</height>
                      </rect>
                     </property>
@@ -1733,7 +1733,7 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
+                      <width>142</width>
                       <height>198</height>
                      </rect>
                     </property>
@@ -2116,7 +2116,7 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
+                      <width>152</width>
                       <height>198</height>
                      </rect>
                     </property>
@@ -3282,6 +3282,9 @@
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>上窗口数据</string>
+               </property>
                <item>
                 <property name="text">
                  <string>电压</string>
@@ -3327,6 +3330,9 @@
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
+               </property>
+               <property name="toolTip">
+                <string>下窗口数据</string>
                </property>
                <property name="currentIndex">
                 <number>1</number>
@@ -3398,6 +3404,9 @@
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>设备输出数据请求频率</string>
+               </property>
                <property name="currentIndex">
                 <number>5</number>
                </property>
@@ -3466,6 +3475,9 @@
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>实时采样率</string>
+               </property>
                <property name="text">
                 <string>0.0Hz</string>
                </property>
@@ -3505,6 +3517,9 @@
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>将原始数据记录到CSV文件，不受图形缓冲区限制</string>
+               </property>
                <property name="text">
                 <string>录制</string>
                </property>
@@ -3522,6 +3537,9 @@
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
+               </property>
+               <property name="toolTip">
+                <string>切换数据波形是否自动适应窗口</string>
                </property>
                <property name="text">
                 <string>适应</string>
@@ -3541,6 +3559,9 @@
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>停止数据波形刷新（数据缓冲区仍在更新）</string>
+               </property>
                <property name="text">
                 <string>保持</string>
                </property>
@@ -3559,8 +3580,32 @@
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>清空波形数据缓冲区</string>
+               </property>
                <property name="text">
                 <string>清空</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnRecordFloatWindow">
+               <property name="maximumSize">
+                <size>
+                 <width>60</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Sarasa Fixed SC SemiBold</family>
+                </font>
+               </property>
+               <property name="toolTip">
+                <string>切换数据监控悬浮窗</string>
+               </property>
+               <property name="text">
+                <string>浮窗</string>
                </property>
               </widget>
              </item>
@@ -3576,6 +3621,9 @@
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
                 </font>
+               </property>
+               <property name="toolTip">
+                <string>清零平均功率和能量累计</string>
                </property>
                <property name="text">
                 <string>回零</string>

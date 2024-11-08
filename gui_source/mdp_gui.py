@@ -115,7 +115,6 @@ class RealtimeData:
         self.start_time = time.perf_counter()
         self.eng_start_time = time.perf_counter()
         self.last_time = 0
-        self.save_datas_flag = False
         self.voltage_tmp = []
         self.current_tmp = []
         self.energy = 0
@@ -538,7 +537,7 @@ class Setting:
         self.freq = 2521
         self.txpower = "4dBm"
         self.idcode = ""
-        self.color = "#66CCFF"
+        self.color = "66CCFF"
         self.m01ch = "CH-0"
         self.blink = False
 
@@ -573,6 +572,7 @@ class Setting:
                 "general_green": "mediumaquamarine",
                 "general_red": "orangered",
                 "general_yellow": "yellow",
+                "general_blue": "lightblue",
                 "line1": "salmon",
                 "line2": "turquoise",
             },
@@ -584,6 +584,7 @@ class Setting:
                 "general_green": "forestgreen",
                 "general_red": "firebrick",
                 "general_yellow": "goldenrod",
+                "general_blue": "darkblue",
                 "line1": "orangered",
                 "line2": "darkcyan",
             },
@@ -620,6 +621,8 @@ update_hardware_setting()
 
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
+    uip_values_signal = QtCore.pyqtSignal(float, float, float)
+    close_signal = QtCore.pyqtSignal()
     data = RealtimeData(setting.data_pts)
     data_fps = 50
     graph_keep_flag = False
@@ -1035,27 +1038,23 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             t = t1 - data.start_time
             dt = t1 - data.last_time
             data.last_time = t1
+            if data.update_count + len_ > data.data_length:
+                offset = data.update_count + len_ - data.data_length
+                data.voltages = np.roll(data.voltages, -offset)
+                data.currents = np.roll(data.currents, -offset)
+                data.powers = np.roll(data.powers, -offset)
+                data.resistances = np.roll(data.resistances, -offset)
+                data.times = np.roll(data.times, -offset)
+                data.update_count -= offset
             for idx, (v, i) in enumerate(rtvalues):
                 data.energy += v * i * (dt / len_)
-            if data.save_datas_flag:
-                if data.update_count + len_ > data.data_length:
-                    offset = data.update_count + len_ - data.data_length
-                    data.voltages = np.roll(data.voltages, -offset)
-                    data.currents = np.roll(data.currents, -offset)
-                    data.powers = np.roll(data.powers, -offset)
-                    data.resistances = np.roll(data.resistances, -offset)
-                    data.times = np.roll(data.times, -offset)
-                    data.update_count -= offset
-                for idx, (v, i) in enumerate(rtvalues):
-                    data.voltages[data.update_count + idx] = v
-                    data.currents[data.update_count + idx] = i
-                    data.powers[data.update_count + idx] = v * i
-                    data.resistances[data.update_count + idx] = (
-                        v / i if i != 0 else self.open_r
-                    )
-                    data.times[data.update_count + idx] = (
-                        t - dt + (dt / len_) * (idx + 1)
-                    )
+                data.voltages[data.update_count + idx] = v
+                data.currents[data.update_count + idx] = i
+                data.powers[data.update_count + idx] = v * i
+                data.resistances[data.update_count + idx] = (
+                    v / i if i != 0 else self.open_r
+                )
+                data.times[data.update_count + idx] = t - dt + (dt / len_) * (idx + 1)
                 data.update_count += len_
         self.fps_counter.tick()
 
@@ -1086,7 +1085,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.lcdCurrent.display(f"{iavg:.{3+setting.interp}f}")
         self.ui.lcdResistence.display(r_text)
         self.ui.lcdPower.display(f"{power:.{3+setting.interp}f}")
-
+        self.uip_values_signal.emit(vavg, iavg, power)
         v_value = round(vavg / self.v_set * 1000) if self.v_set != 0 else 0
         i_value = round(iavg / self.i_set * 1000) if self.i_set != 0 else 0
         self.ui.progressBarVoltage.setValue(min(v_value, 1000))
@@ -1183,7 +1182,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         )
         self.curve1 = self.ui.widgetGraph1.plot(pen=self.pen1, clear=True)
         self.curve2 = self.ui.widgetGraph2.plot(pen=self.pen2, clear=True)
-        self.data.save_datas_flag = True
         self._graph_auto_scale_flag = True
         self.ui.widgetGraph1.setAxisItems(
             axisItems={"left": FmtAxisItem(orientation="left")}
@@ -1313,7 +1311,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     @QtCore.pyqtSlot()
     def on_btnGraphClear_clicked(self):
         with self.data.sync_lock:
-            self.data.save_datas_flag = False
             self.data.voltages = np.zeros(self.data.data_length, np.float64)
             self.data.currents = np.zeros(self.data.data_length, np.float64)
             self.data.powers = np.zeros(self.data.data_length, np.float64)
@@ -1323,7 +1320,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             t = time.perf_counter()
             self.data.start_time = t
             self.data.last_time = t
-            self.data.save_datas_flag = True
 
         self.curve1.setData(x=[], y=[])
         self.curve2.setData(x=[], y=[])
@@ -1990,7 +1986,29 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
         self.CustomTitleBar.set_full_btn_enabled(False)
         self.CustomTitleBar.set_close_btn_enabled(False)
         self.setTitleBar(self.CustomTitleBar)
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        for lineedit in [
+            self.ui.lineEditAddr1,
+            self.ui.lineEditAddr2,
+            self.ui.lineEditAddr3,
+            self.ui.lineEditAddr4,
+            self.ui.lineEditAddr5,
+            self.ui.lineEditColor,
+            self.ui.lineEditIdcode,
+        ]:
+            lineedit.textChanged.connect(
+                lambda t=None, le=lineedit: self.check_hex_input(le)
+            )
+
+    def check_hex_input(self, lineedit: QtWidgets.QLineEdit):
+        text = lineedit.text()
+        new_text = ""
+        for char in text:
+            if char in "0123456789ABCDEFabcdef":
+                new_text += char.upper()
+            else:
+                new_text += ""
+        lineedit.setText(new_text)
 
     def initValues(self):
         self.ui.spinBoxBaud.setValue(setting.baudrate)
@@ -2061,7 +2079,7 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
         self.initValues()
         self.refreshPorts()
         self.ui.lineEditColorIndicator.setStyleSheet(
-            f"background-color: {setting.color}"
+            f"background-color: #{setting.color.lstrip('#')}"
         )
         if self.isVisible():
             self.close()
@@ -2073,15 +2091,15 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
 
     @QtCore.pyqtSlot()
     def on_lineEditColor_editingFinished(self):
-        color = self.ui.lineEditColor.text()
+        color = self.ui.lineEditColor.text().lstrip("#")
         try:
-            _ = bytes.fromhex(color.lstrip("#"))
-            self.ui.lineEditColorIndicator.setStyleSheet(f"background-color: {color}")
+            _ = bytes.fromhex(color)
+            self.ui.lineEditColorIndicator.setStyleSheet(f"background-color: #{color}")
         except Exception:
             CustomMessageBox(
                 self,
-                self.tr("错误"),
-                self.tr("颜色格式错误, 请输入形如#FFFFFF的16进制颜色代码"),
+                self.tr("颜色格式错误"),
+                self.tr("请输入16进制RGB颜色代码(例如: 66CCFF)"),
             )
             self.ui.lineEditColor.setText(setting.color)
 
@@ -2142,7 +2160,7 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.CustomTitleBar.set_full_btn_enabled(False)
         self.CustomTitleBar.set_close_btn_enabled(False)
         self.setTitleBar(self.CustomTitleBar)
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         if NUMBA_ENABLED:
             self.ui.labelNumba.setVisible(True)
         else:
@@ -2311,20 +2329,155 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.close()
 
 
+class TransparentFloatingWindow(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # 设置窗口为无边框和置顶
+        self.setWindowFlags(
+            QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint
+        )
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+        # 设置窗口大小和透明度
+        self.setFixedSize(75, 140)
+        self.setWindowOpacity(0.95)
+
+        font = QtGui.QFont()
+        font.setFamily("Sarasa Fixed SC SemiBold")
+        font.setPointSize(10)
+
+        font_value = QtGui.QFont()
+        font_value.setFamily("Sarasa Fixed SC SemiBold")
+        font_value.setPointSize(12)
+        # 创建主窗口布局
+        window_layout = QtWidgets.QVBoxLayout(self)
+        window_layout.setContentsMargins(0, 0, 0, 0)
+        window_layout.setSpacing(0)
+
+        # 创建Frame
+        frame = QtWidgets.QFrame(self)
+        frame.setStyleSheet("QFrame { background-color: rgba(17, 17, 21, 100); }")
+        window_layout.addWidget(frame)
+
+        # 创建Frame内部布局
+        layout = QtWidgets.QVBoxLayout(frame)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        label = QtWidgets.QLabel(" MDP-P906 ", self)
+        label.setFont(font)
+        set_color(label, "rgb(200, 200, 200)")
+        layout.addWidget(label, alignment=QtCore.Qt.AlignCenter)
+
+        label = QtWidgets.QLabel(self.tr("电压 U"), self)
+        label.setFont(font)
+        set_color(label, setting.color_palette["dark"]["general_red"])
+        layout.addWidget(label)
+        self.voltage_label = QtWidgets.QLabel("", self)
+        self.voltage_label.setFont(font_value)
+        set_color(self.voltage_label, setting.color_palette["dark"]["general_red"])
+        layout.addWidget(self.voltage_label)
+
+        label = QtWidgets.QLabel(self.tr("电流 I"), self)
+        label.setFont(font)
+        set_color(label, setting.color_palette["dark"]["general_green"])
+        layout.addWidget(label)
+        self.current_label = QtWidgets.QLabel("", self)
+        self.current_label.setFont(font_value)
+        set_color(self.current_label, setting.color_palette["dark"]["general_green"])
+        layout.addWidget(self.current_label)
+
+        label = QtWidgets.QLabel(self.tr("功率 P"), self)
+        label.setFont(font)
+        set_color(label, setting.color_palette["dark"]["general_blue"])
+        layout.addWidget(label)
+        self.power_label = QtWidgets.QLabel("", self)
+        self.power_label.setFont(font_value)
+        set_color(self.power_label, setting.color_palette["dark"]["general_blue"])
+        layout.addWidget(self.power_label)
+
+        self.setLayout(window_layout)
+
+        self.dragging = False
+        self.offset = None
+
+        self.update_values(0, 0, 0)
+
+    def center_window(self):
+        self.screen = QtWidgets.QApplication.primaryScreen().geometry()
+        x = self.screen.width() - self.width() - 10
+        y = self.screen.height() // 2 - self.height() // 2
+        self.move(x, y)
+        self.setWindowOpacity(0.95)
+
+    def update_values(self, u, i, p):
+        self.voltage_label.setText(f"{u:06.3f} V")
+        self.current_label.setText(f"{i:06.3f} A")
+        if p < 100:
+            self.power_label.setText(f"{p:06.3f} W")
+        else:
+            self.power_label.setText(f"{p:06.2f} W")
+
+    def switch_visibility(self):
+        if self.isVisible():
+            self.close()
+        else:
+            self.center_window()
+            self.show()
+
+    def wheelEvent(self, event):
+        current_opacity = self.windowOpacity()
+        if event.angleDelta().y() > 0:
+            new_opacity = min(1.0, current_opacity + 0.1)
+        else:
+            new_opacity = max(0.1, current_opacity - 0.1)
+        self.setWindowOpacity(new_opacity)
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.dragging = True
+            self.offset = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.dragging:
+            move = event.globalPos() - self.offset
+            x = max(0, min(move.x(), self.screen.width() - self.width()))
+            y = max(0, min(move.y(), self.screen.height() - self.height()))
+            self.move(x, y)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.dragging = False
+
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.close()
+
+
 DialogSettings = MDPSettings()
 DialogGraphics = MDPGraphics()
+FloatingWindow = TransparentFloatingWindow()
 MainWindow.ui.btnSettings.clicked.connect(DialogSettings.show)
 MainWindow.ui.btnGraphics.clicked.connect(DialogGraphics.show)
 DialogGraphics.set_max_fps_sig.connect(MainWindow.set_graph_max_fps)
 DialogGraphics.state_fps_sig.connect(MainWindow.set_state_fps)
 DialogGraphics.set_data_len_sig.connect(MainWindow.set_data_length)
 DialogGraphics.set_interp_sig.connect(MainWindow.set_interp)
+MainWindow.ui.btnRecordFloatWindow.clicked.connect(FloatingWindow.switch_visibility)
+MainWindow.uip_values_signal.connect(FloatingWindow.update_values)
+MainWindow.close_signal.connect(FloatingWindow.close)
 app.setWindowIcon(QtGui.QIcon(ICON_PATH))
 
 
 def set_theme(theme):
     setting.theme = theme
-    qdarktheme.setup_theme(theme)
+    additional_qss = (
+        "QToolTip {color: rgb(228, 231, 235); background-color: rgb(32, 33, 36); border: 1px solid rgb(63, 64, 66); border-radius: 4px;}"
+        if theme == "dark"
+        else "QToolTip {color: rgb(32, 33, 36); background-color: white; border: 1px solid rgb(218, 220, 224); border-radius: 4px;}"
+    )  # fix QToolTip background color
+    qdarktheme.setup_theme(theme, additional_qss=additional_qss)
     MainWindow.ui.widgetGraph1.setBackground(None)
     MainWindow.ui.widgetGraph2.setBackground(None)
     MainWindow.CustomTitleBar.set_theme(theme)
