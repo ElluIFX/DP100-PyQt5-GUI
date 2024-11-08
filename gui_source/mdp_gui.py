@@ -6,8 +6,9 @@ import random
 import sys
 import time
 import warnings
+from functools import partial
 from threading import Lock
-from typing import List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 import richuru
 from loguru import logger
@@ -192,7 +193,7 @@ class CustomTitleBar(TitleBar):
         super().__init__(parent)
         self.label = QtWidgets.QLabel(name, self)
         self.label.setStyleSheet(
-            "QLabel{font: 13px 'Microsoft YaHei UI'; margin: 10px}"
+            "QLabel{font: 13px 'Sarasa Fixed SC SemiBold'; margin: 10px}"
         )
         self.label.adjustSize()
         self.darkStyle = {
@@ -216,6 +217,283 @@ class CustomTitleBar(TitleBar):
         self.maxBtn.updateStyle(style)
         self.closeBtn.updateStyle(style)
         self.fullBtn.updateStyle(style)
+
+
+class CustomMessageBox(QtWidgets.QDialog, FramelessWindow):
+    def __init__(
+        self,
+        parent,
+        title,
+        message,
+        question=False,
+        additional_actions: List[Tuple[str, Callable[[], bool]]] = [],
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        font = QtGui.QFont()
+        font.setFamily("Sarasa Fixed SC SemiBold")
+
+        title, message = str(title), str(message)
+
+        # Custom title bar
+        self.CustomTitleBar = CustomTitleBar(self, title)
+        self.CustomTitleBar.set_allow_double_toggle_max(False)
+        self.CustomTitleBar.set_min_btn_enabled(False)
+        self.CustomTitleBar.set_max_btn_enabled(False)
+        self.CustomTitleBar.set_full_btn_enabled(False)
+        self.CustomTitleBar.set_close_btn_enabled(False)
+        self.setTitleBar(self.CustomTitleBar)
+
+        # Main layout
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(14, 14, 14, 14)
+        layout.setSpacing(14)
+
+        self.spaceLabel = QtWidgets.QLabel("", self)
+        self.spaceLabel.setFixedHeight(20)
+        layout.addWidget(self.spaceLabel)
+
+        # Message label
+        self.messageLabel = QtWidgets.QLabel(message, self)
+        self.messageLabel.setWordWrap(False)
+        self.messageLabel.setFont(font)
+        self.messageLabel.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )  # Allow horizontal expansion
+        layout.addWidget(self.messageLabel, alignment=QtCore.Qt.AlignCenter)
+
+        # Button
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setSpacing(8)
+        layout.addLayout(self.horizontalLayout)
+        if not question:
+            self.okButton = QtWidgets.QPushButton(self.tr("确定"), self)
+            self.okButton.setFont(font)
+            self.okButton.clicked.connect(self.close)
+            self.horizontalLayout.addWidget(self.okButton)
+        else:
+            self.okButton = QtWidgets.QPushButton(self.tr("是"), self)
+            self.okButton.setFont(font)
+            self.okButton.clicked.connect(self.accept)
+            self.horizontalLayout.addWidget(self.okButton)
+
+            self.cancelButton = QtWidgets.QPushButton(self.tr("否"), self)
+            self.cancelButton.setFont(font)
+            self.cancelButton.clicked.connect(self.reject)
+            self.horizontalLayout.addWidget(self.cancelButton)
+
+        if additional_actions:
+            for text, func in additional_actions:
+                button = QtWidgets.QPushButton(text, self)
+                button.setFont(font)
+                button.clicked.connect(partial(self._handle_additional_action, func))
+                self.horizontalLayout.addWidget(button)
+
+        self.adjustSize()
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.ret = True
+        self.exec_()
+
+    def _handle_additional_action(self, func):
+        if func():
+            self.close()
+
+    def result(self) -> bool:
+        return self.ret
+
+    @staticmethod
+    def question(parent, title, message):
+        dialog = CustomMessageBox(parent, title, message, question=True)
+        return dialog.result()
+
+    def accept(self):
+        self.ret = True
+        return super().accept()
+
+    def reject(self):
+        self.ret = False
+        return super().reject()
+
+
+class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
+    def __init__(
+        self,
+        parent,
+        title,
+        label,
+        input_type="text",
+        default_value=None,
+        placeholder_text=None,
+        min_value=None,
+        max_value=None,
+        decimals=None,
+        step=None,
+        prefix=None,
+        suffix=None,
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        font = QtGui.QFont()
+        font.setFamily("Sarasa Fixed SC SemiBold")
+
+        # Custom title bar
+        self.CustomTitleBar = CustomTitleBar(self, title)
+        self.CustomTitleBar.set_allow_double_toggle_max(False)
+        self.CustomTitleBar.set_min_btn_enabled(False)
+        self.CustomTitleBar.set_max_btn_enabled(False)
+        self.CustomTitleBar.set_full_btn_enabled(False)
+        self.CustomTitleBar.set_close_btn_enabled(False)
+        self.setTitleBar(self.CustomTitleBar)
+
+        # Main layout
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(14, 14, 14, 14)
+        layout.setSpacing(14)
+
+        self.spaceLabel = QtWidgets.QLabel("", self)
+        self.spaceLabel.setFixedHeight(20)
+        layout.addWidget(self.spaceLabel)
+
+        # Input label
+        self.inputLabel = QtWidgets.QLabel(label, self)
+        self.inputLabel.setFont(font)
+        layout.addWidget(self.inputLabel, alignment=QtCore.Qt.AlignCenter)
+
+        # Input field
+        if input_type == "text":
+            self.inputField = QtWidgets.QLineEdit(self)
+            if default_value is not None:
+                self.inputField.setText(default_value)
+            if placeholder_text is not None:
+                self.inputField.setPlaceholderText(placeholder_text)
+        elif input_type == "int":
+            self.inputField = QtWidgets.QSpinBox(self)
+        elif input_type == "double":
+            self.inputField = QtWidgets.QDoubleSpinBox(self)
+            if decimals is not None:
+                self.inputField.setDecimals(decimals)
+        if input_type in ("int", "double"):
+            if min_value is not None:
+                self.inputField.setMinimum(min_value)
+            if max_value is not None:
+                self.inputField.setMaximum(max_value)
+            if default_value is not None:
+                self.inputField.setValue(default_value)
+            if step is not None:
+                self.inputField.setSingleStep(step)
+            if prefix is not None:
+                self.inputField.setPrefix(prefix)
+            if suffix is not None:
+                self.inputField.setSuffix(suffix)
+
+        self.inputField.setFont(font)
+        layout.addWidget(self.inputField, alignment=QtCore.Qt.AlignCenter)
+
+        # Buttons
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setSpacing(8)
+        layout.addLayout(self.horizontalLayout)
+
+        self.okButton = QtWidgets.QPushButton("  " + self.tr("确定") + "  ", self)
+        self.okButton.setFont(font)
+        self.okButton.clicked.connect(self.accept)
+        self.horizontalLayout.addWidget(self.okButton)
+
+        self.cancelButton = QtWidgets.QPushButton("  " + self.tr("取消") + "  ", self)
+        self.cancelButton.setFont(font)
+        self.cancelButton.clicked.connect(self.reject)
+        self.horizontalLayout.addWidget(self.cancelButton)
+
+        self.adjustSize()
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.ret = True
+        self.exec_()
+
+    def result(self) -> Tuple[Any, bool]:
+        if isinstance(self.inputField, QtWidgets.QLineEdit):
+            return self.inputField.text(), self.ret
+        elif isinstance(self.inputField, QtWidgets.QSpinBox):
+            return self.inputField.value(), self.ret
+        elif isinstance(self.inputField, QtWidgets.QDoubleSpinBox):
+            return self.inputField.value(), self.ret
+
+    def accept(self):
+        self.ret = True
+        return super().accept()
+
+    def reject(self):
+        self.ret = False
+        return super().reject()
+
+    @staticmethod
+    def getText(
+        parent, title, label, default_value="", placeholder_text=None
+    ) -> Tuple[str, bool]:
+        dialog = CustomInputDialog(
+            parent,
+            title,
+            label,
+            input_type="text",
+            default_value=default_value,
+            placeholder_text=placeholder_text,
+        )
+        return dialog.result()
+
+    @staticmethod
+    def getInt(
+        parent,
+        title,
+        label,
+        default_value=0,
+        min_value=0,
+        max_value=100,
+        step=1,
+        prefix=None,
+        suffix=None,
+    ) -> Tuple[int, bool]:
+        dialog = CustomInputDialog(
+            parent,
+            title,
+            label,
+            input_type="int",
+            default_value=default_value,
+            min_value=min_value,
+            max_value=max_value,
+            step=step,
+            prefix=prefix,
+            suffix=suffix,
+        )
+        return dialog.result()
+
+    @staticmethod
+    def getDouble(
+        parent,
+        title,
+        label,
+        default_value=0.0,
+        min_value=0.0,
+        max_value=100.0,
+        decimals=2,
+        step=0.01,
+        prefix=None,
+        suffix=None,
+    ) -> Tuple[float, bool]:
+        dialog = CustomInputDialog(
+            parent,
+            title,
+            label,
+            input_type="double",
+            default_value=default_value,
+            min_value=min_value,
+            max_value=max_value,
+            decimals=decimals,
+            step=step,
+            prefix=prefix,
+            suffix=suffix,
+        )
+        return dialog.result()
 
 
 def center_window(instance: QtWidgets.QWidget) -> None:
@@ -374,7 +652,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.set_interp(setting.interp)
         self.refresh_preset()
         self.get_preset("1")
-        self.close_state_ui()
+        # self.close_state_ui()
         self.ui.progressBarVoltage.setMaximum(1000)
         self.ui.progressBarCurrent.setMaximum(1000)
         self._last_state_change_t = time.perf_counter()
@@ -671,9 +949,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.CustomTitleBar.set_name(self.tr("MDP-P906 数控电源上位机"))
             else:
                 if not setting.idcode:
-                    QtWidgets.QMessageBox.warning(
+                    CustomMessageBox(
                         self,
-                        self.tr("警告"),
+                        self.tr("错误"),
                         self.tr("IDCODE为空, 请先完成连接设置"),
                     )
                     return
@@ -706,11 +984,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.open_state_ui()
                 self.ui.btnGraphClear.clicked.emit()
         except Exception as e:
-            QtWidgets.QMessageBox.warning(
-                self,
-                self.tr("连接失败"),
-                str(e),
-            )
+            CustomMessageBox(self, self.tr("连接失败"), str(e))
             return
 
     def request_state(self):
@@ -1089,13 +1363,24 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.graph_record_save_timer.stop()
             self.graph_record_data.to_csv(self.graph_record_filename)
             self.graph_record_data = RecordData()
-            msg_box = QtWidgets.QMessageBox()
-            msg_box.setWindowTitle(self.tr("录制完成"))
-            msg_box.setText(
-                self.tr("数据已保存至：") + f"{self.graph_record_filename[2:]}"
+
+            CustomMessageBox(
+                self,
+                self.tr("录制完成"),
+                self.tr("数据已保存至：") + f"{self.graph_record_filename[2:]}",
+                additional_actions=[
+                    (
+                        self.tr("打开文件路径"),
+                        partial(self._handle_open_filebase, self.graph_record_filename),
+                    ),
+                ],
             )
-            msg_box.exec_()
             self.ui.btnGraphRecord.setText(self.tr("录制"))
+
+    def _handle_open_filebase(self, file):
+        folder = os.path.dirname(file)
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(folder))
+        return True
 
     def graph_record_save(self):
         if self.graph_record_flag:
@@ -1190,6 +1475,23 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             if not self.output_state:
                 self.v_set = self._sweep_start
                 self.on_btnOutput_clicked()
+
+    @QtCore.pyqtSlot(str)
+    def on_comboSweepTarget_currentTextChanged(self, text):
+        if text == self.tr("电压"):
+            self.ui.spinBoxSweepStart.setSuffix("V")
+            self.ui.spinBoxSweepStop.setSuffix("V")
+            self.ui.spinBoxSweepStep.setSuffix("V")
+            self.ui.spinBoxSweepStart.setRange(0, 30)
+            self.ui.spinBoxSweepStop.setRange(0, 30)
+            self.ui.spinBoxSweepStep.setRange(0.001, 30)
+        elif text == self.tr("电流"):
+            self.ui.spinBoxSweepStart.setSuffix("A")
+            self.ui.spinBoxSweepStop.setSuffix("A")
+            self.ui.spinBoxSweepStep.setSuffix("A")
+            self.ui.spinBoxSweepStart.setRange(0, 10)
+            self.ui.spinBoxSweepStop.setRange(0, 10)
+            self.ui.spinBoxSweepStep.setRange(0.001, 10)
 
     def stop_func_sweep(self):
         self.func_sweep_timer.stop()
@@ -1449,25 +1751,22 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             return
         item = self.ui.listSeq.item(row)
         text = item.text()
-        text, ok = QtWidgets.QInputDialog.getText(
+        text, ok = CustomInputDialog.getText(
             self,
             self.tr("编辑动作"),
             self.tr("请确保修改后动作文本格式正确,否则无法识别动作"),
-            text=text,
+            default_value=text,
         )
         if not ok:
             return
         item.setText(text)
 
     def seq_clear_all(self):
-        ok = QtWidgets.QMessageBox.question(
+        if CustomMessageBox.question(
             self,
-            self.tr("清空序列"),
+            self.tr("警告"),
             self.tr("确定要清空序列吗？"),
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-            QtWidgets.QMessageBox.No,
-        )
-        if ok == QtWidgets.QMessageBox.Yes:
+        ):
             self.ui.listSeq.clear()
 
     # listSeq 右键菜单 (listSeq)
@@ -1490,68 +1789,94 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def on_listSeq_itemDoubleClicked(self, item):
         self.seq_edit_item()
 
+    def seq_set_item_font(self, index):
+        item = self.ui.listSeq.item(index)
+        font = QtGui.QFont()
+        font.setFamily("Sarasa Fixed SC SemiBold")
+        font.setPointSize(10)
+        item.setFont(font)
+
     @QtCore.pyqtSlot()
     def on_btnSeqDelay_clicked(self):
         row = self.ui.listSeq.currentRow()
-        delay, ok = QtWidgets.QInputDialog.getInt(
+        delay, ok = CustomInputDialog.getInt(
             self,
-            self.tr("输入延时"),
-            self.tr("请输入延时时间 (ms)"),
-            1000,
-            0,
-            100000,
-            1,
+            self.tr("添加动作"),
+            self.tr("请输入延时时间:"),
+            default_value=1000,
+            min_value=0,
+            max_value=100000,
+            step=1,
+            suffix="ms",
         )
         if not ok:
             return
         self.ui.listSeq.insertItem(row + 1, f"DELAY {delay} ms")
         self.ui.listSeq.setCurrentRow(row + 1)
+        self.seq_set_item_font(row + 1)
 
     @QtCore.pyqtSlot()
     def on_btnSeqWaitTime_clicked(self):
         row = self.ui.listSeq.currentRow()
         time_now_str = datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S")
-        wait_time, ok = QtWidgets.QInputDialog.getText(
+        wait_time, ok = CustomInputDialog.getText(
             self,
-            self.tr("输入等待时间"),
-            self.tr("请输入等待时间 (格式: 年-月-日 时:分:秒)"),
-            text=time_now_str,
+            self.tr("添加动作"),
+            self.tr("请输入等待时间:") + "\n" + self.tr("格式: 年-月-日 时:分:秒"),
+            default_value=time_now_str,
         )
         if not ok:
             return
         try:
             datetime.datetime.strptime(wait_time, "%y-%m-%d %H:%M:%S")
         except ValueError:
-            QtWidgets.QMessageBox.warning(
-                self, self.tr("错误"), self.tr("时间格式错误")
-            )
+            CustomMessageBox(self, self.tr("错误"), self.tr("时间格式错误"))
             return
         if not ok:
             return
-        self.ui.listSeq.insertItem(row + 1, f"WAIT {wait_time}")
+        self.ui.listSeq.insertItem(row + 1, f"WAIT  {wait_time}")
         self.ui.listSeq.setCurrentRow(row + 1)
+        self.seq_set_item_font(row + 1)
 
     @QtCore.pyqtSlot()
     def on_btnSeqVoltage_clicked(self):
         row = self.ui.listSeq.currentRow()
-        voltage, ok = QtWidgets.QInputDialog.getDouble(
-            self, self.tr("输入电压"), self.tr("请输入电压值 (V)"), 1, 0, 30, 3
+        voltage, ok = CustomInputDialog.getDouble(
+            self,
+            self.tr("添加动作"),
+            self.tr("请输入电压值:"),
+            default_value=5,
+            min_value=0,
+            max_value=30,
+            step=0.001,
+            decimals=3,
+            suffix="V",
         )
         if not ok:
             return
         self.ui.listSeq.insertItem(row + 1, f"SET-V {voltage:.3f} V")
         self.ui.listSeq.setCurrentRow(row + 1)
+        self.seq_set_item_font(row + 1)
 
     @QtCore.pyqtSlot()
     def on_btnSeqCurrent_clicked(self):
         row = self.ui.listSeq.currentRow()
-        current, ok = QtWidgets.QInputDialog.getDouble(
-            self, self.tr("输入电流"), self.tr("请输入电流值 (A)"), 1, 0, 10, 3
+        current, ok = CustomInputDialog.getDouble(
+            self,
+            self.tr("添加动作"),
+            self.tr("请输入电流值:"),
+            default_value=1,
+            min_value=0,
+            max_value=10,
+            step=0.001,
+            decimals=3,
+            suffix="A",
         )
         if not ok:
             return
         self.ui.listSeq.insertItem(row + 1, f"SET-I {current:.3f} A")
         self.ui.listSeq.setCurrentRow(row + 1)
+        self.seq_set_item_font(row + 1)
 
     def switch_to_seq(self, index) -> bool:
         if index > self._seq_cnt:
@@ -1640,8 +1965,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                     assert _[2] in ["ms", "V", "A"]
                     float(_[1])
                 self.ui.listSeq.addItem(line)
+                self.seq_set_item_font(self.ui.listSeq.count() - 1)
             except Exception:
-                QtWidgets.QMessageBox.warning(
+                CustomMessageBox(
                     self, self.tr("错误"), self.tr("数据验证错误: ") + f"{line}"
                 )
                 return
@@ -1700,11 +2026,9 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
     @QtCore.pyqtSlot()
     def on_btnMatch_clicked(self):
         if MainWindow.api is not None:
-            QtWidgets.QMessageBox.warning(
-                self, self.tr("错误"), self.tr("请先断开连接")
-            )
+            CustomMessageBox(self, self.tr("错误"), self.tr("请先断开连接"))
             return
-        self.on_btnSave_clicked()
+        self.save_settings()
         try:
             color_rgb = bytes.fromhex(setting.color.lstrip("#"))
             api = MDP_P906(
@@ -1722,18 +2046,16 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
             idcode = api.auto_match()
         except Exception as e:
             logger.exception(self.tr("自动配对失败"))
-            QtWidgets.QMessageBox.warning(self, self.tr("自动配对失败"), str(e))
+            CustomMessageBox(self, self.tr("自动配对失败"), str(e))
             try:
                 api.close()
             except Exception:
                 pass
             return
         api.close()
-        QtWidgets.QMessageBox.information(
-            self, self.tr("自动配对成功"), f"IDCODE: {idcode}"
-        )
+        CustomMessageBox(self, self.tr("自动配对成功"), f"IDCODE: {idcode}")
         self.ui.lineEditIdcode.setText(idcode)
-        self.on_btnSave_clicked()
+        self.save_settings()
 
     def show(self) -> None:
         self.initValues()
@@ -1756,7 +2078,7 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
             _ = bytes.fromhex(color.lstrip("#"))
             self.ui.lineEditColorIndicator.setStyleSheet(f"background-color: {color}")
         except Exception:
-            QtWidgets.QMessageBox.warning(
+            CustomMessageBox(
                 self,
                 self.tr("错误"),
                 self.tr("颜色格式错误, 请输入形如#FFFFFF的16进制颜色代码"),
@@ -1789,6 +2111,7 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
 
     @QtCore.pyqtSlot()
     def on_btnSave_clicked(self):
+        self.save_settings()
         self.ui.btnSave.setText(self.tr("重新连接生效"))
         QtCore.QTimer.singleShot(1000, self._reset_btn_text)
 

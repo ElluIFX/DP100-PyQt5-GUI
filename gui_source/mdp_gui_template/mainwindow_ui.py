@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Code\stm32\MDP_Adapter\mdp_gui_template\mainwindow.ui'
+# Form implementation generated from reading ui file 'c:\Code\git\mdp_p906_pc_controller\gui_source\mdp_gui_template\mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -51,7 +51,8 @@ class Ui_MainWindow(object):
         self.label.setMinimumSize(QtCore.QSize(0, 50))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
-        font.setPointSize(14)
+        font.setPointSize(13)
+        font.setBold(True)
         self.label.setFont(font)
         self.label.setScaledContents(False)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
@@ -59,9 +60,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.label)
         self.lcdVoltage = QtWidgets.QLCDNumber(self.frameLcd)
         self.lcdVoltage.setEnabled(True)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lcdVoltage.sizePolicy().hasHeightForWidth())
@@ -90,16 +89,15 @@ class Ui_MainWindow(object):
         self.label_2.setMinimumSize(QtCore.QSize(0, 50))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
-        font.setPointSize(14)
+        font.setPointSize(13)
+        font.setBold(True)
         self.label_2.setFont(font)
         self.label_2.setScaledContents(False)
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_2.addWidget(self.label_2)
         self.lcdCurrent = QtWidgets.QLCDNumber(self.frameLcd)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lcdCurrent.sizePolicy().hasHeightForWidth())
@@ -129,16 +127,15 @@ class Ui_MainWindow(object):
         self.label_3 = QtWidgets.QLabel(self.frameLcd)
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
-        font.setPointSize(14)
+        font.setPointSize(13)
+        font.setBold(True)
         self.label_3.setFont(font)
         self.label_3.setScaledContents(False)
         self.label_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_3.addWidget(self.label_3)
         self.lcdPower = QtWidgets.QLCDNumber(self.frameLcd)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lcdPower.sizePolicy().hasHeightForWidth())
@@ -164,7 +161,8 @@ class Ui_MainWindow(object):
         self.label_4 = QtWidgets.QLabel(self.frameLcd)
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
-        font.setPointSize(14)
+        font.setPointSize(13)
+        font.setBold(True)
         self.label_4.setFont(font)
         self.label_4.setScaledContents(False)
         self.label_4.setAlignment(QtCore.Qt.AlignCenter)
@@ -172,9 +170,7 @@ class Ui_MainWindow(object):
         self.label_4.setObjectName("label_4")
         self.horizontalLayout_4.addWidget(self.label_4)
         self.lcdEnerge = QtWidgets.QLCDNumber(self.frameLcd)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lcdEnerge.sizePolicy().hasHeightForWidth())
@@ -204,16 +200,15 @@ class Ui_MainWindow(object):
         self.label_5 = QtWidgets.QLabel(self.frameLcd)
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
-        font.setPointSize(14)
+        font.setPointSize(13)
+        font.setBold(True)
         self.label_5.setFont(font)
         self.label_5.setScaledContents(False)
         self.label_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label_5.setObjectName("label_5")
         self.horizontalLayout_5.addWidget(self.label_5)
         self.lcdAvgPower = QtWidgets.QLCDNumber(self.frameLcd)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lcdAvgPower.sizePolicy().hasHeightForWidth())
@@ -239,21 +234,18 @@ class Ui_MainWindow(object):
         self.label_6 = QtWidgets.QLabel(self.frameLcd)
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
-        font.setPointSize(14)
+        font.setPointSize(13)
+        font.setBold(True)
         self.label_6.setFont(font)
         self.label_6.setScaledContents(False)
         self.label_6.setAlignment(QtCore.Qt.AlignCenter)
         self.label_6.setObjectName("label_6")
         self.horizontalLayout_6.addWidget(self.label_6)
         self.lcdResistence = QtWidgets.QLCDNumber(self.frameLcd)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.lcdResistence.sizePolicy().hasHeightForWidth()
-        )
+        sizePolicy.setHeightForWidth(self.lcdResistence.sizePolicy().hasHeightForWidth())
         self.lcdResistence.setSizePolicy(sizePolicy)
         self.lcdResistence.setMaximumSize(QtCore.QSize(280, 16777215))
         font = QtGui.QFont()
@@ -314,9 +306,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_26.setContentsMargins(-1, -1, -1, 0)
         self.horizontalLayout_26.setObjectName("horizontalLayout_26")
         self.labelState = QtWidgets.QLabel(self.frameOutputSetting)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.labelState.sizePolicy().hasHeightForWidth())
@@ -415,15 +405,11 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
         self.progressBarVoltage.setFont(font)
-        self.progressBarVoltage.setStyleSheet(
-            "QProgressBar::chunk {   background-color: #FF7B5E;}"
-        )
+        self.progressBarVoltage.setStyleSheet("QProgressBar::chunk {   background-color: #FF7B5E;}")
         self.progressBarVoltage.setMinimum(0)
         self.progressBarVoltage.setMaximum(1000)
         self.progressBarVoltage.setProperty("value", 0)
-        self.progressBarVoltage.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.progressBarVoltage.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.progressBarVoltage.setOrientation(QtCore.Qt.Horizontal)
         self.progressBarVoltage.setInvertedAppearance(False)
         self.progressBarVoltage.setFormat("")
@@ -439,14 +425,10 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
         self.progressBarCurrent.setFont(font)
-        self.progressBarCurrent.setStyleSheet(
-            "QProgressBar::chunk {   background-color:#23A173;}"
-        )
+        self.progressBarCurrent.setStyleSheet("QProgressBar::chunk {   background-color:#23A173;}")
         self.progressBarCurrent.setMaximum(1000)
         self.progressBarCurrent.setProperty("value", 0)
-        self.progressBarCurrent.setAlignment(
-            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-        )
+        self.progressBarCurrent.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.progressBarCurrent.setInvertedAppearance(False)
         self.progressBarCurrent.setFormat("")
         self.progressBarCurrent.setObjectName("progressBarCurrent")
@@ -567,9 +549,7 @@ class Ui_MainWindow(object):
         self.label_30.setAlignment(QtCore.Qt.AlignCenter)
         self.label_30.setObjectName("label_30")
         self.horizontalLayout_29.addWidget(self.label_30)
-        self.spinBoxPresetVoltage = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_4
-        )
+        self.spinBoxPresetVoltage = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_4)
         self.spinBoxPresetVoltage.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -579,9 +559,7 @@ class Ui_MainWindow(object):
         self.spinBoxPresetVoltage.setMinimum(0.0)
         self.spinBoxPresetVoltage.setMaximum(30.0)
         self.spinBoxPresetVoltage.setSingleStep(0.1)
-        self.spinBoxPresetVoltage.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxPresetVoltage.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxPresetVoltage.setObjectName("spinBoxPresetVoltage")
         self.horizontalLayout_29.addWidget(self.spinBoxPresetVoltage)
         self.horizontalLayout_29.setStretch(0, 1)
@@ -597,9 +575,7 @@ class Ui_MainWindow(object):
         self.label_31.setAlignment(QtCore.Qt.AlignCenter)
         self.label_31.setObjectName("label_31")
         self.horizontalLayout_30.addWidget(self.label_31)
-        self.spinBoxPresetCurrent = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_4
-        )
+        self.spinBoxPresetCurrent = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_4)
         self.spinBoxPresetCurrent.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -609,9 +585,7 @@ class Ui_MainWindow(object):
         self.spinBoxPresetCurrent.setMinimum(0.0)
         self.spinBoxPresetCurrent.setMaximum(10.0)
         self.spinBoxPresetCurrent.setSingleStep(0.1)
-        self.spinBoxPresetCurrent.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxPresetCurrent.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxPresetCurrent.setProperty("value", 0.0)
         self.spinBoxPresetCurrent.setObjectName("spinBoxPresetCurrent")
         self.horizontalLayout_30.addWidget(self.spinBoxPresetCurrent)
@@ -624,9 +598,7 @@ class Ui_MainWindow(object):
         self.btnPresetSave.setFont(font)
         self.btnPresetSave.setObjectName("btnPresetSave")
         self.verticalLayout_20.addWidget(self.btnPresetSave)
-        spacerItem = QtWidgets.QSpacerItem(
-            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
-        )
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_20.addItem(spacerItem)
         self.scrollArea_4.setWidget(self.scrollAreaWidgetContents_4)
         self.verticalLayout_21.addWidget(self.scrollArea_4)
@@ -660,9 +632,7 @@ class Ui_MainWindow(object):
         self.label_9.setAlignment(QtCore.Qt.AlignCenter)
         self.label_9.setObjectName("label_9")
         self.horizontalLayout_10.addWidget(self.label_9)
-        self.spinBoxKeepPowerSet = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents
-        )
+        self.spinBoxKeepPowerSet = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.spinBoxKeepPowerSet.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -673,9 +643,7 @@ class Ui_MainWindow(object):
         self.spinBoxKeepPowerSet.setMinimum(0.0)
         self.spinBoxKeepPowerSet.setMaximum(100.0)
         self.spinBoxKeepPowerSet.setSingleStep(0.1)
-        self.spinBoxKeepPowerSet.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxKeepPowerSet.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxKeepPowerSet.setObjectName("spinBoxKeepPowerSet")
         self.horizontalLayout_10.addWidget(self.spinBoxKeepPowerSet)
         self.horizontalLayout_10.setStretch(0, 1)
@@ -692,9 +660,7 @@ class Ui_MainWindow(object):
         self.label_10.setAlignment(QtCore.Qt.AlignCenter)
         self.label_10.setObjectName("label_10")
         self.horizontalLayout_11.addWidget(self.label_10)
-        self.spinBoxKeepPowerPi = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents
-        )
+        self.spinBoxKeepPowerPi = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.spinBoxKeepPowerPi.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -705,9 +671,7 @@ class Ui_MainWindow(object):
         self.spinBoxKeepPowerPi.setMinimum(0.0)
         self.spinBoxKeepPowerPi.setMaximum(40.0)
         self.spinBoxKeepPowerPi.setSingleStep(0.1)
-        self.spinBoxKeepPowerPi.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxKeepPowerPi.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxKeepPowerPi.setProperty("value", 2.5)
         self.spinBoxKeepPowerPi.setObjectName("spinBoxKeepPowerPi")
         self.horizontalLayout_11.addWidget(self.spinBoxKeepPowerPi)
@@ -725,9 +689,7 @@ class Ui_MainWindow(object):
         self.label_28.setAlignment(QtCore.Qt.AlignCenter)
         self.label_28.setObjectName("label_28")
         self.horizontalLayout_35.addWidget(self.label_28)
-        self.spinBoxKeepPowerMaxV = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents
-        )
+        self.spinBoxKeepPowerMaxV = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.spinBoxKeepPowerMaxV.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -738,9 +700,7 @@ class Ui_MainWindow(object):
         self.spinBoxKeepPowerMaxV.setMinimum(0.0)
         self.spinBoxKeepPowerMaxV.setMaximum(30.0)
         self.spinBoxKeepPowerMaxV.setSingleStep(0.1)
-        self.spinBoxKeepPowerMaxV.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxKeepPowerMaxV.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxKeepPowerMaxV.setProperty("value", 30.0)
         self.spinBoxKeepPowerMaxV.setObjectName("spinBoxKeepPowerMaxV")
         self.horizontalLayout_35.addWidget(self.spinBoxKeepPowerMaxV)
@@ -758,9 +718,7 @@ class Ui_MainWindow(object):
         self.label_19.setAlignment(QtCore.Qt.AlignCenter)
         self.label_19.setObjectName("label_19")
         self.horizontalLayout_19.addWidget(self.label_19)
-        self.spinBoxKeepPowerLoopFreq = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents
-        )
+        self.spinBoxKeepPowerLoopFreq = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.spinBoxKeepPowerLoopFreq.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -771,18 +729,14 @@ class Ui_MainWindow(object):
         self.spinBoxKeepPowerLoopFreq.setMinimum(0.0)
         self.spinBoxKeepPowerLoopFreq.setMaximum(100.0)
         self.spinBoxKeepPowerLoopFreq.setSingleStep(0.1)
-        self.spinBoxKeepPowerLoopFreq.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxKeepPowerLoopFreq.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxKeepPowerLoopFreq.setProperty("value", 30.0)
         self.spinBoxKeepPowerLoopFreq.setObjectName("spinBoxKeepPowerLoopFreq")
         self.horizontalLayout_19.addWidget(self.spinBoxKeepPowerLoopFreq)
         self.horizontalLayout_19.setStretch(0, 1)
         self.horizontalLayout_19.setStretch(1, 2)
         self.verticalLayout_15.addLayout(self.horizontalLayout_19)
-        spacerItem1 = QtWidgets.QSpacerItem(
-            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
-        )
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_15.addItem(spacerItem1)
         self.scrollAreaKeepPower.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout_5.addWidget(self.scrollAreaKeepPower)
@@ -822,9 +776,7 @@ class Ui_MainWindow(object):
         font.setFamily("Sarasa Fixed SC SemiBold")
         font.setBold(True)
         self.comboSweepTarget.setFont(font)
-        self.comboSweepTarget.setSizeAdjustPolicy(
-            QtWidgets.QComboBox.AdjustToContentsOnFirstShow
-        )
+        self.comboSweepTarget.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContentsOnFirstShow)
         self.comboSweepTarget.setObjectName("comboSweepTarget")
         self.comboSweepTarget.addItem("")
         self.comboSweepTarget.addItem("")
@@ -843,9 +795,7 @@ class Ui_MainWindow(object):
         self.label_15.setAlignment(QtCore.Qt.AlignCenter)
         self.label_15.setObjectName("label_15")
         self.horizontalLayout_15.addWidget(self.label_15)
-        self.spinBoxSweepStart = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_2
-        )
+        self.spinBoxSweepStart = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_2)
         self.spinBoxSweepStart.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -854,11 +804,9 @@ class Ui_MainWindow(object):
         self.spinBoxSweepStart.setAlignment(QtCore.Qt.AlignCenter)
         self.spinBoxSweepStart.setDecimals(3)
         self.spinBoxSweepStart.setMinimum(0.0)
-        self.spinBoxSweepStart.setMaximum(100.0)
+        self.spinBoxSweepStart.setMaximum(30.0)
         self.spinBoxSweepStart.setSingleStep(0.1)
-        self.spinBoxSweepStart.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxSweepStart.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxSweepStart.setObjectName("spinBoxSweepStart")
         self.horizontalLayout_15.addWidget(self.spinBoxSweepStart)
         self.horizontalLayout_15.setStretch(0, 1)
@@ -875,9 +823,7 @@ class Ui_MainWindow(object):
         self.label_16.setAlignment(QtCore.Qt.AlignCenter)
         self.label_16.setObjectName("label_16")
         self.horizontalLayout_16.addWidget(self.label_16)
-        self.spinBoxSweepStop = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_2
-        )
+        self.spinBoxSweepStop = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_2)
         self.spinBoxSweepStop.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -886,11 +832,9 @@ class Ui_MainWindow(object):
         self.spinBoxSweepStop.setAlignment(QtCore.Qt.AlignCenter)
         self.spinBoxSweepStop.setDecimals(3)
         self.spinBoxSweepStop.setMinimum(0.0)
-        self.spinBoxSweepStop.setMaximum(100.0)
+        self.spinBoxSweepStop.setMaximum(30.0)
         self.spinBoxSweepStop.setSingleStep(0.1)
-        self.spinBoxSweepStop.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxSweepStop.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxSweepStop.setProperty("value", 5.0)
         self.spinBoxSweepStop.setObjectName("spinBoxSweepStop")
         self.horizontalLayout_16.addWidget(self.spinBoxSweepStop)
@@ -908,9 +852,7 @@ class Ui_MainWindow(object):
         self.label_17.setAlignment(QtCore.Qt.AlignCenter)
         self.label_17.setObjectName("label_17")
         self.horizontalLayout_17.addWidget(self.label_17)
-        self.spinBoxSweepStep = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_2
-        )
+        self.spinBoxSweepStep = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_2)
         self.spinBoxSweepStep.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -919,11 +861,9 @@ class Ui_MainWindow(object):
         self.spinBoxSweepStep.setAlignment(QtCore.Qt.AlignCenter)
         self.spinBoxSweepStep.setDecimals(3)
         self.spinBoxSweepStep.setMinimum(0.001)
-        self.spinBoxSweepStep.setMaximum(100.0)
+        self.spinBoxSweepStep.setMaximum(30.0)
         self.spinBoxSweepStep.setSingleStep(0.1)
-        self.spinBoxSweepStep.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxSweepStep.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxSweepStep.setProperty("value", 0.001)
         self.spinBoxSweepStep.setObjectName("spinBoxSweepStep")
         self.horizontalLayout_17.addWidget(self.spinBoxSweepStep)
@@ -941,9 +881,7 @@ class Ui_MainWindow(object):
         self.label_18.setAlignment(QtCore.Qt.AlignCenter)
         self.label_18.setObjectName("label_18")
         self.horizontalLayout_18.addWidget(self.label_18)
-        self.spinBoxSweepDelay = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_2
-        )
+        self.spinBoxSweepDelay = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_2)
         self.spinBoxSweepDelay.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -954,17 +892,13 @@ class Ui_MainWindow(object):
         self.spinBoxSweepDelay.setMinimum(0.01)
         self.spinBoxSweepDelay.setMaximum(999999.0)
         self.spinBoxSweepDelay.setSingleStep(0.1)
-        self.spinBoxSweepDelay.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxSweepDelay.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxSweepDelay.setObjectName("spinBoxSweepDelay")
         self.horizontalLayout_18.addWidget(self.spinBoxSweepDelay)
         self.horizontalLayout_18.setStretch(0, 1)
         self.horizontalLayout_18.setStretch(1, 2)
         self.verticalLayout_16.addLayout(self.horizontalLayout_18)
-        spacerItem2 = QtWidgets.QSpacerItem(
-            20, 36, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
-        )
+        spacerItem2 = QtWidgets.QSpacerItem(20, 36, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_16.addItem(spacerItem2)
         self.scrollAreaSweep.setWidget(self.scrollAreaWidgetContents_2)
         self.verticalLayout_9.addWidget(self.scrollAreaSweep)
@@ -1024,9 +958,7 @@ class Ui_MainWindow(object):
         self.label_22.setAlignment(QtCore.Qt.AlignCenter)
         self.label_22.setObjectName("label_22")
         self.horizontalLayout_22.addWidget(self.label_22)
-        self.spinBoxWaveGenPeriod = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_3
-        )
+        self.spinBoxWaveGenPeriod = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_3)
         self.spinBoxWaveGenPeriod.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -1037,9 +969,7 @@ class Ui_MainWindow(object):
         self.spinBoxWaveGenPeriod.setMinimum(0.0)
         self.spinBoxWaveGenPeriod.setMaximum(100.0)
         self.spinBoxWaveGenPeriod.setSingleStep(0.1)
-        self.spinBoxWaveGenPeriod.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxWaveGenPeriod.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxWaveGenPeriod.setProperty("value", 1.0)
         self.spinBoxWaveGenPeriod.setObjectName("spinBoxWaveGenPeriod")
         self.horizontalLayout_22.addWidget(self.spinBoxWaveGenPeriod)
@@ -1057,9 +987,7 @@ class Ui_MainWindow(object):
         self.label_25.setAlignment(QtCore.Qt.AlignCenter)
         self.label_25.setObjectName("label_25")
         self.horizontalLayout_25.addWidget(self.label_25)
-        self.spinBoxWaveGenHigh = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_3
-        )
+        self.spinBoxWaveGenHigh = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_3)
         self.spinBoxWaveGenHigh.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -1070,9 +998,7 @@ class Ui_MainWindow(object):
         self.spinBoxWaveGenHigh.setMinimum(0.0)
         self.spinBoxWaveGenHigh.setMaximum(100.0)
         self.spinBoxWaveGenHigh.setSingleStep(0.1)
-        self.spinBoxWaveGenHigh.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxWaveGenHigh.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxWaveGenHigh.setProperty("value", 5.0)
         self.spinBoxWaveGenHigh.setObjectName("spinBoxWaveGenHigh")
         self.horizontalLayout_25.addWidget(self.spinBoxWaveGenHigh)
@@ -1090,9 +1016,7 @@ class Ui_MainWindow(object):
         self.label_24.setAlignment(QtCore.Qt.AlignCenter)
         self.label_24.setObjectName("label_24")
         self.horizontalLayout_24.addWidget(self.label_24)
-        self.spinBoxWaveGenLow = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_3
-        )
+        self.spinBoxWaveGenLow = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_3)
         self.spinBoxWaveGenLow.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -1103,9 +1027,7 @@ class Ui_MainWindow(object):
         self.spinBoxWaveGenLow.setMinimum(0.0)
         self.spinBoxWaveGenLow.setMaximum(100.0)
         self.spinBoxWaveGenLow.setSingleStep(0.1)
-        self.spinBoxWaveGenLow.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxWaveGenLow.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxWaveGenLow.setObjectName("spinBoxWaveGenLow")
         self.horizontalLayout_24.addWidget(self.spinBoxWaveGenLow)
         self.horizontalLayout_24.setStretch(0, 1)
@@ -1122,9 +1044,7 @@ class Ui_MainWindow(object):
         self.label_20.setAlignment(QtCore.Qt.AlignCenter)
         self.label_20.setObjectName("label_20")
         self.horizontalLayout_20.addWidget(self.label_20)
-        self.spinBoxWaveGenLoopFreq = QtWidgets.QDoubleSpinBox(
-            self.scrollAreaWidgetContents_3
-        )
+        self.spinBoxWaveGenLoopFreq = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents_3)
         self.spinBoxWaveGenLoopFreq.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setFamily("Sarasa Fixed SC SemiBold")
@@ -1135,18 +1055,14 @@ class Ui_MainWindow(object):
         self.spinBoxWaveGenLoopFreq.setMinimum(0.0)
         self.spinBoxWaveGenLoopFreq.setMaximum(100.0)
         self.spinBoxWaveGenLoopFreq.setSingleStep(0.1)
-        self.spinBoxWaveGenLoopFreq.setStepType(
-            QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType
-        )
+        self.spinBoxWaveGenLoopFreq.setStepType(QtWidgets.QAbstractSpinBox.AdaptiveDecimalStepType)
         self.spinBoxWaveGenLoopFreq.setProperty("value", 30.0)
         self.spinBoxWaveGenLoopFreq.setObjectName("spinBoxWaveGenLoopFreq")
         self.horizontalLayout_20.addWidget(self.spinBoxWaveGenLoopFreq)
         self.horizontalLayout_20.setStretch(0, 1)
         self.horizontalLayout_20.setStretch(1, 2)
         self.verticalLayout_17.addLayout(self.horizontalLayout_20)
-        spacerItem3 = QtWidgets.QSpacerItem(
-            20, 36, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
-        )
+        spacerItem3 = QtWidgets.QSpacerItem(20, 36, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_17.addItem(spacerItem3)
         self.scrollAreaWaveGen.setWidget(self.scrollAreaWidgetContents_3)
         self.verticalLayout_10.addWidget(self.scrollAreaWaveGen)
@@ -1156,9 +1072,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_22 = QtWidgets.QVBoxLayout(self.tabSeq)
         self.verticalLayout_22.setObjectName("verticalLayout_22")
         self.listSeq = QtWidgets.QListWidget(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.listSeq.sizePolicy().hasHeightForWidth())
@@ -1178,9 +1092,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_37.setSpacing(1)
         self.horizontalLayout_37.setObjectName("horizontalLayout_37")
         self.btnSeqDelay = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btnSeqDelay.sizePolicy().hasHeightForWidth())
@@ -1195,14 +1107,10 @@ class Ui_MainWindow(object):
         self.btnSeqDelay.setObjectName("btnSeqDelay")
         self.horizontalLayout_37.addWidget(self.btnSeqDelay)
         self.btnSeqWaitTime = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.btnSeqWaitTime.sizePolicy().hasHeightForWidth()
-        )
+        sizePolicy.setHeightForWidth(self.btnSeqWaitTime.sizePolicy().hasHeightForWidth())
         self.btnSeqWaitTime.setSizePolicy(sizePolicy)
         self.btnSeqWaitTime.setMinimumSize(QtCore.QSize(0, 0))
         self.btnSeqWaitTime.setMaximumSize(QtCore.QSize(40, 16777215))
@@ -1214,14 +1122,10 @@ class Ui_MainWindow(object):
         self.btnSeqWaitTime.setObjectName("btnSeqWaitTime")
         self.horizontalLayout_37.addWidget(self.btnSeqWaitTime)
         self.btnSeqVoltage = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.btnSeqVoltage.sizePolicy().hasHeightForWidth()
-        )
+        sizePolicy.setHeightForWidth(self.btnSeqVoltage.sizePolicy().hasHeightForWidth())
         self.btnSeqVoltage.setSizePolicy(sizePolicy)
         self.btnSeqVoltage.setMinimumSize(QtCore.QSize(0, 0))
         self.btnSeqVoltage.setMaximumSize(QtCore.QSize(40, 16777215))
@@ -1233,14 +1137,10 @@ class Ui_MainWindow(object):
         self.btnSeqVoltage.setObjectName("btnSeqVoltage")
         self.horizontalLayout_37.addWidget(self.btnSeqVoltage)
         self.btnSeqCurrent = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.btnSeqCurrent.sizePolicy().hasHeightForWidth()
-        )
+        sizePolicy.setHeightForWidth(self.btnSeqCurrent.sizePolicy().hasHeightForWidth())
         self.btnSeqCurrent.setSizePolicy(sizePolicy)
         self.btnSeqCurrent.setMinimumSize(QtCore.QSize(0, 0))
         self.btnSeqCurrent.setMaximumSize(QtCore.QSize(40, 16777215))
@@ -1257,9 +1157,7 @@ class Ui_MainWindow(object):
         self.layoutSeqAction.setSpacing(1)
         self.layoutSeqAction.setObjectName("layoutSeqAction")
         self.btnSeqSave = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btnSeqSave.sizePolicy().hasHeightForWidth())
@@ -1274,9 +1172,7 @@ class Ui_MainWindow(object):
         self.btnSeqSave.setObjectName("btnSeqSave")
         self.layoutSeqAction.addWidget(self.btnSeqSave)
         self.btnSeqLoad = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btnSeqLoad.sizePolicy().hasHeightForWidth())
@@ -1291,9 +1187,7 @@ class Ui_MainWindow(object):
         self.btnSeqLoad.setObjectName("btnSeqLoad")
         self.layoutSeqAction.addWidget(self.btnSeqLoad)
         self.btnSeqSingle = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btnSeqSingle.sizePolicy().hasHeightForWidth())
@@ -1308,9 +1202,7 @@ class Ui_MainWindow(object):
         self.btnSeqSingle.setObjectName("btnSeqSingle")
         self.layoutSeqAction.addWidget(self.btnSeqSingle)
         self.btnSeqLoop = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btnSeqLoop.sizePolicy().hasHeightForWidth())
@@ -1331,9 +1223,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_38.setObjectName("horizontalLayout_38")
         self.verticalLayout_22.addLayout(self.horizontalLayout_38)
         self.btnSeqStop = QtWidgets.QPushButton(self.tabSeq)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btnSeqStop.sizePolicy().hasHeightForWidth())
@@ -1583,9 +1473,7 @@ class Ui_MainWindow(object):
         self.labelFps.setAlignment(QtCore.Qt.AlignCenter)
         self.labelFps.setObjectName("labelFps")
         self.horizontalLayout_27.addWidget(self.labelFps)
-        spacerItem4 = QtWidgets.QSpacerItem(
-            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
-        )
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_27.addItem(spacerItem4)
         self.btnGraphRecord = QtWidgets.QPushButton(self.frameGraph)
         self.btnGraphRecord.setMaximumSize(QtCore.QSize(60, 16777215))
@@ -1636,23 +1524,17 @@ class Ui_MainWindow(object):
         self.widgetGraph2.setFont(font)
         self.widgetGraph2.setObjectName("widgetGraph2")
         self.verticalLayout_7.addWidget(self.widgetGraph2)
-        spacerItem5 = QtWidgets.QSpacerItem(
-            20, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
-        )
+        spacerItem5 = QtWidgets.QSpacerItem(20, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_7.addItem(spacerItem5)
         self.horizontalLayout_39 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_39.setContentsMargins(-1, -1, -1, 0)
         self.horizontalLayout_39.setSpacing(0)
         self.horizontalLayout_39.setObjectName("horizontalLayout_39")
         self.labelGraphInfo = QtWidgets.QLabel(self.frameGraph)
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
-        )
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.labelGraphInfo.sizePolicy().hasHeightForWidth()
-        )
+        sizePolicy.setHeightForWidth(self.labelGraphInfo.sizePolicy().hasHeightForWidth())
         self.labelGraphInfo.setSizePolicy(sizePolicy)
         self.labelGraphInfo.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
@@ -1718,30 +1600,33 @@ class Ui_MainWindow(object):
         self.comboPresetEdit.setItemText(7, _translate("MainWindow", "8"))
         self.comboPresetEdit.setItemText(8, _translate("MainWindow", "9"))
         self.label_30.setText(_translate("MainWindow", "设定电压"))
+        self.spinBoxPresetVoltage.setSuffix(_translate("MainWindow", "V"))
         self.label_31.setText(_translate("MainWindow", "设定电流"))
+        self.spinBoxPresetCurrent.setSuffix(_translate("MainWindow", "A"))
         self.btnPresetSave.setText(_translate("MainWindow", "保存"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tabPreset), _translate("MainWindow", "预设组")
-        )
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabPreset), _translate("MainWindow", "预设组"))
         self.btnKeepPower.setText(_translate("MainWindow", "功能已关闭"))
         self.label_9.setText(_translate("MainWindow", "目标功率"))
+        self.spinBoxKeepPowerSet.setSuffix(_translate("MainWindow", "W"))
         self.label_10.setText(_translate("MainWindow", "闭环参数"))
         self.label_28.setText(_translate("MainWindow", "电压上限"))
+        self.spinBoxKeepPowerMaxV.setSuffix(_translate("MainWindow", "V"))
         self.label_19.setText(_translate("MainWindow", "执行频率"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tabPower), _translate("MainWindow", "功率环")
-        )
+        self.spinBoxKeepPowerLoopFreq.setSuffix(_translate("MainWindow", "Hz"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabPower), _translate("MainWindow", "功率环"))
         self.btnSweep.setText(_translate("MainWindow", "功能已关闭"))
         self.label_11.setText(_translate("MainWindow", "目标参数"))
         self.comboSweepTarget.setItemText(0, _translate("MainWindow", "电压"))
         self.comboSweepTarget.setItemText(1, _translate("MainWindow", "电流"))
         self.label_15.setText(_translate("MainWindow", "起始点"))
+        self.spinBoxSweepStart.setSuffix(_translate("MainWindow", "V"))
         self.label_16.setText(_translate("MainWindow", "结束点"))
+        self.spinBoxSweepStop.setSuffix(_translate("MainWindow", "V"))
         self.label_17.setText(_translate("MainWindow", "步进值"))
-        self.label_18.setText(_translate("MainWindow", "延迟(s)"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tabSweep), _translate("MainWindow", "扫描")
-        )
+        self.spinBoxSweepStep.setSuffix(_translate("MainWindow", "V"))
+        self.label_18.setText(_translate("MainWindow", "延迟"))
+        self.spinBoxSweepDelay.setSuffix(_translate("MainWindow", "s"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabSweep), _translate("MainWindow", "扫描"))
         self.btnWaveGen.setText(_translate("MainWindow", "功能已关闭"))
         self.label_23.setText(_translate("MainWindow", "波形类型"))
         self.comboWaveGenType.setItemText(0, _translate("MainWindow", "方波"))
@@ -1750,12 +1635,14 @@ class Ui_MainWindow(object):
         self.comboWaveGenType.setItemText(3, _translate("MainWindow", "锯齿波"))
         self.comboWaveGenType.setItemText(4, _translate("MainWindow", "噪音"))
         self.label_22.setText(_translate("MainWindow", " 周期 "))
+        self.spinBoxWaveGenPeriod.setSuffix(_translate("MainWindow", "s"))
         self.label_25.setText(_translate("MainWindow", "高电平"))
+        self.spinBoxWaveGenHigh.setSuffix(_translate("MainWindow", "V"))
         self.label_24.setText(_translate("MainWindow", "低电平"))
+        self.spinBoxWaveGenLow.setSuffix(_translate("MainWindow", "V"))
         self.label_20.setText(_translate("MainWindow", "执行频率"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tabWaveGen), _translate("MainWindow", "函数")
-        )
+        self.spinBoxWaveGenLoopFreq.setSuffix(_translate("MainWindow", "Hz"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWaveGen), _translate("MainWindow", "函数"))
         self.listSeq.setSortingEnabled(False)
         self.btnSeqDelay.setText(_translate("MainWindow", "延迟"))
         self.btnSeqWaitTime.setText(_translate("MainWindow", "等待"))
@@ -1766,9 +1653,7 @@ class Ui_MainWindow(object):
         self.btnSeqSingle.setText(_translate("MainWindow", "单次"))
         self.btnSeqLoop.setText(_translate("MainWindow", "循环"))
         self.btnSeqStop.setText(_translate("MainWindow", "停止"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tabSeq), _translate("MainWindow", "序列")
-        )
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabSeq), _translate("MainWindow", "序列"))
         self.label_27.setText(_translate("MainWindow", "系统状态 / SYSTEM STATE"))
         self.labelComSpeed.setText(_translate("MainWindow", "0kBps"))
         self.labelErrRate.setText(_translate("MainWindow", "CON-ERR 0%"))
@@ -1810,6 +1695,4 @@ class Ui_MainWindow(object):
         self.btnGraphClear.setText(_translate("MainWindow", "清空"))
         self.btnRecordClear.setText(_translate("MainWindow", "回零"))
         self.labelGraphInfo.setText(_translate("MainWindow", "No Info"))
-
-
 from pyqtgraph import PlotWidget

@@ -91,7 +91,8 @@
                <property name="font">
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
-                 <pointsize>14</pointsize>
+                 <pointsize>13</pointsize>
+                 <bold>true</bold>
                 </font>
                </property>
                <property name="text">
@@ -172,7 +173,8 @@
                <property name="font">
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
-                 <pointsize>14</pointsize>
+                 <pointsize>13</pointsize>
+                 <bold>true</bold>
                 </font>
                </property>
                <property name="text">
@@ -247,7 +249,8 @@
                <property name="font">
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
-                 <pointsize>14</pointsize>
+                 <pointsize>13</pointsize>
+                 <bold>true</bold>
                 </font>
                </property>
                <property name="text">
@@ -315,7 +318,8 @@
                <property name="font">
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
-                 <pointsize>14</pointsize>
+                 <pointsize>13</pointsize>
+                 <bold>true</bold>
                 </font>
                </property>
                <property name="text">
@@ -393,7 +397,8 @@
                <property name="font">
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
-                 <pointsize>14</pointsize>
+                 <pointsize>13</pointsize>
+                 <bold>true</bold>
                 </font>
                </property>
                <property name="text">
@@ -461,7 +466,8 @@
                <property name="font">
                 <font>
                  <family>Sarasa Fixed SC SemiBold</family>
-                 <pointsize>14</pointsize>
+                 <pointsize>13</pointsize>
+                 <bold>true</bold>
                 </font>
                </property>
                <property name="text">
@@ -1249,6 +1255,9 @@
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="suffix">
+                          <string>V</string>
+                         </property>
                          <property name="decimals">
                           <number>3</number>
                          </property>
@@ -1309,6 +1318,9 @@
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="suffix">
+                          <string>A</string>
                          </property>
                          <property name="decimals">
                           <number>3</number>
@@ -1448,6 +1460,9 @@
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="suffix">
+                          <string>W</string>
+                         </property>
                          <property name="decimals">
                           <number>2</number>
                          </property>
@@ -1577,6 +1592,9 @@
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="suffix">
+                          <string>V</string>
+                         </property>
                          <property name="decimals">
                           <number>1</number>
                          </property>
@@ -1642,6 +1660,9 @@
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="suffix">
+                          <string>Hz</string>
                          </property>
                          <property name="decimals">
                           <number>1</number>
@@ -1822,6 +1843,9 @@
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="suffix">
+                          <string>V</string>
+                         </property>
                          <property name="decimals">
                           <number>3</number>
                          </property>
@@ -1829,7 +1853,7 @@
                           <double>0.000000000000000</double>
                          </property>
                          <property name="maximum">
-                          <double>100.000000000000000</double>
+                          <double>30.000000000000000</double>
                          </property>
                          <property name="singleStep">
                           <double>0.100000000000000</double>
@@ -1885,6 +1909,9 @@
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="suffix">
+                          <string>V</string>
+                         </property>
                          <property name="decimals">
                           <number>3</number>
                          </property>
@@ -1892,7 +1919,7 @@
                           <double>0.000000000000000</double>
                          </property>
                          <property name="maximum">
-                          <double>100.000000000000000</double>
+                          <double>30.000000000000000</double>
                          </property>
                          <property name="singleStep">
                           <double>0.100000000000000</double>
@@ -1951,6 +1978,9 @@
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="suffix">
+                          <string>V</string>
+                         </property>
                          <property name="decimals">
                           <number>3</number>
                          </property>
@@ -1958,7 +1988,7 @@
                           <double>0.001000000000000</double>
                          </property>
                          <property name="maximum">
-                          <double>100.000000000000000</double>
+                          <double>30.000000000000000</double>
                          </property>
                          <property name="singleStep">
                           <double>0.100000000000000</double>
@@ -1990,7 +2020,7 @@
                           </font>
                          </property>
                          <property name="text">
-                          <string>延迟(s)</string>
+                          <string>延迟</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
@@ -2016,6 +2046,9 @@
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="suffix">
+                          <string>s</string>
                          </property>
                          <property name="decimals">
                           <number>2</number>
@@ -2202,6 +2235,9 @@
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="suffix">
+                          <string>s</string>
+                         </property>
                          <property name="decimals">
                           <number>2</number>
                          </property>
@@ -2267,6 +2303,9 @@
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="suffix">
+                          <string>V</string>
                          </property>
                          <property name="decimals">
                           <number>3</number>
@@ -2334,6 +2373,9 @@
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="suffix">
+                          <string>V</string>
+                         </property>
                          <property name="decimals">
                           <number>3</number>
                          </property>
@@ -2396,6 +2438,9 @@
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="suffix">
+                          <string>Hz</string>
                          </property>
                          <property name="decimals">
                           <number>1</number>
