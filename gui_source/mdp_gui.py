@@ -97,6 +97,9 @@ if (
 _ = QtGui.QFontDatabase.addApplicationFont(FONT_PATH)
 fonts = QtGui.QFontDatabase.applicationFontFamilies(_)
 logger.info(f"Loaded custom fonts: {fonts}")
+global_font = QtGui.QFont()
+global_font.setFamily(fonts[0])
+app.setFont(global_font)
 
 
 class FmtAxisItem(pg.AxisItem):
@@ -229,8 +232,6 @@ class CustomMessageBox(QtWidgets.QDialog, FramelessWindow):
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle(title)
-        font = QtGui.QFont()
-        font.setFamily("Sarasa Fixed SC SemiBold")
 
         title, message = str(title), str(message)
 
@@ -255,7 +256,7 @@ class CustomMessageBox(QtWidgets.QDialog, FramelessWindow):
         # Message label
         self.messageLabel = QtWidgets.QLabel(message, self)
         self.messageLabel.setWordWrap(False)
-        self.messageLabel.setFont(font)
+        self.messageLabel.setFont(global_font)
         self.messageLabel.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
         )  # Allow horizontal expansion
@@ -268,24 +269,24 @@ class CustomMessageBox(QtWidgets.QDialog, FramelessWindow):
         layout.addLayout(self.horizontalLayout)
         if not question:
             self.okButton = QtWidgets.QPushButton(self.tr("确定"), self)
-            self.okButton.setFont(font)
+            self.okButton.setFont(global_font)
             self.okButton.clicked.connect(self.close)
             self.horizontalLayout.addWidget(self.okButton)
         else:
             self.okButton = QtWidgets.QPushButton(self.tr("是"), self)
-            self.okButton.setFont(font)
+            self.okButton.setFont(global_font)
             self.okButton.clicked.connect(self.accept)
             self.horizontalLayout.addWidget(self.okButton)
 
             self.cancelButton = QtWidgets.QPushButton(self.tr("否"), self)
-            self.cancelButton.setFont(font)
+            self.cancelButton.setFont(global_font)
             self.cancelButton.clicked.connect(self.reject)
             self.horizontalLayout.addWidget(self.cancelButton)
 
         if additional_actions:
             for text, func in additional_actions:
                 button = QtWidgets.QPushButton(text, self)
-                button.setFont(font)
+                button.setFont(global_font)
                 button.clicked.connect(partial(self._handle_additional_action, func))
                 self.horizontalLayout.addWidget(button)
 
@@ -333,8 +334,6 @@ class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle(title)
-        font = QtGui.QFont()
-        font.setFamily("Sarasa Fixed SC SemiBold")
 
         # Custom title bar
         self.CustomTitleBar = CustomTitleBar(self, title)
@@ -356,7 +355,7 @@ class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
 
         # Input label
         self.inputLabel = QtWidgets.QLabel(label, self)
-        self.inputLabel.setFont(font)
+        self.inputLabel.setFont(global_font)
         layout.addWidget(self.inputLabel, alignment=QtCore.Qt.AlignCenter)
 
         # Input field
@@ -386,7 +385,7 @@ class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
             if suffix is not None:
                 self.inputField.setSuffix(suffix)
 
-        self.inputField.setFont(font)
+        self.inputField.setFont(global_font)
         layout.addWidget(self.inputField, alignment=QtCore.Qt.AlignCenter)
 
         # Buttons
@@ -396,12 +395,12 @@ class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
         layout.addLayout(self.horizontalLayout)
 
         self.okButton = QtWidgets.QPushButton("  " + self.tr("确定") + "  ", self)
-        self.okButton.setFont(font)
+        self.okButton.setFont(global_font)
         self.okButton.clicked.connect(self.accept)
         self.horizontalLayout.addWidget(self.okButton)
 
         self.cancelButton = QtWidgets.QPushButton("  " + self.tr("取消") + "  ", self)
-        self.cancelButton.setFont(font)
+        self.cancelButton.setFont(global_font)
         self.cancelButton.clicked.connect(self.reject)
         self.horizontalLayout.addWidget(self.cancelButton)
 
@@ -563,7 +562,7 @@ class Setting:
         self.iset_cali_k = 1.0
         self.iset_cali_b = 0.0
         self.theme = "dark"
-        self.color_palette = {
+        self.color_palette_v2 = {
             "dark": {
                 "off": "khaki",
                 "on": "lightgreen",
@@ -622,6 +621,7 @@ update_hardware_setting()
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     uip_values_signal = QtCore.pyqtSignal(float, float, float)
+    display_data_signal = QtCore.pyqtSignal(list, list, str, str, str, str, str)
     close_signal = QtCore.pyqtSignal()
     data = RealtimeData(setting.data_pts)
     data_fps = 50
@@ -655,7 +655,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.set_interp(setting.interp)
         self.refresh_preset()
         self.get_preset("1")
-        # self.close_state_ui()
+        self.close_state_ui()
         self.ui.progressBarVoltage.setMaximum(1000)
         self.ui.progressBarCurrent.setMaximum(1000)
         self._last_state_change_t = time.perf_counter()
@@ -666,24 +666,28 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxCurrent.setSingleStep(0.001)
 
         if ENGLISH:
-            font = QtGui.QFont()
-            font.setFamily("Sarasa Fixed SC SemiBold")
-            font.setPointSize(7)
-            self.ui.btnSeqCurrent.setFont(font)
+            c_font = QtGui.QFont()
+            c_font.setFamily("Sarasa Fixed SC SemiBold")
+            c_font.setPointSize(7)
+            self.ui.btnSeqCurrent.setFont(c_font)
             self.ui.btnSeqCurrent.setText("I-SET")
-            self.ui.btnSeqVoltage.setFont(font)
+            self.ui.btnSeqVoltage.setFont(c_font)
             self.ui.btnSeqVoltage.setText("V-SET")
-            self.ui.btnSeqDelay.setFont(font)
-            self.ui.btnSeqWaitTime.setFont(font)
-            self.ui.btnSeqSingle.setFont(font)
+            self.ui.btnSeqDelay.setFont(c_font)
+            self.ui.btnSeqWaitTime.setFont(c_font)
+            self.ui.btnSeqSingle.setFont(c_font)
             self.ui.btnSeqSingle.setText("Once")
-            self.ui.btnSeqLoop.setFont(font)
-            self.ui.btnSeqSave.setFont(font)
-            self.ui.btnSeqLoad.setFont(font)
+            self.ui.btnSeqLoop.setFont(c_font)
+            self.ui.btnSeqSave.setFont(c_font)
+            self.ui.btnSeqLoad.setFont(c_font)
 
     def showEvent(self, a0: QtGui.QShowEvent) -> None:
         center_window(self)
         return super().showEvent(a0)
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.close_signal.emit()
+        return super().closeEvent(a0)
 
     def initTimer(self):
         self.state_request_sender_timer = QtCore.QTimer(self)
@@ -819,10 +823,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         errrate = self.api._adp.speed_counter.error_rate * 100
         self.ui.labelErrRate.setText(f"CON-ERR {errrate:.0f}%")
         clr = (
-            setting.color_palette[setting.theme]["general_red"]
+            setting.color_palette_v2[setting.theme]["general_red"]
             if errrate > 50
             else (
-                setting.color_palette[setting.theme]["general_yellow"]
+                setting.color_palette_v2[setting.theme]["general_yellow"]
                 if errrate > 10
                 else None
             )
@@ -854,7 +858,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.btnOutput.setText(f"-  {State.upper()}  -")
         set_color(
             self.ui.btnOutput,
-            setting.color_palette[setting.theme][State],
+            setting.color_palette_v2[setting.theme][State],
         )
         self.output_state = State != "off"
         self.locked = Locked
@@ -874,7 +878,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.labelLockState.setText("[LOCKED]" if Locked else "UNLOCKED")
         set_color(
             self.ui.labelLockState,
-            setting.color_palette[setting.theme]["general_red"] if Locked else None,
+            setting.color_palette_v2[setting.theme]["general_red"] if Locked else None,
         )
         self.ui.labelInputVals.setText(f"{InputVoltage:.2f}V {InputCurrent:.2f}A")
         self.ui.labelTemperature.setText(f"TEMP {Temperature:.1f}℃")
@@ -930,7 +934,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.labelConnectState.setText(self.tr("已连接"))
         set_color(
             self.ui.labelConnectState,
-            setting.color_palette[setting.theme]["general_green"],
+            setting.color_palette_v2[setting.theme]["general_green"],
         )
         self.ui.frameOutputSetting.setEnabled(True)
         self.ui.frameGraph.setEnabled(True)
@@ -985,7 +989,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.startMyTimer()
                 self.update_state()
                 self.open_state_ui()
-                self.ui.btnGraphClear.clicked.emit()
+                self.on_btnGraphClear_clicked(skip_confirm=True)
         except Exception as e:
             CustomMessageBox(self, self.tr("连接失败"), str(e))
             return
@@ -1055,7 +1059,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                     v / i if i != 0 else self.open_r
                 )
                 data.times[data.update_count + idx] = t - dt + (dt / len_) * (idx + 1)
-                data.update_count += len_
+            data.update_count += len_
         self.fps_counter.tick()
 
     def update_state_lcd(self):
@@ -1127,7 +1131,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def set_data_length(self, length) -> None:
         self.data.data_length = length
-        self.on_btnGraphClear_clicked()
+        self.on_btnGraphClear_clicked(skip_confirm=True)
 
     @QtCore.pyqtSlot()
     def on_btnRecordClear_clicked(self):
@@ -1175,10 +1179,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.widgetGraph1.setMouseEnabled(x=False, y=False)
         self.ui.widgetGraph2.setMouseEnabled(x=False, y=False)
         self.pen1 = pg.mkPen(
-            color=setting.color_palette[setting.theme]["line1"], width=1
+            color=setting.color_palette_v2[setting.theme]["line1"], width=1
         )
         self.pen2 = pg.mkPen(
-            color=setting.color_palette[setting.theme]["line2"], width=1
+            color=setting.color_palette_v2[setting.theme]["line2"], width=1
         )
         self.curve1 = self.ui.widgetGraph1.plot(pen=self.pen1, clear=True)
         self.curve2 = self.ui.widgetGraph2.plot(pen=self.pen2, clear=True)
@@ -1193,8 +1197,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.set_graph2_data(self.tr("电流"))
 
     def update_pen(self):
-        self.pen1.setColor(QtGui.QColor(setting.color_palette[setting.theme]["line1"]))
-        self.pen2.setColor(QtGui.QColor(setting.color_palette[setting.theme]["line2"]))
+        self.pen1.setColor(
+            QtGui.QColor(setting.color_palette_v2[setting.theme]["line1"])
+        )
+        self.pen2.setColor(
+            QtGui.QColor(setting.color_palette_v2[setting.theme]["line2"])
+        )
 
     def get_data(self, text: str, display_pts: int):
         if text == self.tr("电压"):
@@ -1309,7 +1317,13 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.widgetGraph2.setLabel("left", text, units=self._graph_units_dict[text])
 
     @QtCore.pyqtSlot()
-    def on_btnGraphClear_clicked(self):
+    def on_btnGraphClear_clicked(self, _=None, skip_confirm=False):
+        if not skip_confirm and not CustomMessageBox.question(
+            self,
+            self.tr("警告"),
+            self.tr("确定要清空数据缓冲区吗？"),
+        ):
+            return
         with self.data.sync_lock:
             self.data.voltages = np.zeros(self.data.data_length, np.float64)
             self.data.currents = np.zeros(self.data.data_length, np.float64)
@@ -1440,6 +1454,15 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     ######### 辅助功能-参数扫描 #########
 
+    _sweep_response_type = ""
+    _sweep_response_data_y = []
+    _sweep_response_data_x = []
+    _sweep_response_x_label = ""
+    _sweep_response_y_label = ""
+    _sweep_response_x_unit = ""
+    _sweep_response_y_unit = ""
+    _sweep_flag = False
+
     @QtCore.pyqtSlot()
     def on_btnSweep_clicked(self):
         if self.func_sweep_timer.isActive():
@@ -1460,7 +1483,26 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                     1000, lambda: self.ui.btnSweep.setText(self.tr("功能已关闭"))
                 )
                 return
+
             self._sweep_temp = None
+            if self.ui.comboSweepRecord.currentIndex() == 0:
+                self._sweep_response_type = ""
+            else:
+                self._sweep_response_type = self.ui.comboSweepRecord.currentText()
+                units_dict = {
+                    self.tr("电压"): "V",
+                    self.tr("电流"): "A",
+                    self.tr("功率"): "W",
+                    self.tr("阻值"): "Ω",
+                }
+                self._sweep_response_x_label = self._sweep_target
+                self._sweep_response_y_label = self._sweep_response_type
+                self._sweep_response_x_unit = units_dict[self._sweep_target]
+                self._sweep_response_y_unit = units_dict[self._sweep_response_type]
+                self._sweep_response_data_x = []
+                self._sweep_response_data_y = []
+
+            self._sweep_flag = True
             self.func_sweep_timer.start(round(self._sweep_delay * 1000))
             self.ui.btnSweep.setText(self.tr("功能已开启"))
             if self._sweep_target == self.tr("电压"):
@@ -1468,9 +1510,34 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             elif self._sweep_target == self.tr("电流"):
                 self.ui.spinBoxCurrent.setEnabled(False)
             self.ui.scrollAreaSweep.setEnabled(False)
+            self.v_set = self._sweep_start
             if not self.output_state:
-                self.v_set = self._sweep_start
                 self.on_btnOutput_clicked()
+
+    @QtCore.pyqtSlot(int)
+    def on_comboSweepRecord_currentIndexChanged(self, index):
+        if index == 0:
+            self.ui.btnSweepShowRecord.setEnabled(False)
+        else:
+            self.ui.btnSweepShowRecord.setEnabled(True)
+
+    @QtCore.pyqtSlot()
+    def on_btnSweepShowRecord_clicked(self):
+        if not self._sweep_response_type:
+            CustomMessageBox(self, self.tr("错误"), self.tr("扫描响应记录为空"))
+            return
+        len_y = len(self._sweep_response_data_y)
+        len_x = len(self._sweep_response_data_x)
+        min_len = min(len_x, len_y)
+        MainWindow.display_data_signal.emit(
+            self._sweep_response_data_x[:min_len],
+            self._sweep_response_data_y[:min_len],
+            self._sweep_response_x_label,
+            self._sweep_response_y_label,
+            self._sweep_response_x_unit,
+            self._sweep_response_y_unit,
+            self.tr("扫描响应结果曲线"),
+        )
 
     @QtCore.pyqtSlot(str)
     def on_comboSweepTarget_currentTextChanged(self, text):
@@ -1499,6 +1566,24 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.scrollAreaSweep.setEnabled(True)
 
     def func_sweep(self):
+        if self._sweep_response_type:
+            _data_sources = {
+                self.tr("电压"): self.data.voltages,
+                self.tr("电流"): self.data.currents,
+                self.tr("功率"): self.data.powers,
+                self.tr("阻值"): self.data.resistances,
+            }
+            self._sweep_response_data_x.append(
+                _data_sources[self._sweep_response_x_label][self.data.update_count - 1]
+            )
+            self._sweep_response_data_y.append(
+                _data_sources[self._sweep_response_y_label][self.data.update_count - 1]
+            )
+
+        if not self._sweep_flag:
+            self.stop_func_sweep()
+            return
+
         if self._sweep_temp is None:
             self._sweep_temp = self._sweep_start
         else:
@@ -1506,6 +1591,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self._sweep_temp += self._sweep_step
             else:
                 self._sweep_temp -= self._sweep_step
+
         if (
             self._sweep_start > self._sweep_stop
             and self._sweep_temp <= self._sweep_stop
@@ -1513,8 +1599,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self._sweep_start <= self._sweep_stop
             and self._sweep_temp >= self._sweep_stop
         ):
-            self._swep_temp = self._sweep_stop
+            self._sweep_temp = self._sweep_stop
+            self._sweep_flag = False
             self.stop_func_sweep()
+
         if self._sweep_target == self.tr("电压"):
             self.v_set = self._sweep_temp
         elif self._sweep_target == self.tr("电流"):
@@ -1787,10 +1875,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def seq_set_item_font(self, index):
         item = self.ui.listSeq.item(index)
-        font = QtGui.QFont()
-        font.setFamily("Sarasa Fixed SC SemiBold")
-        font.setPointSize(10)
-        item.setFont(font)
+        sfont = QtGui.QFont()
+        sfont.setFamily("Sarasa Fixed SC SemiBold")
+        sfont.setPointSize(10)
+        item.setFont(sfont)
 
     @QtCore.pyqtSlot()
     def on_btnSeqDelay_clicked(self):
@@ -2339,17 +2427,20 @@ class TransparentFloatingWindow(QtWidgets.QWidget):
         )
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
+        self.setWindowTitle("MDP-P906 Floating Monitor")
+
         # 设置窗口大小和透明度
         self.setFixedSize(75, 140)
         self.setWindowOpacity(0.95)
 
-        font = QtGui.QFont()
-        font.setFamily("Sarasa Fixed SC SemiBold")
-        font.setPointSize(10)
+        font_title = QtGui.QFont()
+        font_title.setFamily("Sarasa Fixed SC SemiBold")
+        font_title.setPointSize(10)
 
         font_value = QtGui.QFont()
         font_value.setFamily("Sarasa Fixed SC SemiBold")
         font_value.setPointSize(12)
+
         # 创建主窗口布局
         window_layout = QtWidgets.QVBoxLayout(self)
         window_layout.setContentsMargins(0, 0, 0, 0)
@@ -2365,36 +2456,38 @@ class TransparentFloatingWindow(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        label = QtWidgets.QLabel(" MDP-P906 ", self)
-        label.setFont(font)
-        set_color(label, "rgb(200, 200, 200)")
-        layout.addWidget(label, alignment=QtCore.Qt.AlignCenter)
+        self.title_label = QtWidgets.QLabel(" MDP-P906 ", self)
+        self.title_label.setFont(font_title)
+        set_color(self.title_label, "rgb(200, 200, 200)")
+        layout.addWidget(self.title_label, alignment=QtCore.Qt.AlignCenter)
 
-        label = QtWidgets.QLabel(self.tr("电压 U"), self)
-        label.setFont(font)
-        set_color(label, setting.color_palette["dark"]["general_red"])
-        layout.addWidget(label)
+        self.label_visable = True
+
+        self.v_label = QtWidgets.QLabel(self.tr("电压 U"), self)
+        self.v_label.setFont(font_title)
+        set_color(self.v_label, setting.color_palette_v2["dark"]["general_red"])
+        layout.addWidget(self.v_label)
         self.voltage_label = QtWidgets.QLabel("", self)
         self.voltage_label.setFont(font_value)
-        set_color(self.voltage_label, setting.color_palette["dark"]["general_red"])
+        set_color(self.voltage_label, setting.color_palette_v2["dark"]["general_red"])
         layout.addWidget(self.voltage_label)
 
-        label = QtWidgets.QLabel(self.tr("电流 I"), self)
-        label.setFont(font)
-        set_color(label, setting.color_palette["dark"]["general_green"])
-        layout.addWidget(label)
+        self.i_label = QtWidgets.QLabel(self.tr("电流 I"), self)
+        self.i_label.setFont(font_title)
+        set_color(self.i_label, setting.color_palette_v2["dark"]["general_green"])
+        layout.addWidget(self.i_label)
         self.current_label = QtWidgets.QLabel("", self)
         self.current_label.setFont(font_value)
-        set_color(self.current_label, setting.color_palette["dark"]["general_green"])
+        set_color(self.current_label, setting.color_palette_v2["dark"]["general_green"])
         layout.addWidget(self.current_label)
 
-        label = QtWidgets.QLabel(self.tr("功率 P"), self)
-        label.setFont(font)
-        set_color(label, setting.color_palette["dark"]["general_blue"])
-        layout.addWidget(label)
+        self.p_label = QtWidgets.QLabel(self.tr("功率 P"), self)
+        self.p_label.setFont(font_title)
+        set_color(self.p_label, setting.color_palette_v2["dark"]["general_blue"])
+        layout.addWidget(self.p_label)
         self.power_label = QtWidgets.QLabel("", self)
         self.power_label.setFont(font_value)
-        set_color(self.power_label, setting.color_palette["dark"]["general_blue"])
+        set_color(self.power_label, setting.color_palette_v2["dark"]["general_blue"])
         layout.addWidget(self.power_label)
 
         self.setLayout(window_layout)
@@ -2412,6 +2505,8 @@ class TransparentFloatingWindow(QtWidgets.QWidget):
         self.setWindowOpacity(0.95)
 
     def update_values(self, u, i, p):
+        if not self.label_visable:
+            return
         self.voltage_label.setText(f"{u:06.3f} V")
         self.current_label.setText(f"{i:06.3f} A")
         if p < 100:
@@ -2451,12 +2546,97 @@ class TransparentFloatingWindow(QtWidgets.QWidget):
             self.dragging = False
 
     def mouseDoubleClickEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
+        self.switch_label_visibility()
+
+    def switch_label_visibility(self):
+        self.label_visable = not self.label_visable
+        if self.label_visable:
+            self.v_label.setVisible(True)
+            self.i_label.setVisible(True)
+            self.p_label.setVisible(True)
+            self.setFixedHeight(140)
+        else:
+            self.v_label.setVisible(False)
+            self.i_label.setVisible(False)
+            self.p_label.setVisible(False)
+            self.setFixedHeight(80)
+
+    def contextMenuEvent(self, event):
+        menu = QtWidgets.QMenu(self)
+
+        toggle_action = menu.addAction(
+            self.tr("折叠") if self.label_visable else self.tr("展开")
+        )
+        close_action = menu.addAction(self.tr("关闭"))
+
+        action = menu.exec_(event.globalPos())
+
+        if action == toggle_action:
+            self.switch_label_visibility()
+        elif action == close_action:
             self.close()
+
+
+class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # 创建主布局
+        self.main_layout = QtWidgets.QVBoxLayout()
+
+        # padding
+        label = QtWidgets.QLabel("")
+        label.setFixedHeight(25)
+        self.main_layout.addWidget(label)
+
+        self.setLayout(self.main_layout)
+
+        # 设置自定义标题栏
+        self.setWindowTitle("MDP-P906 Result Graph Window")
+        self.CustomTitleBar = CustomTitleBar(self, "MDP-P906 Result Graph Window")
+        self.CustomTitleBar.set_theme("dark")
+        self.CustomTitleBar.set_allow_double_toggle_max(False)
+        self.CustomTitleBar.set_full_btn_enabled(False)
+        self.setTitleBar(self.CustomTitleBar)
+
+        # 创建图表组件
+        self.plot_widget = pg.PlotWidget()
+        self.plot_widget.setBackground(None)
+        self.plot_widget.showGrid(x=True, y=True)
+        self.plot_widget.setLabel("left", "Y-Axis")
+        self.plot_widget.setLabel("bottom", "X-Axis")
+
+        # 创建曲线
+        self.pen = pg.mkPen(
+            color=setting.color_palette_v2[setting.theme]["line1"], width=2
+        )
+        self.curve = self.plot_widget.plot(pen=self.pen)
+        self.curve.setData([], [])
+        self.plot_widget.autoRange()
+
+        # 添加到布局
+        self.main_layout.addWidget(self.plot_widget)
+
+    def show(self):
+        self.resize(800, 600)
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2
+        self.move(x, y)
+        super().show()
+
+    @QtCore.pyqtSlot(list, list, str, str, str, str, str)
+    def showData(self, x, y, x_label, y_label, x_unit, y_unit, title):
+        self.curve.setData(x, y)
+        self.plot_widget.setLabel("bottom", x_label, units=x_unit)
+        self.plot_widget.setLabel("left", y_label, units=y_unit)
+        self.plot_widget.autoRange()
+        self.CustomTitleBar.set_name(title)
+        self.show()
 
 
 DialogSettings = MDPSettings()
 DialogGraphics = MDPGraphics()
+DialogResult = ResultGraphWindow()
 FloatingWindow = TransparentFloatingWindow()
 MainWindow.ui.btnSettings.clicked.connect(DialogSettings.show)
 MainWindow.ui.btnGraphics.clicked.connect(DialogGraphics.show)
@@ -2466,7 +2646,9 @@ DialogGraphics.set_data_len_sig.connect(MainWindow.set_data_length)
 DialogGraphics.set_interp_sig.connect(MainWindow.set_interp)
 MainWindow.ui.btnRecordFloatWindow.clicked.connect(FloatingWindow.switch_visibility)
 MainWindow.uip_values_signal.connect(FloatingWindow.update_values)
+MainWindow.display_data_signal.connect(DialogResult.showData)
 MainWindow.close_signal.connect(FloatingWindow.close)
+MainWindow.close_signal.connect(DialogResult.close)
 app.setWindowIcon(QtGui.QIcon(ICON_PATH))
 
 
@@ -2485,14 +2667,17 @@ def set_theme(theme):
     DialogGraphics.CustomTitleBar.set_theme(theme)
     set_color(
         DialogGraphics.ui.labelNumba,
-        setting.color_palette[setting.theme]["general_green"],
+        setting.color_palette_v2[setting.theme]["general_green"],
     )
     if MainWindow.api is not None:
         set_color(
             MainWindow.ui.labelConnectState,
-            setting.color_palette[setting.theme]["general_green"],
+            setting.color_palette_v2[setting.theme]["general_green"],
         )
     MainWindow.update_pen()
+    DialogResult.pen.setColor(
+        QtGui.QColor(setting.color_palette_v2[setting.theme]["line1"])
+    )
 
 
 set_theme(setting.theme)

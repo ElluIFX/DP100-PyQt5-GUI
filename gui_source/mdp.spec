@@ -18,12 +18,9 @@ a = Analysis(
     runtime_hooks=[],
     excludes=[
         "llvm",
-        "matplotlib",
-        "wx",
-        "scipy",
-        "PIL",
         "llvmlite",
         "numba",
+        "matplotlib",
     ],  #
     win_no_prefer_redirects=False,
     win_private_assemblies=False,

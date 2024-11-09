@@ -669,12 +669,15 @@
                    <property name="font">
                     <font>
                      <family>Sarasa Fixed SC SemiBold</family>
-                     <pointsize>11</pointsize>
+                     <pointsize>10</pointsize>
                      <bold>true</bold>
                     </font>
                    </property>
                    <property name="text">
                     <string>N/A</string>
+                   </property>
+                   <property name="flat">
+                    <bool>false</bool>
                    </property>
                   </widget>
                  </item>
@@ -1411,7 +1414,7 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>152</width>
+                      <width>165</width>
                       <height>162</height>
                      </rect>
                     </property>
@@ -1733,8 +1736,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>142</width>
-                      <height>198</height>
+                      <width>165</width>
+                      <height>263</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -2068,6 +2071,89 @@
                         </widget>
                        </item>
                       </layout>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_41" stretch="1,2">
+                       <item>
+                        <widget class="QLabel" name="label_26">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>28</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>Sarasa Fixed SC SemiBold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>扫描响应</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="margin">
+                          <number>6</number>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboSweepRecord">
+                         <property name="maximumSize">
+                          <size>
+                           <width>80</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <family>Sarasa Fixed SC SemiBold</family>
+                           <bold>true</bold>
+                          </font>
+                         </property>
+                         <property name="sizeAdjustPolicy">
+                          <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+                         </property>
+                         <item>
+                          <property name="text">
+                           <string>不记录</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>电压</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>电流</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>功率</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>阻值</string>
+                          </property>
+                         </item>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="btnSweepShowRecord">
+                       <property name="enabled">
+                        <bool>false</bool>
+                       </property>
+                       <property name="text">
+                        <string>查看响应曲线</string>
+                       </property>
+                      </widget>
                      </item>
                      <item>
                       <spacer name="verticalSpacer_2">
