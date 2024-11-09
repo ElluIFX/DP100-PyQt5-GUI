@@ -655,7 +655,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.set_interp(setting.interp)
         self.refresh_preset()
         self.get_preset("1")
-        self.close_state_ui()
+        # self.close_state_ui()
         self.ui.progressBarVoltage.setMaximum(1000)
         self.ui.progressBarCurrent.setMaximum(1000)
         self._last_state_change_t = time.perf_counter()
@@ -1454,11 +1454,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     ######### 辅助功能-参数扫描 #########
 
-    _sweep_response_type = ""
-    _sweep_response_data_y = []
-    _sweep_response_data_x = []
-    _sweep_response_x_label = ""
-    _sweep_response_y_label = ""
+    _sweep_response_type = "x"
+    _sweep_response_data_y = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    _sweep_response_data_x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    _sweep_response_x_label = "x"
+    _sweep_response_y_label = "y"
     _sweep_response_x_unit = ""
     _sweep_response_y_unit = ""
     _sweep_flag = False
@@ -2587,7 +2587,6 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         label = QtWidgets.QLabel("")
         label.setFixedHeight(25)
         self.main_layout.addWidget(label)
-
         self.setLayout(self.main_layout)
 
         # 设置自定义标题栏
@@ -2612,26 +2611,83 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.curve = self.plot_widget.plot(pen=self.pen)
         self.curve.setData([], [])
         self.plot_widget.autoRange()
-
-        # 添加到布局
         self.main_layout.addWidget(self.plot_widget)
 
-    def show(self):
-        self.resize(800, 600)
-        screen = QtWidgets.QApplication.primaryScreen().geometry()
-        x = (screen.width() - self.width()) // 2
-        y = (screen.height() - self.height()) // 2
-        self.move(x, y)
-        super().show()
+        self.hlayout = QtWidgets.QHBoxLayout()
+
+        label = QtWidgets.QLabel(self.tr("多项式拟合次数:"))
+        label.setFont(global_font)
+        self.hlayout.addWidget(label)
+
+        self.spinBoxFit = QtWidgets.QSpinBox()
+        self.spinBoxFit.setRange(0, 8)
+        self.spinBoxFit.setValue(0)
+        self.hlayout.addWidget(self.spinBoxFit)
+        self.spinBoxFit.valueChanged.connect(self.update_fit_result)
+
+        self.labelFitResult = QtWidgets.QLabel("N/A")
+        self.labelFitResult.setFont(global_font)
+        self.hlayout.addWidget(self.labelFitResult)
+
+        self.hlayout.setStretch(0, 0)
+        self.hlayout.setStretch(1, 0)
+        self.hlayout.setStretch(2, 1)
+
+        self.main_layout.addLayout(self.hlayout)
+
+        self.x_data = []
+        self.y_data = []
+
+    def format_fit_result(self, result):
+        for i in range(len(result)):
+            if abs(result[i]) < 1e-9:
+                result[i] = 0
+        text = "y = ("
+        for i, coef in enumerate(result):
+            if i != 0:
+                text += " + ("
+            text += f"{coef:0.4g}"
+            ml = len(result) - i - 1
+            if ml > 1:
+                text += f"x^{ml}"
+            elif ml == 1:
+                text += "x"
+            text += ")"
+        return text
+
+    def update_fit_result(self, _=None):
+        if len(self.x_data) + len(self.y_data) < 4 or self.spinBoxFit.value() < 1:
+            self.labelFitResult.setText("N/A")
+            return
+        logger.info(
+            f"fit {len(self.x_data)} points with {self.spinBoxFit.value()} order"
+        )
+        z = np.polyfit(self.x_data, self.y_data, self.spinBoxFit.value())
+
+        y_pred = np.polyval(z, self.x_data)
+        rmse = np.sqrt(np.mean((np.array(self.y_data) - y_pred) ** 2))
+        logger.info(f"fit result: {z} with rmse={rmse:0.4g}")
+
+        self.labelFitResult.setText(f"rmse={rmse:0.4f} {self.format_fit_result(z)}")
 
     @QtCore.pyqtSlot(list, list, str, str, str, str, str)
     def showData(self, x, y, x_label, y_label, x_unit, y_unit, title):
+        self.x_data = x
+        self.y_data = y
         self.curve.setData(x, y)
         self.plot_widget.setLabel("bottom", x_label, units=x_unit)
         self.plot_widget.setLabel("left", y_label, units=y_unit)
         self.plot_widget.autoRange()
         self.CustomTitleBar.set_name(title)
+        self.update_fit_result()
         self.show()
+        if self.isMaximized():
+            self.showNormal()
+        self.resize(800, 600)
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2
+        self.move(x, y)
 
 
 DialogSettings = MDPSettings()
