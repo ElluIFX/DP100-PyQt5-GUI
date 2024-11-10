@@ -3457,7 +3457,7 @@
                           <set>Qt::AlignCenter</set>
                          </property>
                          <property name="suffix">
-                          <string>C</string>
+                          <string>S</string>
                          </property>
                          <property name="decimals">
                           <number>0</number>

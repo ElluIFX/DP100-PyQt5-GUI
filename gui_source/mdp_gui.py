@@ -12,7 +12,6 @@ from typing import List, Optional, Tuple
 
 import richuru
 from loguru import logger
-from scipy.interpolate import make_interp_spline
 
 try:
     import mdp_controller

@@ -1967,7 +1967,7 @@ class Ui_MainWindow(object):
         self.label_40.setText(_translate("MainWindow", "单节内阻"))
         self.spinBoxBatSimRes.setSuffix(_translate("MainWindow", "mΩ"))
         self.label_41.setText(_translate("MainWindow", "多节串联"))
-        self.spinBoxBatSimCells.setSuffix(_translate("MainWindow", "C"))
+        self.spinBoxBatSimCells.setSuffix(_translate("MainWindow", "S"))
         self.label_38.setText(_translate("MainWindow", "执行频率"))
         self.spinBoxBatSimLoopFreq.setSuffix(_translate("MainWindow", "Hz"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabBat), _translate("MainWindow", "电池模拟"))
