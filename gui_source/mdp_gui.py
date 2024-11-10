@@ -8,10 +8,11 @@ import time
 import warnings
 from functools import partial
 from threading import Lock
-from typing import Any, Callable, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import richuru
 from loguru import logger
+from scipy.interpolate import make_interp_spline
 
 try:
     import mdp_controller
@@ -44,7 +45,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
-from qframelesswindow import FramelessWindow, TitleBar
+from qframelesswindow import FramelessWindow
 
 OPENGL_AVALIABLE = False
 try:
@@ -76,6 +77,7 @@ from simple_pid import PID
 SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
+BAT_EXAMPLE_PATH = os.path.join(ABS_PATH, "Li-ion.csv")
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -101,11 +103,10 @@ global_font = QtGui.QFont()
 global_font.setFamily(fonts[0])
 app.setFont(global_font)
 
+from mdp_custom import CustomInputDialog, CustomMessageBox, CustomTitleBar
+
 
 class FmtAxisItem(pg.AxisItem):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def tickStrings(self, values, scale, spacing):
         if len(values) == 0 or max(values) < 1e6:
             return super().tickStrings(values, scale, spacing)
@@ -190,316 +191,22 @@ class FPSCounter(object):
         return self._fps
 
 
-class CustomTitleBar(TitleBar):
-    def __init__(self, parent, name):
-        super().__init__(parent)
-        self.label = QtWidgets.QLabel(name, self)
-        self.label.setStyleSheet(
-            "QLabel{font: 13px 'Sarasa Fixed SC SemiBold'; margin: 10px}"
-        )
-        self.label.adjustSize()
-        self.darkStyle = {
-            "normal": {
-                "color": (255, 255, 255),
-            }
-        }
-        self.lightStyle = {
-            "normal": {
-                "color": (20, 20, 20),
-            }
-        }
-
-    def set_name(self, name):
-        self.label.setText(name)
-        self.label.adjustSize()
-
-    def set_theme(self, theme):
-        style = getattr(self, f"{theme}Style")
-        self.minBtn.updateStyle(style)
-        self.maxBtn.updateStyle(style)
-        self.closeBtn.updateStyle(style)
-        self.fullBtn.updateStyle(style)
-
-
-class CustomMessageBox(QtWidgets.QDialog, FramelessWindow):
-    def __init__(
-        self,
-        parent,
-        title,
-        message,
-        question=False,
-        additional_actions: List[Tuple[str, Callable[[], bool]]] = [],
-    ) -> None:
-        super().__init__(parent)
-        self.setWindowTitle(title)
-
-        title, message = str(title), str(message)
-
-        # Custom title bar
-        self.CustomTitleBar = CustomTitleBar(self, title)
-        self.CustomTitleBar.set_allow_double_toggle_max(False)
-        self.CustomTitleBar.set_min_btn_enabled(False)
-        self.CustomTitleBar.set_max_btn_enabled(False)
-        self.CustomTitleBar.set_full_btn_enabled(False)
-        self.CustomTitleBar.set_close_btn_enabled(False)
-        self.setTitleBar(self.CustomTitleBar)
-
-        # Main layout
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(14, 14, 14, 14)
-        layout.setSpacing(14)
-
-        self.spaceLabel = QtWidgets.QLabel("", self)
-        self.spaceLabel.setFixedHeight(20)
-        layout.addWidget(self.spaceLabel)
-
-        # Message label
-        self.messageLabel = QtWidgets.QLabel(message, self)
-        self.messageLabel.setWordWrap(False)
-        self.messageLabel.setFont(global_font)
-        self.messageLabel.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
-        )  # Allow horizontal expansion
-        layout.addWidget(self.messageLabel, alignment=QtCore.Qt.AlignCenter)
-
-        # Button
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout.setSpacing(8)
-        layout.addLayout(self.horizontalLayout)
-        if not question:
-            self.okButton = QtWidgets.QPushButton(self.tr("确定"), self)
-            self.okButton.setFont(global_font)
-            self.okButton.clicked.connect(self.close)
-            self.horizontalLayout.addWidget(self.okButton)
-        else:
-            self.okButton = QtWidgets.QPushButton(self.tr("是"), self)
-            self.okButton.setFont(global_font)
-            self.okButton.clicked.connect(self.accept)
-            self.horizontalLayout.addWidget(self.okButton)
-
-            self.cancelButton = QtWidgets.QPushButton(self.tr("否"), self)
-            self.cancelButton.setFont(global_font)
-            self.cancelButton.clicked.connect(self.reject)
-            self.horizontalLayout.addWidget(self.cancelButton)
-
-        if additional_actions:
-            for text, func in additional_actions:
-                button = QtWidgets.QPushButton(text, self)
-                button.setFont(global_font)
-                button.clicked.connect(partial(self._handle_additional_action, func))
-                self.horizontalLayout.addWidget(button)
-
-        self.adjustSize()
-        self.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.ret = True
-        self.exec_()
-
-    def _handle_additional_action(self, func):
-        if func():
-            self.close()
-
-    def result(self) -> bool:
-        return self.ret
-
-    @staticmethod
-    def question(parent, title, message):
-        dialog = CustomMessageBox(parent, title, message, question=True)
-        return dialog.result()
-
-    def accept(self):
-        self.ret = True
-        return super().accept()
-
-    def reject(self):
-        self.ret = False
-        return super().reject()
-
-
-class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
-    def __init__(
-        self,
-        parent,
-        title,
-        label,
-        input_type="text",
-        default_value=None,
-        placeholder_text=None,
-        min_value=None,
-        max_value=None,
-        decimals=None,
-        step=None,
-        prefix=None,
-        suffix=None,
-    ) -> None:
-        super().__init__(parent)
-        self.setWindowTitle(title)
-
-        # Custom title bar
-        self.CustomTitleBar = CustomTitleBar(self, title)
-        self.CustomTitleBar.set_allow_double_toggle_max(False)
-        self.CustomTitleBar.set_min_btn_enabled(False)
-        self.CustomTitleBar.set_max_btn_enabled(False)
-        self.CustomTitleBar.set_full_btn_enabled(False)
-        self.CustomTitleBar.set_close_btn_enabled(False)
-        self.setTitleBar(self.CustomTitleBar)
-
-        # Main layout
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(14, 14, 14, 14)
-        layout.setSpacing(14)
-
-        self.spaceLabel = QtWidgets.QLabel("", self)
-        self.spaceLabel.setFixedHeight(20)
-        layout.addWidget(self.spaceLabel)
-
-        # Input label
-        self.inputLabel = QtWidgets.QLabel(label, self)
-        self.inputLabel.setFont(global_font)
-        layout.addWidget(self.inputLabel, alignment=QtCore.Qt.AlignCenter)
-
-        # Input field
-        if input_type == "text":
-            self.inputField = QtWidgets.QLineEdit(self)
-            if default_value is not None:
-                self.inputField.setText(default_value)
-            if placeholder_text is not None:
-                self.inputField.setPlaceholderText(placeholder_text)
-        elif input_type == "int":
-            self.inputField = QtWidgets.QSpinBox(self)
-        elif input_type == "double":
-            self.inputField = QtWidgets.QDoubleSpinBox(self)
-            if decimals is not None:
-                self.inputField.setDecimals(decimals)
-        if input_type in ("int", "double"):
-            if min_value is not None:
-                self.inputField.setMinimum(min_value)
-            if max_value is not None:
-                self.inputField.setMaximum(max_value)
-            if default_value is not None:
-                self.inputField.setValue(default_value)
-            if step is not None:
-                self.inputField.setSingleStep(step)
-            if prefix is not None:
-                self.inputField.setPrefix(prefix)
-            if suffix is not None:
-                self.inputField.setSuffix(suffix)
-
-        self.inputField.setFont(global_font)
-        layout.addWidget(self.inputField, alignment=QtCore.Qt.AlignCenter)
-
-        # Buttons
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout.setSpacing(8)
-        layout.addLayout(self.horizontalLayout)
-
-        self.okButton = QtWidgets.QPushButton("  " + self.tr("确定") + "  ", self)
-        self.okButton.setFont(global_font)
-        self.okButton.clicked.connect(self.accept)
-        self.horizontalLayout.addWidget(self.okButton)
-
-        self.cancelButton = QtWidgets.QPushButton("  " + self.tr("取消") + "  ", self)
-        self.cancelButton.setFont(global_font)
-        self.cancelButton.clicked.connect(self.reject)
-        self.horizontalLayout.addWidget(self.cancelButton)
-
-        self.adjustSize()
-        self.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.ret = True
-        self.exec_()
-
-    def result(self) -> Tuple[Any, bool]:
-        if isinstance(self.inputField, QtWidgets.QLineEdit):
-            return self.inputField.text(), self.ret
-        elif isinstance(self.inputField, QtWidgets.QSpinBox):
-            return self.inputField.value(), self.ret
-        elif isinstance(self.inputField, QtWidgets.QDoubleSpinBox):
-            return self.inputField.value(), self.ret
-
-    def accept(self):
-        self.ret = True
-        return super().accept()
-
-    def reject(self):
-        self.ret = False
-        return super().reject()
-
-    @staticmethod
-    def getText(
-        parent, title, label, default_value="", placeholder_text=None
-    ) -> Tuple[str, bool]:
-        dialog = CustomInputDialog(
-            parent,
-            title,
-            label,
-            input_type="text",
-            default_value=default_value,
-            placeholder_text=placeholder_text,
-        )
-        return dialog.result()
-
-    @staticmethod
-    def getInt(
-        parent,
-        title,
-        label,
-        default_value=0,
-        min_value=0,
-        max_value=100,
-        step=1,
-        prefix=None,
-        suffix=None,
-    ) -> Tuple[int, bool]:
-        dialog = CustomInputDialog(
-            parent,
-            title,
-            label,
-            input_type="int",
-            default_value=default_value,
-            min_value=min_value,
-            max_value=max_value,
-            step=step,
-            prefix=prefix,
-            suffix=suffix,
-        )
-        return dialog.result()
-
-    @staticmethod
-    def getDouble(
-        parent,
-        title,
-        label,
-        default_value=0.0,
-        min_value=0.0,
-        max_value=100.0,
-        decimals=2,
-        step=0.01,
-        prefix=None,
-        suffix=None,
-    ) -> Tuple[float, bool]:
-        dialog = CustomInputDialog(
-            parent,
-            title,
-            label,
-            input_type="double",
-            default_value=default_value,
-            min_value=min_value,
-            max_value=max_value,
-            decimals=decimals,
-            step=step,
-            prefix=prefix,
-            suffix=suffix,
-        )
-        return dialog.result()
-
-
-def center_window(instance: QtWidgets.QWidget) -> None:
-    geo = instance.geometry()
-    scr_geo = QtWidgets.QApplication.desktop().screenGeometry()
-    center_x = (scr_geo.width() - geo.width()) // 2
-    center_y = (scr_geo.height() - geo.height()) // 2
-    instance.move(center_x, center_y)
+def center_window(instance: QtWidgets.QWidget, width=None, height=None) -> None:
+    if instance.isMaximized():  # restore window size
+        instance.showNormal()
+    if instance.isVisible():  # bring window to front
+        instance.activateWindow()
+    scr_geo = QtWidgets.QApplication.primaryScreen().geometry()
+    logger.info(f"Screen geometry: {scr_geo}")
+    if not width or not height:  # center window
+        geo = instance.geometry()
+        center_x = (scr_geo.width() - geo.width()) // 2
+        center_y = (scr_geo.height() - geo.height()) // 2
+        instance.move(center_x, center_y)
+    else:  # set window size and center window
+        center_x = (scr_geo.width() - width) // 2
+        center_y = (scr_geo.height() - height) // 2
+        instance.setGeometry(center_x, center_y, width, height)
 
 
 def float_str(value, limit=1e5):
@@ -608,7 +315,7 @@ setting.load(SETTING_FILE)
 setting.save(SETTING_FILE)
 
 
-def update_hardware_setting():
+def update_pyqtgraph_setting():
     pg.setConfigOption("antialias", setting.antialias)
     if OPENGL_AVALIABLE:
         pg.setConfigOption("enableExperimental", setting.opengl)
@@ -616,12 +323,13 @@ def update_hardware_setting():
     logger.info(f"Antialias: {setting.antialias}, OpenGL: {setting.opengl}")
 
 
-update_hardware_setting()
+update_pyqtgraph_setting()
 
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     uip_values_signal = QtCore.pyqtSignal(float, float, float)
     display_data_signal = QtCore.pyqtSignal(list, list, str, str, str, str, str)
+    highlight_point_signal = QtCore.pyqtSignal(float, float)
     close_signal = QtCore.pyqtSignal()
     data = RealtimeData(setting.data_pts)
     data_fps = 50
@@ -632,6 +340,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     _v_set = 0.0
     _i_set = 0.0
     open_r = 1e7
+    continuous_energy_counter = 0
     model = "Unknown"
 
     def __init__(self, parent=None):
@@ -649,13 +358,14 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.comboDataFps.setCurrentText(f"{self.data_fps}Hz")
         self.setTitleBar(self.CustomTitleBar)
         self.initSignals()
-        self.resize(920, 800)
         self.initGraph()
         self.initTimer()
         self.set_interp(setting.interp)
         self.refresh_preset()
         self.get_preset("1")
-        # self.close_state_ui()
+        self.close_state_ui()
+        self.load_battery_model(BAT_EXAMPLE_PATH)
+        center_window(self, 920, 800)
         self.ui.progressBarVoltage.setMaximum(1000)
         self.ui.progressBarCurrent.setMaximum(1000)
         self._last_state_change_t = time.perf_counter()
@@ -681,10 +391,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.btnSeqSave.setFont(c_font)
             self.ui.btnSeqLoad.setFont(c_font)
 
-    def showEvent(self, a0: QtGui.QShowEvent) -> None:
-        center_window(self)
-        return super().showEvent(a0)
-
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.close_signal.emit()
         return super().closeEvent(a0)
@@ -707,6 +413,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.func_keep_power_timer.timeout.connect(self.func_keep_power)
         self.func_seq_timer = QtCore.QTimer(self)
         self.func_seq_timer.timeout.connect(self.func_seq)
+        self.func_bat_sim_timer = QtCore.QTimer(self)
+        self.func_bat_sim_timer.timeout.connect(self.func_bat_sim)
         self.graph_record_save_timer = QtCore.QTimer(self)
         self.graph_record_save_timer.timeout.connect(self.graph_record_save)
 
@@ -758,7 +466,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def set_step(self, spin: QtWidgets.QDoubleSpinBox, f, t):
         if not setting.bitadjust:
+            # enable adaptive step size
+            spin.setStepType(
+                QtWidgets.QAbstractSpinBox.StepType.AdaptiveDecimalStepType
+            )
             return
+        spin.setStepType(QtWidgets.QAbstractSpinBox.StepType.DefaultStepType)
         STEPS = {
             0: 0.001,
             -1: 0.001,
@@ -1024,6 +737,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                     self.graph_record_data.add_values(
                         v, i, t - dt + (dt / len_) * (idx + 1)
                     )
+        eng = 0
         with data.sync_lock:
             for v, i in rtvalues:
                 data.voltage_tmp.append(v)
@@ -1042,6 +756,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             t = t1 - data.start_time
             dt = t1 - data.last_time
             data.last_time = t1
+            for idx, (v, i) in enumerate(rtvalues):
+                eng += v * i * (dt / len_)
+            self.continuous_energy_counter += eng
+            data.energy += eng
             if data.update_count + len_ > data.data_length:
                 offset = data.update_count + len_ - data.data_length
                 data.voltages = np.roll(data.voltages, -offset)
@@ -1051,7 +769,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 data.times = np.roll(data.times, -offset)
                 data.update_count -= offset
             for idx, (v, i) in enumerate(rtvalues):
-                data.energy += v * i * (dt / len_)
                 data.voltages[data.update_count + idx] = v
                 data.currents[data.update_count + idx] = i
                 data.powers[data.update_count + idx] = v * i
@@ -1454,11 +1171,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     ######### 辅助功能-参数扫描 #########
 
-    _sweep_response_type = "x"
-    _sweep_response_data_y = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    _sweep_response_data_x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    _sweep_response_x_label = "x"
-    _sweep_response_y_label = "y"
+    _sweep_response_type = ""
+    _sweep_response_data_y = []
+    _sweep_response_data_x = []
+    _sweep_response_x_label = ""
+    _sweep_response_y_label = ""
     _sweep_response_x_unit = ""
     _sweep_response_y_unit = ""
     _sweep_flag = False
@@ -1503,7 +1220,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self._sweep_response_data_y = []
 
             self._sweep_flag = True
-            self.func_sweep_timer.start(round(self._sweep_delay * 1000))
             self.ui.btnSweep.setText(self.tr("功能已开启"))
             if self._sweep_target == self.tr("电压"):
                 self.ui.spinBoxVoltage.setEnabled(False)
@@ -1513,13 +1229,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.v_set = self._sweep_start
             if not self.output_state:
                 self.on_btnOutput_clicked()
-
-    @QtCore.pyqtSlot(int)
-    def on_comboSweepRecord_currentIndexChanged(self, index):
-        if index == 0:
-            self.ui.btnSweepShowRecord.setEnabled(False)
-        else:
-            self.ui.btnSweepShowRecord.setEnabled(True)
+            QtCore.QTimer.singleShot(
+                200,  # wait for 0.2s to ensure output is stable
+                lambda: self.func_sweep_timer.start(round(self._sweep_delay * 1000)),
+            )
 
     @QtCore.pyqtSlot()
     def on_btnSweepShowRecord_clicked(self):
@@ -1763,6 +1476,140 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self._keep_power_pid_max_v = self.ui.spinBoxKeepPowerMaxV.value()
         if self.func_keep_power_timer.isActive():
             self._keep_power_pid.output_limits = (0, self._keep_power_pid_max_v)
+
+    ######### 辅助功能-电池模拟 #########
+
+    _battery_models = {}
+    _bat_sim_soc = []
+    _bat_sim_voltage = []
+    _bat_sim_total_energy = 0
+    _bat_sim_used_energy = 0
+    _bat_sim_stop_energy = 0
+    _bat_sim_cells = 1
+    _bat_sim_internal_r = 0.0
+    _bat_sim_last_e_temp = 0
+    _bat_sim_start_time = 0
+
+    def load_battery_model(self, path):
+        csv = np.loadtxt(path, delimiter=",", skiprows=1)
+        csv_name = os.path.basename(os.path.splitext(path)[0])
+        soc = csv[:, 0]
+        voltage = csv[:, 1]
+        self._battery_models[csv_name] = (soc, voltage)
+        if csv_name not in [
+            self.ui.comboBatSimCurve.itemText(i)
+            for i in range(self.ui.comboBatSimCurve.count())
+        ]:
+            self.ui.comboBatSimCurve.addItem(csv_name)
+        self.ui.comboBatSimCurve.setCurrentText(csv_name)
+
+    @QtCore.pyqtSlot()
+    def on_btnBatSimLoad_clicked(self):
+        path, ok = QtWidgets.QFileDialog.getOpenFileName(
+            self, self.tr("打开"), "", self.tr("CSV文件 (*.csv)")
+        )
+        if path == "" or not ok:
+            return
+        self.load_battery_model(path)
+
+    @QtCore.pyqtSlot()
+    def on_btnBatSimPreview_clicked(self):
+        curve_name = self.ui.comboBatSimCurve.currentText()
+        if curve_name not in self._battery_models:
+            return
+        soc, voltage = self._battery_models[curve_name]
+        new_soc = np.arange(0, 100 + 1e-9, 0.1)
+        new_voltage = np.interp(new_soc, soc, voltage)
+        self.display_data_signal.emit(
+            new_soc.tolist(),
+            new_voltage.tolist(),
+            self.tr("SOC"),
+            self.tr("电压"),
+            "%",
+            "V",
+            f"{curve_name} Voltage-SOC (State of Charge) Curve",
+        )
+
+    def set_batsim_widget_enabled(self, enabled):
+        for item in self.ui.scrollAreaBatSim.findChildren(QtWidgets.QPushButton):
+            if item is not self.ui.btnBatSimPreview:
+                item.setEnabled(enabled)
+        for item in self.ui.scrollAreaBatSim.findChildren(QtWidgets.QDoubleSpinBox):
+            item.setEnabled(enabled)
+        for item in self.ui.scrollAreaBatSim.findChildren(QtWidgets.QComboBox):
+            item.setEnabled(enabled)
+
+    @QtCore.pyqtSlot()
+    def on_btnBatSim_clicked(self):
+        if self.func_bat_sim_timer.isActive():
+            self.func_bat_sim_timer.stop()
+            self.set_batsim_widget_enabled(True)
+            self.ui.btnBatSim.setText(self.tr("功能已关闭"))
+        else:
+            curve_name = self.ui.comboBatSimCurve.currentText()
+            if curve_name not in self._battery_models:
+                return
+            self._bat_sim_soc = self._battery_models[curve_name][0]
+            self._bat_sim_voltage = self._battery_models[curve_name][1]
+            self._bat_sim_cells = self.ui.spinBoxBatSimCells.value()
+            self._bat_sim_total_energy = (
+                self.ui.spinBoxBatSimCap.value() * 3600 * self._bat_sim_cells
+            )  # Wh->J
+            self._bat_sim_used_energy = (
+                1 - self.ui.spinBoxBatSimCurrent.value() / 100
+            ) * self._bat_sim_total_energy
+            self._bat_sim_stop_energy = self._bat_sim_total_energy - (
+                self.ui.spinBoxBatSimStop.value() / 100 * self._bat_sim_total_energy
+            )
+            self._bat_sim_internal_r = (
+                self.ui.spinBoxBatSimRes.value() / 1000
+            )  # mOhm->Ohm
+            self.func_bat_sim_timer.start(
+                round(1000 / self.ui.spinBoxBatSimLoopFreq.value())
+            )
+            self._bat_sim_last_e_temp = self.continuous_energy_counter
+            self._bat_sim_start_time = time.perf_counter()
+            self.ui.labelBatSimTime.setText("Discharge Time: 00:00:00")
+            self.ui.btnBatSim.setText(self.tr("功能已开启"))
+            if not self.output_state:
+                self.on_btnOutput_clicked()
+            self.set_batsim_widget_enabled(False)
+            self.display_data_signal.emit(
+                self._bat_sim_soc.tolist(),
+                self._bat_sim_voltage.tolist(),
+                self.tr("SOC"),
+                self.tr("电压"),
+                "%",
+                "V",
+                f"{curve_name} Battery Simulation Real-Time Curve",
+            )
+
+    def func_bat_sim(self):
+        add_e = self.continuous_energy_counter - self._bat_sim_last_e_temp
+        self._bat_sim_last_e_temp += add_e
+        self._bat_sim_used_energy += add_e
+        if self._bat_sim_used_energy >= self._bat_sim_stop_energy:
+            if self.output_state:
+                self.on_btnOutput_clicked()
+            self.on_btnBatSim_clicked()
+        new_percent = (
+            (self._bat_sim_total_energy - self._bat_sim_used_energy)
+            / self._bat_sim_total_energy
+            * 100
+        )
+        self.ui.spinBoxBatSimCurrent.setValue(new_percent)
+        new_volt = np.interp(new_percent, self._bat_sim_soc, self._bat_sim_voltage)
+        self.v_set = (
+            new_volt
+            - self._bat_sim_internal_r * self.data.currents[self.data.update_count]
+        ) * self._bat_sim_cells
+        self.highlight_point_signal.emit(new_percent, new_volt)
+        self.ui.labelBatSimTime.setText(
+            "Discharge Time: "
+            + time.strftime(
+                "%H:%M:%S", time.gmtime(time.perf_counter() - self._bat_sim_start_time)
+            )
+        )
 
     ######### 辅助功能-序列 #########
 
@@ -2169,13 +2016,8 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
         self.ui.lineEditColorIndicator.setStyleSheet(
             f"background-color: #{setting.color.lstrip('#')}"
         )
-        if self.isVisible():
-            self.close()
-        super().show()
-
-    def showEvent(self, a0: QtGui.QShowEvent) -> None:
         center_window(self)
-        return super().showEvent(a0)
+        super().show()
 
     @QtCore.pyqtSlot()
     def on_lineEditColor_editingFinished(self):
@@ -2286,13 +2128,8 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
 
     def show(self) -> None:
         self.initValues()
-        if self.isVisible():
-            self.close()
-        super().show()
-
-    def showEvent(self, a0: QtGui.QShowEvent) -> None:
         center_window(self)
-        return super().showEvent(a0)
+        super().show()
 
     @QtCore.pyqtSlot(int)
     def on_comboInput_currentIndexChanged(self, index):
@@ -2305,12 +2142,12 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
     @QtCore.pyqtSlot(int)
     def on_checkBoxAntialias_stateChanged(self, state: int):
         setting.antialias = state == QtCore.Qt.CheckState.Checked
-        update_hardware_setting()
+        update_pyqtgraph_setting()
 
     @QtCore.pyqtSlot(int)
     def on_checkBoxOpenGL_stateChanged(self, state: int):
         setting.opengl = state == QtCore.Qt.CheckState.Checked
-        update_hardware_setting()
+        update_pyqtgraph_setting()
 
     @QtCore.pyqtSlot(float)
     def on_spinMaxFps_valueChanged(self, _=None):
@@ -2667,11 +2504,10 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         y_pred = np.polyval(z, self.x_data)
         rmse = np.sqrt(np.mean((np.array(self.y_data) - y_pred) ** 2))
         logger.info(f"fit result: {z} with rmse={rmse:0.4g}")
-
         self.labelFitResult.setText(f"rmse={rmse:0.4f} {self.format_fit_result(z)}")
 
-    @QtCore.pyqtSlot(list, list, str, str, str, str, str)
     def showData(self, x, y, x_label, y_label, x_unit, y_unit, title):
+        self.spinBoxFit.setValue(0)
         self.x_data = x
         self.y_data = y
         self.curve.setData(x, y)
@@ -2680,14 +2516,30 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.plot_widget.autoRange()
         self.CustomTitleBar.set_name(title)
         self.update_fit_result()
-        self.show()
-        if self.isMaximized():
-            self.showNormal()
-        self.resize(800, 600)
-        screen = QtWidgets.QApplication.primaryScreen().geometry()
-        x = (screen.width() - self.width()) // 2
-        y = (screen.height() - self.height()) // 2
-        self.move(x, y)
+        if not self.isVisible():
+            self.show()
+            center_window(self, 800, 600)
+
+    def highlightPoint(self, x, y):
+        if hasattr(self, "vLine"):
+            self.plot_widget.removeItem(self.vLine)
+        if hasattr(self, "hLine"):
+            self.plot_widget.removeItem(self.hLine)
+
+        self.vLine = pg.InfiniteLine(
+            angle=90,
+            movable=False,
+            pen=pg.mkPen(setting.color_palette_v2[setting.theme]["line2"]),
+        )
+        self.hLine = pg.InfiniteLine(
+            angle=0,
+            movable=False,
+            pen=pg.mkPen(setting.color_palette_v2[setting.theme]["line2"]),
+        )
+        self.vLine.setPos(x)
+        self.hLine.setPos(y)
+        self.plot_widget.addItem(self.vLine)
+        self.plot_widget.addItem(self.hLine)
 
 
 DialogSettings = MDPSettings()
@@ -2703,6 +2555,7 @@ DialogGraphics.set_interp_sig.connect(MainWindow.set_interp)
 MainWindow.ui.btnRecordFloatWindow.clicked.connect(FloatingWindow.switch_visibility)
 MainWindow.uip_values_signal.connect(FloatingWindow.update_values)
 MainWindow.display_data_signal.connect(DialogResult.showData)
+MainWindow.highlight_point_signal.connect(DialogResult.highlightPoint)
 MainWindow.close_signal.connect(FloatingWindow.close)
 MainWindow.close_signal.connect(DialogResult.close)
 app.setWindowIcon(QtGui.QIcon(ICON_PATH))
@@ -2741,7 +2594,7 @@ set_theme(setting.theme)
 
 def show_app():
     MainWindow.show()
-    MainWindow.activateWindow()  # bring window to front
+    MainWindow.activateWindow()
     sys.exit(app.exec_())
 
 

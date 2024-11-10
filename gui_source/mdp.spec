@@ -11,6 +11,7 @@ a = Analysis(
         (".\\icon.ico", "."),
         (".\\en_US.qm", "."),
         (".\\SarasaFixedSC-SemiBold.ttf", "."),
+        (".\\Li-ion.csv", "."),
     ],
     hiddenimports=["pyi_splash"],
     hookspath=[],
