@@ -2514,6 +2514,10 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.plot_widget.setLabel("left", y_label, units=y_unit)
         self.plot_widget.autoRange()
         self.CustomTitleBar.set_name(title)
+        if hasattr(self, "vLine"):
+            self.plot_widget.removeItem(self.vLine)
+        if hasattr(self, "hLine"):
+            self.plot_widget.removeItem(self.hLine)
         self.update_fit_result()
         if not self.isVisible():
             self.show()

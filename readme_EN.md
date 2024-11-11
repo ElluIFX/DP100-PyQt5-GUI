@@ -28,10 +28,13 @@ A lot of time was spent optimizing the communication quality based on this proje
 - Data acquisition, plotting, analysis and saving up to 100Hz (adjustable)
 - PID constant power control
 - Parameter scanning (voltage/current)
+  - Plotting scanning response curves (for studying load characteristics)
 - Function generator (sine/square/triangle/sawtooth/random)
-- Operation sequence (execute operations in sequence)
-- Material Design style
+- Operation sequence (single or loop execution of action sequences)
+- Battery simulator (supports custom battery voltage curves/capacity/internal resistance/series-connection settings)
+- Material Design style with two color themes
 - i18n support (zh-CN/en-US)
+- Portable executable files ready to use (Win Only / Source Code Cross-Platform)
 
 ## Usage Instructions
 
