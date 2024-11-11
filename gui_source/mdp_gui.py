@@ -77,6 +77,7 @@ SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
 BAT_EXAMPLE_PATH = os.path.join(ABS_PATH, "Li-ion.csv")
+VERSION = "Ver3.6"
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -351,7 +352,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.fps_counter = FPSCounter()
         self.CustomTitleBar = CustomTitleBar(
             self,
-            self.tr("MDP-P906 数控电源上位机"),
+            self.tr("MDP-P906 数控电源上位机") + f" {VERSION}",
         )
         self.CustomTitleBar.set_theme("dark")
         self.ui.comboDataFps.setCurrentText(f"{self.data_fps}Hz")
@@ -562,11 +563,13 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             if Model == "P905":
                 self.ui.spinBoxCurrent.setRange(0, 5)
                 self.CustomTitleBar.set_name(
-                    self.tr("MDP-P906 数控电源上位机") + " - P905 Mode"
+                    self.tr("MDP-P906 数控电源上位机") + f" {VERSION} - P905 Mode"
                 )
             elif Model == "P906":
                 self.ui.spinBoxCurrent.setRange(0, 10)
-                self.CustomTitleBar.set_name(self.tr("MDP-P906 数控电源上位机"))
+                self.CustomTitleBar.set_name(
+                    self.tr("MDP-P906 数控电源上位机") + f" {VERSION}"
+                )
         self.ui.btnOutput.setText(f"-  {State.upper()}  -")
         set_color(
             self.ui.btnOutput,
@@ -1600,7 +1603,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         new_volt = np.interp(new_percent, self._bat_sim_soc, self._bat_sim_voltage)
         self.v_set = (
             new_volt
-            - self._bat_sim_internal_r * self.data.currents[self.data.update_count]
+            - self._bat_sim_internal_r * self.data.currents[self.data.update_count - 1]
         ) * self._bat_sim_cells
         self.highlight_point_signal.emit(new_percent, new_volt)
         self.ui.labelBatSimTime.setText(
