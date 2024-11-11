@@ -25,10 +25,10 @@ A lot of time was spent optimizing the communication quality based on this proje
 ### PyQt5 GUI
 
 - Basic parameter setting, preset group management, setting modification
-- Data acquisition, plotting, analysis and saving up to 100Hz (adjustable)
+- Data acquisition, plotting, analysis, and saving up to 100Hz (adjustable)
 - PID constant power control
 - Parameter scanning (voltage/current)
-  - Plotting scanning response curves (for studying load characteristics)
+  - Plotting scanning response curves (for discovering load characteristics)
 - Function generator (sine/square/triangle/sawtooth/random)
 - Operation sequence (single or loop execution of action sequences)
 - Battery simulator (supports custom battery voltage curves/capacity/internal resistance/series-connection settings)
@@ -42,7 +42,7 @@ A lot of time was spent optimizing the communication quality based on this proje
 
 Although the following text says that this project requires buying a module, if you already have an STM32 + NRF24L01 combo, you can easily port this project to your device by simply modifying cubemx. This is the only advantage of using the HAL library.
 
-I won't include the specific circuit that I reverse-engineered here; you can directly refer to the pin definitions in cubemx.
+I won't include the specific circuit I reverse-engineered here; you can directly refer to the pin definitions in cubemx.
 
 ### Prerequisite
 
@@ -50,11 +50,11 @@ This project requires a USB to NRF24L01 module, sold for $5.67 on [AliExpress](h
 
 ![1721841880272](image/readme_EN/1721841880272.png)
 
-This module has an independent PA amplifier, allowing for a communication range of up to two meters compared to the Arduino Nano RF used by leommxj. However, the module uses its own protocol to implement a wireless serial port, which is not compatible with the original NRF24L01 data stream required to control the device.
+This module has an independent PA amplifier, allowing for a communication range of up to two meters compared to the Arduino Nano RF used by leommxj. However, the module uses its protocol to implement a wireless serial port, which is not compatible with the original NRF24L01 data stream required to control the device.
 
 ![1722007003614](image/readme/1722007003614.png)
 
-Fortunately, the module uses a genuine STM32F030F4P6 as the main controller, allowing us to write our own programs to repurpose its hardware.
+Fortunately, the module uses a genuine STM32F030F4P6 as the main controller, allowing us to write our programs to repurpose its hardware.
 
 ### Modification Method 1
 
@@ -68,7 +68,7 @@ Download [STM32 CubeProgrammer](https://www.st.com/en/development-tools/stm32cub
 
 Now, use a pair of tweezers to short the `BOOT0` and `3V3` test points in the image above, and **keep them shorted throughout the entire flashing process**.
 
-Insert the module into the computer, select the correct port number, and click Connect to connect. If everything goes well, you should see the image below, indicating successful removal of the read-write protection on the chip.
+Insert the module into the computer, select the correct port number, and click Connect to connect. If everything goes well, you should see the image below, indicating the successful removal of the read-write protection on the chip.
 
 ![1721841074236](image/readme/1721841074236.png)
 
@@ -92,9 +92,9 @@ Refer to the code and the comments.
 
 ### Control by GUI
 
-I have released a PyInstaller packaged version, you can just download and run it. Everything out of the box.
+I have released a PyInstaller packaged version, you can just download and run it. Everything is out of the box.
 
-> Set environment varible `MDP_FORCE_ENGLISH` to `1` can force the interface to be English if it failed to detect your system language.
+> Set environment variable `MDP_FORCE_ENGLISH` to `1` can force the interface to be English if it fails to detect your system language.
 
 ## References (Thanks)
 
