@@ -22,8 +22,8 @@ jobs:
           spec: "gui_source/mdp.spec"
           requirements: "gui_source/requirements.txt"
           upload_exe_with_name: "MDP-P906"
-          options: --noconfirm
           compression_level: 9
+          options: --upx-dir "./.upx"
 
       - name: Build MDP-P906-Numba
         uses: sayyid5416/pyinstaller@v1
@@ -32,5 +32,5 @@ jobs:
           spec: "gui_source/mdp_numba.spec"
           requirements: "gui_source/requirements.txt"
           upload_exe_with_name: "MDP-P906-Numba"
-          options: --noconfirm
           compression_level: 9
+          options: --upx-dir "./.upx"
