@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  pyinstaller-build:
+  build-mdp-p906:
     runs-on: windows-latest
     steps:
       - name: Build MDP-P906
@@ -25,6 +25,9 @@ jobs:
           compression_level: 9
           options: --upx-dir "./.upx"
 
+  build-mdp-p906-numba:
+    runs-on: windows-latest
+    steps:
       - name: Build MDP-P906-Numba
         uses: sayyid5416/pyinstaller@v1
         with:
