@@ -16,7 +16,7 @@ from loguru import logger
 try:
     import mdp_controller
 except ImportError:
-    sys.path.append("../")
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
     import mdp_controller
 
 from mdp_controller import MDP_P906
