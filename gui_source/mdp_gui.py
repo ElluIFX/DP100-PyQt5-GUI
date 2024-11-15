@@ -375,6 +375,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxVoltage.setSingleStep(0.001)
         self.ui.spinBoxCurrent.setSingleStep(0.001)
 
+        # hide tabWidget's tabBar
+        self.ui.tabWidget.tabBar().setVisible(False)
+        self.ui.labelTab.setText(
+            self.ui.tabWidget.tabText(self.ui.tabWidget.currentIndex())
+        )
+
         if ENGLISH:
             c_font = QtGui.QFont()
             c_font.setFamily("Sarasa Fixed SC SemiBold")
@@ -390,6 +396,47 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.btnSeqLoop.setFont(c_font)
             self.ui.btnSeqSave.setFont(c_font)
             self.ui.btnSeqLoad.setFont(c_font)
+
+    @QtCore.pyqtSlot(int)
+    def on_tabWidget_currentChanged(self, index):
+        self.ui.labelTab.setText(self.ui.tabWidget.tabText(index))
+        if index == 0:
+            self.ui.pushButtonLastTab.setEnabled(False)
+        elif index == self.ui.tabWidget.count() - 1:
+            self.ui.pushButtonNextTab.setEnabled(False)
+        else:
+            self.ui.pushButtonLastTab.setEnabled(True)
+            self.ui.pushButtonNextTab.setEnabled(True)
+
+    def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
+        pos = event.pos()
+        label_geom = self.ui.labelTab.geometry()
+        label_pos = self.ui.labelTab.mapTo(self, QtCore.QPoint(0, 0))
+        label_rect = QtCore.QRect(label_pos, label_geom.size())
+        if self.api is not None and label_rect.contains(pos):
+            delta = event.angleDelta().y()
+            current_idx = self.ui.tabWidget.currentIndex()
+            if delta > 0:
+                if current_idx > 0:
+                    self.ui.tabWidget.setCurrentIndex(current_idx - 1)
+            else:
+                if current_idx < self.ui.tabWidget.count() - 1:
+                    self.ui.tabWidget.setCurrentIndex(current_idx + 1)
+            event.accept()
+        else:
+            event.ignore()
+
+    @QtCore.pyqtSlot()
+    def on_pushButtonLastTab_clicked(self):
+        idx = self.ui.tabWidget.currentIndex()
+        if idx > 0:
+            self.ui.tabWidget.setCurrentIndex(idx - 1)
+
+    @QtCore.pyqtSlot()
+    def on_pushButtonNextTab_clicked(self):
+        idx = self.ui.tabWidget.currentIndex()
+        if idx < self.ui.tabWidget.count() - 1:
+            self.ui.tabWidget.setCurrentIndex(idx + 1)
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.close_signal.emit()
@@ -949,7 +996,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 np.min(eval_data),
                 np.mean(eval_data),
             )
-        elif text == self.tr("无"):
+        else:
             return None, None, None, None, None, None
         if data.size == 0:
             return None, None, None, None, None, None
