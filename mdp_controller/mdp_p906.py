@@ -175,7 +175,7 @@ class MDP_P906:
                 logger.warning(f"Unhandled Type-{data[0]}: {data.hex(' ').upper()}")
 
             if self._debug:
-                logger.debug(
+                logger.trace(
                     f"Type-{data[0]}: {data.hex(' ').upper()} -> {self._status}"
                 )
 
@@ -332,6 +332,7 @@ class MDP_P906:
             state (bool): True for on, False for off.
         """
         assert self._idcode is not None, "Please pair first"
+        logger.debug(f"Set output: {state}")
         self._transfer(
             mdp_protocal.gen_set_output(
                 self._idcode, state, self._m01_channel, blink=self._blink
@@ -348,6 +349,7 @@ class MDP_P906:
         """
         assert self._idcode is not None, "Please pair first"
         assert 0 <= voltage_set <= 30, "Voltage limit is 0~30V"
+        logger.debug(f"Set VOUT: {voltage_set}")
         self._transfer(
             mdp_protocal.gen_set_voltage(
                 self._idcode, voltage_set, self._m01_channel, blink=self._blink
@@ -367,6 +369,7 @@ class MDP_P906:
             assert 0 <= current_set <= 5, "P905 current limit is 0~5A"
         elif self._status["Model"] == "P906":
             assert 0 <= current_set <= 10, "P906 current limit is 0~10A"
+        logger.debug(f"Set IOUT: {current_set}")
         self._transfer(
             mdp_protocal.gen_set_current(
                 self._idcode, current_set, self._m01_channel, blink=self._blink
@@ -395,6 +398,7 @@ class MDP_P906:
         assert self._idcode is not None, "Please pair first"
         rgb565 = _convert_to_rgb565(*rgb)
         self._led_color = rgb565
+        logger.debug(f"Set LED color to: {rgb565}")
         self._transfer(
             mdp_protocal.gen_set_led_color(
                 self._idcode, self._led_color, self._m01_channel, blink=self._blink
@@ -423,8 +427,7 @@ class MDP_P906:
                 time.sleep(0.1)
                 continue
             break
-        if self._adp._debug:
-            logger.debug(f"Init status: {self._status}")
+        logger.debug(f"MDP init status: {self._status}")
         logger.success("MDP-P906 Connected")
 
     def auto_match(self, try_times: int = 3) -> str:

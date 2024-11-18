@@ -1,10 +1,38 @@
 from functools import partial
 from typing import Any, Callable, List, Tuple
 
+import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
 from qframelesswindow import FramelessWindow, TitleBar
 
 global_font = QtGui.QFont()
+
+
+class FmtAxisItem(pg.AxisItem):
+    def __init__(self, *args, **kwargs):
+        self.sync_with = kwargs.pop("sync_with", None)
+        self.sync_left_spacing = kwargs.pop("sync_left_spacing", False)
+        self.max_string_len = None
+        super().__init__(*args, **kwargs)
+
+    def syncWith(self, axis: "FmtAxisItem", left_spacing=False):
+        self.sync_with = axis
+        self.sync_left_spacing = left_spacing
+
+    def tickStrings(self, values, scale, spacing):
+        if len(values) == 0 or max(values) < 1e6:
+            strings = super().tickStrings(values, scale, spacing)
+        else:
+            strings = [f"{v:.2e}" for v in values]
+        self.max_string_len = max(len(s) for s in strings)
+        if self.sync_with is not None:
+            maxl = self.sync_with.max_string_len
+            if maxl is not None and maxl > self.max_string_len:
+                if self.sync_left_spacing:
+                    strings = [s.rjust(maxl) for s in strings]
+                else:
+                    strings = [s.ljust(maxl) for s in strings]
+        return strings
 
 
 class CustomTitleBar(TitleBar):

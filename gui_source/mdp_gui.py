@@ -10,37 +10,34 @@ from functools import partial
 from threading import Lock
 from typing import List, Optional, Tuple
 
-import richuru
-from loguru import logger
-
-try:
-    import mdp_controller
-except ImportError:
-    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-    import mdp_controller
-
-from mdp_controller import MDP_P906
+os.environ["PYQTGRAPH_QT_LIB"] = "PyQt5"
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 ARG_PATH = os.path.dirname(sys.argv[0])
 ABS_PATH = os.path.dirname(__file__)
 
+import richuru
+from loguru import logger
+
 if os.environ.get("MDP_ENABLE_LOG") is not None or "--debug" in sys.argv:
-    richuru.install()
+    richuru.install(level="DEBUG")
     logger.add(
         os.path.join(ARG_PATH, "mdp.log"), level="TRACE", backtrace=True, diagnose=True
     )
     DEBUG = True
 else:
-    richuru.install(tracebacks_suppress=[mdp_controller], level="INFO")
+    richuru.install(level="INFO")
     DEBUG = False
-
 logger.info("---- NEW SESSION ----")
 
-os.environ["PYQTGRAPH_QT_LIB"] = "PyQt5"
+try:
+    from mdp_controller import MDP_P906
+except ImportError:
+    logger.info("Redirecting to repo mdp_controller")
+    sys.path.append(os.path.dirname(ABS_PATH))
+    from mdp_controller import MDP_P906
 
-# ignore opengl runtime warnings
-warnings.filterwarnings("ignore", category=RuntimeWarning)
-
+    logger.success("Found mdp_controller in repo")
 
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -51,7 +48,7 @@ try:
     import OpenGL  # noqa: F401
 
     OPENGL_AVALIABLE = True
-    logger.info("OpenGL successfully enabled")
+    logger.success("OpenGL successfully enabled")
 except Exception as e:
     logger.warning(f"Enabling OpenGL failed with {e}.")
 
@@ -61,7 +58,7 @@ try:
     import numba as nb  # noqa: F401
 
     pg.setConfigOption("useNumba", True)
-    logger.info("Numba successfully enabled")
+    logger.success("Numba successfully enabled")
     NUMBA_ENABLED = True
 except Exception as e:
     logger.warning(f"Enabling Numba failed with {e}.")
@@ -72,6 +69,7 @@ import qdarktheme
 from mdp_gui_template import Ui_DialogGraphics, Ui_DialogSettings, Ui_MainWindow
 from serial.tools.list_ports import comports
 from simple_pid import PID
+from superqt.utils import signals_blocked
 
 SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
@@ -103,15 +101,7 @@ global_font = QtGui.QFont()
 global_font.setFamily(fonts[0])
 app.setFont(global_font)
 
-from mdp_custom import CustomInputDialog, CustomMessageBox, CustomTitleBar
-
-
-class FmtAxisItem(pg.AxisItem):
-    def tickStrings(self, values, scale, spacing):
-        if len(values) == 0 or max(values) < 1e6:
-            return super().tickStrings(values, scale, spacing)
-        else:
-            return [f"{v:.2e}" for v in values]
+from mdp_custom import CustomInputDialog, CustomMessageBox, CustomTitleBar, FmtAxisItem
 
 
 class RealtimeData:
@@ -197,7 +187,7 @@ def center_window(instance: QtWidgets.QWidget, width=None, height=None) -> None:
     if instance.isVisible():  # bring window to front
         instance.activateWindow()
     scr_geo = QtWidgets.QApplication.primaryScreen().geometry()
-    logger.info(f"Screen geometry: {scr_geo}")
+    logger.debug(f"Screen geometry: {scr_geo}")
     if not width or not height:  # center window
         geo = instance.geometry()
         center_x = (scr_geo.width() - geo.width()) // 2
@@ -320,7 +310,7 @@ def update_pyqtgraph_setting():
     if OPENGL_AVALIABLE:
         pg.setConfigOption("enableExperimental", setting.opengl)
         pg.setConfigOption("useOpenGL", setting.opengl)
-    logger.info(f"Antialias: {setting.antialias}, OpenGL: {setting.opengl}")
+    logger.debug(f"Antialias: {setting.antialias}, OpenGL: {setting.opengl}")
 
 
 update_pyqtgraph_setting()
@@ -349,6 +339,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.initSignals()
+        self.initGraph()
+        self.initTimer()
         self.fps_counter = FPSCounter()
         self.CustomTitleBar = CustomTitleBar(
             self,
@@ -357,9 +350,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.CustomTitleBar.set_theme("dark")
         self.ui.comboDataFps.setCurrentText(f"{self.data_fps}Hz")
         self.setTitleBar(self.CustomTitleBar)
-        self.initSignals()
-        self.initGraph()
-        self.initTimer()
         self.set_interp(setting.interp)
         self.refresh_preset()
         self.get_preset("1")
@@ -479,6 +469,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         )
         self.ui.spinBoxCurrent.lineEdit().cursorPositionChanged.connect(
             lambda *args: self.set_step(self.ui.spinBoxCurrent, *args)
+        )
+        self.ui.horizontalSlider.sliderMoved.connect(
+            self.on_horizontalSlider_sliderMoved
         )
 
     def startMyTimer(self):
@@ -691,6 +684,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.lcdEnerge,
         ]:
             widget.display("")
+        self.ui.horizontalSlider.setVisible(False)
+        self.ui.horizontalSlider.setRange(0, 10)
+        self.ui.horizontalSlider.setValue((0, 10))
+        self.ui.labelBufferSize.setVisible(False)
+        self.ui.labelDisplayRange.setVisible(False)
 
     def open_state_ui(self):
         self.ui.labelConnectState.setText(self.tr("已连接"))
@@ -701,6 +699,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.frameOutputSetting.setEnabled(True)
         self.ui.frameGraph.setEnabled(True)
         self.ui.frameSystemState.setEnabled(True)
+        self.ui.horizontalSlider.setVisible(True)
+        self.ui.labelBufferSize.setVisible(True)
+        self.ui.labelDisplayRange.setVisible(True)
+        set_color(self.ui.labelBufferSize, None)
 
     @QtCore.pyqtSlot()
     def on_btnConnect_clicked(self):
@@ -953,14 +955,14 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.curve1 = self.ui.widgetGraph1.plot(pen=self.pen1, clear=True)
         self.curve2 = self.ui.widgetGraph2.plot(pen=self.pen2, clear=True)
         self._graph_auto_scale_flag = True
-        self.ui.widgetGraph1.setAxisItems(
-            axisItems={"left": FmtAxisItem(orientation="left")}
-        )
-        self.ui.widgetGraph2.setAxisItems(
-            axisItems={"left": FmtAxisItem(orientation="left")}
-        )
-        self.set_graph1_data(self.tr("电压"))
-        self.set_graph2_data(self.tr("电流"))
+        axis1 = FmtAxisItem(orientation="left")
+        axis2 = FmtAxisItem(orientation="left")
+        axis1.syncWith(axis2, left_spacing=True)
+        axis2.syncWith(axis1, left_spacing=True)
+        self.ui.widgetGraph1.setAxisItems(axisItems={"left": axis1})
+        self.ui.widgetGraph2.setAxisItems(axisItems={"left": axis2})
+        self.set_graph1_data(self.tr("电压"), skip_update=True)
+        self.set_graph2_data(self.tr("电流"), skip_update=True)
 
     def update_pen(self):
         self.pen1.setColor(
@@ -970,7 +972,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             QtGui.QColor(setting.color_palette_v2[setting.theme]["line2"])
         )
 
-    def get_data(self, text: str, display_pts: int):
+    def get_data(self, text: str, display_pts: int, r_offset: int = 0):
         if text == self.tr("电压"):
             data = self.data.voltages[: self.data.update_count]
         elif text == self.tr("电流"):
@@ -984,10 +986,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             indexs = np.where(data != self.open_r)[0]
             data = data[indexs]
             if data.size == 0:
-                return None, None, None, None, None, None
+                return None, None, None, None, None, None, None
             time = time[indexs]
-            start_index = max(0, len(data) - display_pts)
-            eval_data = data[start_index:]
+            start_index = max(0, len(data) - display_pts - r_offset)
+            to_index = len(data) - r_offset
+            eval_data = data[start_index:to_index]
             return (
                 data,
                 time,
@@ -997,21 +1000,33 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 np.mean(eval_data),
             )
         else:
-            return None, None, None, None, None, None
+            return None, None, None, None, None, None, None
         if data.size == 0:
-            return None, None, None, None, None, None
-        start_index = max(0, len(data) - display_pts)
-        eval_data = data[start_index:]
+            return None, None, None, None, None, None, None
+        start_index = max(0, len(data) - display_pts - r_offset)
+        to_index = len(data) - r_offset
+        eval_data = data[start_index:to_index]
         return (
             data,
             self.data.times[: self.data.update_count],
             start_index,
+            to_index,
             np.max(eval_data),
             np.min(eval_data),
             np.mean(eval_data),
         )
 
     _typename_dict = None
+
+    def on_horizontalSlider_sliderMoved(self, values):
+        left = int(values[0])
+        right = int(values[1])
+        if right - left < setting.display_pts:
+            right = min(left + setting.display_pts, self.ui.horizontalSlider._maximum)
+            if right - left < setting.display_pts:
+                left = max(right - setting.display_pts, 0)
+            with signals_blocked(self.ui.horizontalSlider):
+                self.ui.horizontalSlider.setValue((left, right))
 
     def draw_graph(self):
         if self._typename_dict is None:
@@ -1027,12 +1042,59 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         type1 = self.ui.comboGraph1Data.currentText()
         type2 = self.ui.comboGraph2Data.currentText()
         with self.data.sync_lock:
-            data1, time1, start_index1, max1, min1, avg1 = self.get_data(
-                type1, setting.display_pts
+            update_count = self.data.update_count
+            if update_count > setting.display_pts + 5:
+                left, right = self.ui.horizontalSlider.sliderPosition()
+                max_ = self.ui.horizontalSlider._maximum
+                syncing = right == max_
+                allfit = syncing and (left == 0)
+                if not self.ui.horizontalSlider.isEnabled():
+                    self.ui.horizontalSlider.setEnabled(True)
+                    allfit = False
+                    left = max(1, right - setting.display_pts)
+                if allfit:
+                    display_pts = update_count
+                else:
+                    display_pts = max(int(right) - int(left), setting.display_pts)
+                if not syncing:
+                    r_offset = update_count - int(right)
+                else:
+                    r_offset = 0
+                right = update_count - r_offset
+                if not allfit:
+                    left = max(0, right - display_pts)
+                else:
+                    left = 0
+            else:
+                display_pts = update_count
+                r_offset = 0
+                syncing = True
+                allfit = False
+                left = 0
+                right = update_count
+                self.ui.horizontalSlider.setEnabled(False)
+            self.ui.horizontalSlider.setRange(0, update_count)
+            if syncing:
+                self.ui.horizontalSlider.setValue((left, update_count))
+            data1, time1, start_index1, to_index1, max1, min1, avg1 = self.get_data(
+                type1, display_pts, r_offset
             )
-            data2, time2, start_index2, max2, min2, avg2 = self.get_data(
-                type2, setting.display_pts
+            data2, time2, start_index2, to_index2, max2, min2, avg2 = self.get_data(
+                type2, display_pts, r_offset
             )
+        self.ui.labelBufferSize.setText(
+            f"{update_count/self.data.data_length*100:.1f}%"
+        )
+        self.ui.labelBufferSize.setToolTip(
+            self.tr("数据缓冲区占用率") + f"\n{update_count} / {self.data.data_length}"
+        )
+        self.ui.labelDisplayRange.setText(str(display_pts))
+        if update_count > self.data.data_length * 0.95:
+            set_color(
+                self.ui.labelBufferSize,
+                setting.color_palette_v2[setting.theme]["general_yellow"],
+            )
+
         _ = self._typename_dict.get(type1)
         if data1 is not None and data1.size > 0:
             self.curve1.setData(x=time1, y=data1)
@@ -1061,26 +1123,38 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 if max1 != np.inf and min1 != -np.inf:
                     add1 = max(0.01, (max1 - min1) * 0.05)
                     self.ui.widgetGraph1.setYRange(min1 - add1, max1 + add1)
-                    self.ui.widgetGraph1.setXRange(time1[start_index1], time1[-1])
+                    self.ui.widgetGraph1.setXRange(
+                        time1[start_index1], time1[to_index1 - 1]
+                    )
             if data2 is not None and time2.size != 0:
                 if max2 != np.inf and min2 != -np.inf:
                     add2 = max(0.01, (max2 - min2) * 0.05)
                     self.ui.widgetGraph2.setYRange(min2 - add2, max2 + add2)
-                    self.ui.widgetGraph2.setXRange(time2[start_index2], time2[-1])
+                    self.ui.widgetGraph2.setXRange(
+                        time2[start_index2], time2[to_index2 - 1]
+                    )
 
-    def set_graph1_data(self, text):
+    def set_graph1_data(self, text, skip_update=False):
         if text == self.tr("无"):
             self.ui.widgetGraph1.hide()
             return
         self.ui.widgetGraph1.show()
         self.ui.widgetGraph1.setLabel("left", text, units=self._graph_units_dict[text])
+        if not skip_update and self.draw_graph_timer.isActive():  # force update axis
+            self.ui.widgetGraph1.setYRange(0, 0)
+            self.ui.widgetGraph2.setYRange(0, 0)
+            self.draw_graph()
 
-    def set_graph2_data(self, text):
+    def set_graph2_data(self, text, skip_update=False):
         if text == self.tr("无"):
             self.ui.widgetGraph2.hide()
             return
         self.ui.widgetGraph2.show()
         self.ui.widgetGraph2.setLabel("left", text, units=self._graph_units_dict[text])
+        if not skip_update and self.draw_graph_timer.isActive():
+            self.ui.widgetGraph1.setYRange(0, 0)
+            self.ui.widgetGraph2.setYRange(0, 0)
+            self.draw_graph()
 
     @QtCore.pyqtSlot()
     def on_btnGraphClear_clicked(self, _=None, skip_confirm=False):
@@ -1103,14 +1177,21 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
         self.curve1.setData(x=[], y=[])
         self.curve2.setData(x=[], y=[])
+        set_color(self.ui.labelBufferSize, None)
 
     @QtCore.pyqtSlot()
     def on_btnGraphKeep_clicked(self):
         self.graph_keep_flag = not self.graph_keep_flag
         if self.graph_keep_flag:
             self.ui.btnGraphKeep.setText(self.tr("解除"))
+            self.ui.comboGraph1Data.setEnabled(False)
+            self.ui.comboGraph2Data.setEnabled(False)
+            self.ui.horizontalSlider.setVisible(False)
         else:
             self.ui.btnGraphKeep.setText(self.tr("保持"))
+            self.ui.comboGraph1Data.setEnabled(True)
+            self.ui.comboGraph2Data.setEnabled(True)
+            self.ui.horizontalSlider.setVisible(True)
         mouse_enabled = self.graph_keep_flag or (not self._graph_auto_scale_flag)
         self.ui.widgetGraph1.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
         self.ui.widgetGraph2.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
@@ -2617,11 +2698,36 @@ app.setWindowIcon(QtGui.QIcon(ICON_PATH))
 def set_theme(theme):
     setting.theme = theme
     additional_qss = (
-        "QToolTip {color: rgb(228, 231, 235); background-color: rgb(32, 33, 36); border: 1px solid rgb(63, 64, 66); border-radius: 4px;}"
+        "QToolTip {"
+        "   color: rgb(228, 231, 235);"
+        "   background-color: rgb(32, 33, 36);"
+        "   border: 1px solid rgb(63, 64, 66);"
+        "   border-radius: 4px;"
+        "}"
+        "QSlider::add-page:horizontal {"
+        "   background: #20ffffff;"
+        "}"
+        "QSlider::sub-page:horizontal {"
+        "   background: #20ffffff;"
+        "}"
         if theme == "dark"
-        else "QToolTip {color: rgb(32, 33, 36); background-color: white; border: 1px solid rgb(218, 220, 224); border-radius: 4px;}"
-    )  # fix QToolTip background color
-    qdarktheme.setup_theme(theme, additional_qss=additional_qss)
+        else "QToolTip {"
+        "   color: rgb(32, 33, 36);"
+        "   background-color: white;"
+        "   border: 1px solid rgb(218, 220, 224);"
+        "   border-radius: 4px;"
+        "}"
+        "QSlider::add-page:horizontal {"
+        "   background: #28000000;"
+        "}"
+        "QSlider::sub-page:horizontal {"
+        "   background: #28000000;"
+        "}"
+    )
+    qdarktheme.setup_theme(
+        theme,
+        additional_qss=additional_qss,
+    )
     MainWindow.ui.widgetGraph1.setBackground(None)
     MainWindow.ui.widgetGraph2.setBackground(None)
     MainWindow.CustomTitleBar.set_theme(theme)
@@ -2640,6 +2746,8 @@ def set_theme(theme):
     DialogResult.pen.setColor(
         QtGui.QColor(setting.color_palette_v2[setting.theme]["line1"])
     )
+    MainWindow.ui.horizontalSlider.setStyleSheet("background: none;")
+    MainWindow.ui.horizontalSlider.setBarVisible(False)
 
 
 set_theme(setting.theme)

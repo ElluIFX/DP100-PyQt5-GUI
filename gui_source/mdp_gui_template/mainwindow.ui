@@ -1910,7 +1910,7 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>146</width>
+                         <width>177</width>
                          <height>263</height>
                         </rect>
                        </property>
@@ -2388,7 +2388,7 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>152</width>
+                         <width>177</width>
                          <height>198</height>
                         </rect>
                        </property>
@@ -3191,7 +3191,7 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>176</width>
+                         <width>177</width>
                          <height>301</height>
                         </rect>
                        </property>
@@ -4058,7 +4058,7 @@
           <number>3</number>
          </property>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,1,1,0,0">
+          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,1,1,0,0,0">
            <property name="spacing">
             <number>6</number>
            </property>
@@ -4532,6 +4532,92 @@
             </spacer>
            </item>
            <item>
+            <layout class="QHBoxLayout" name="horizontalLayoutSlider" stretch="0,1,0">
+             <property name="spacing">
+              <number>7</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="labelBufferSize">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Sarasa Fixed SC SemiBold</family>
+                 <pointsize>10</pointsize>
+                 <italic>false</italic>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="text">
+                <string>0.0%</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRangeSlider" name="horizontalSlider">
+               <property name="tracking">
+                <bool>true</bool>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="labelDisplayRange">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Sarasa Fixed SC SemiBold</family>
+                 <pointsize>10</pointsize>
+                 <italic>false</italic>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="toolTip">
+                <string>显示范围</string>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_39" stretch="1">
              <property name="spacing">
               <number>0</number>
@@ -4587,6 +4673,11 @@
    <extends>QWidget</extends>
    <header>pyqtgraph</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QRangeSlider</class>
+   <extends>QSlider</extends>
+   <header>superqt</header>
   </customwidget>
  </customwidgets>
  <resources/>

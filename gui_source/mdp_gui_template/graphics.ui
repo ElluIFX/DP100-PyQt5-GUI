@@ -464,7 +464,7 @@
         </font>
        </property>
        <property name="text">
-        <string>显示点数</string>
+        <string>最小显示点数</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

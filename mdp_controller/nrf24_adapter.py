@@ -202,7 +202,7 @@ class NRF24Adapter:
         with self._ser_wr_lock:
             self._serial.write(send)
         if self._debug:
-            logger.debug(f"Sent {send.hex(' ')}")
+            logger.trace(f"Sent {send.hex(' ')}")
 
     def _action(self, cmd: int, data: bytes, timeout: Optional[float]) -> bool:
         self._action_event.clear()
@@ -245,7 +245,7 @@ class NRF24Adapter:
                     continue
                 cmd, data = self._reader.result
                 if self._debug:
-                    logger.debug(f"Received: {cmd:02X} - {data.hex(' ')}")
+                    logger.trace(f"Received: {cmd:02X} - {data.hex(' ')}")
                 if cmd == RESPONSE.ECHO:
                     last_recv_ping = time.perf_counter()
                     if not self._connect_event.is_set():
@@ -277,7 +277,7 @@ class NRF24Adapter:
             self._counter.resp_ok()
             self._send_event.set()
             if self._debug:
-                logger.debug("NRF Response: NRF send success")
+                logger.trace("NRF Response: NRF send success")
         elif cmd == RESPONSE.NRF_SEND_FAIL:
             self._counter.resp_err()
             logger.warning("NRF Response: NRF send no ack")
@@ -286,7 +286,7 @@ class NRF24Adapter:
             if self._recv_callback is not None:
                 self._recv_callback(data)
             if self._debug:
-                logger.debug(f"NRF Response: NRF received {data.hex(' ')}")
+                logger.trace(f"NRF Response: NRF received {data.hex(' ')}")
         elif cmd == RESPONSE.NRF_RECV_FAIL:
             logger.warning("NRF Response: NRF receive failed")
         elif cmd == RESPONSE.NRF_FIFO_OVERFLOW:
@@ -301,22 +301,25 @@ class NRF24Adapter:
             self._query_data = data
             self._query_event.set()
             if self._debug:
-                logger.debug(f"NRF Response: NRF setting {data.hex(' ')}")
+                logger.trace(f"NRF Response: NRF setting {data.hex(' ')}")
         else:
             logger.error(f"NRF Response: Unknown cmd {cmd:02X}")
 
     def reboot(self, timeout: Optional[float] = 2):
         if not self._action(CMD.REBOOT, b"", timeout):
             raise NRF24AdapterError("Reboot failed")
+        logger.info("NRF24-Adapter rebooting")
 
     def reset_settings(self, timeout: Optional[float] = 2):
         if not self._action(CMD.RESET, b"", timeout):
             raise NRF24AdapterError("Reset setting failed")
+        logger.info("NRF24-Adapter reset settings")
 
     def set_baudrate(self, baudrate: int, timeout: Optional[float] = 2):
         data1 = baudrate // 10000
         data2 = (baudrate % 10000) // 100
         data3 = baudrate % 100
+        logger.debug(f"Setting baudrate to: {baudrate} -> {data1}{data2}{data3}")
         if not self._action(CMD.SET_BAUDRATE, bytes([data1, data2, data3]), timeout):
             raise NRF24AdapterError("Set baudrate failed")
         else:
@@ -343,7 +346,7 @@ class NRF24Adapter:
         self._query_event.clear()
         if ret := self._query(CMD.NRF_QUERY, b"", timeout):
             data = struct.unpack("<" + "B" * 13, ret)
-            return NRF24AdapterSetting(
+            set = NRF24AdapterSetting(
                 freq=data[0] + 2400,
                 air_data_rate=_inv_dict(ADR_DICT)[data[1]],  # type:ignore
                 tx_output_power=_inv_dict(TOP_DICT)[data[2]],  # type:ignore
@@ -354,6 +357,8 @@ class NRF24Adapter:
                 address_width=data[7],
                 address=bytes(data[8:]),
             )
+            logger.debug(f"NRF got settings: {set}")
+            return set
         else:
             raise NRF24AdapterError("NRF get settings failed")
 
@@ -373,6 +378,7 @@ class NRF24Adapter:
             0 <= settings.auto_retransmit_count <= 15
         ), "Auto retransmit count must be between 0 and 15"
         assert 3 <= settings.address_width <= 5, "Address width must be between 3 and 5"
+        logger.debug(f"NRF set settings: {settings}")
         data = struct.pack(
             "<" + "B" * 13,
             int(settings.freq) - 2400,

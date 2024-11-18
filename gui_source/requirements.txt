@@ -34,12 +34,15 @@ packaging==24.1
     #   matplotlib
     #   pyinstaller
     #   pyinstaller-hooks-contrib
+    #   qtpy
 pefile==2023.2.7
     # via pyinstaller
 pillow==11.0.0
     # via matplotlib
 pygments==2.18.0
-    # via rich
+    # via
+    #   rich
+    #   superqt
 pyinstaller==6.11.0
 pyinstaller-hooks-contrib==2024.9
     # via pyinstaller
@@ -60,6 +63,8 @@ python-dateutil==2.9.0.post0
 pywin32==306
 pywin32-ctypes==0.2.3
     # via pyinstaller
+qtpy==2.4.2
+    # via superqt
 rich==13.9.4
 setuptools==75.3.0
     # via
@@ -68,5 +73,8 @@ setuptools==75.3.0
 simple-pid==2.0.1
 six==1.16.0
     # via python-dateutil
+superqt==0.6.7
+typing-extensions==4.12.2
+    # via superqt
 win32-setctime==1.1.0
     # via loguru

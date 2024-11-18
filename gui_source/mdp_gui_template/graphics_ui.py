@@ -548,7 +548,7 @@ class Ui_DialogGraphics(object):
         self.comboAvgMode.setItemText(1, _translate("DialogGraphics", "三值平均"))
         self.comboAvgMode.setItemText(2, _translate("DialogGraphics", "九值平均"))
         self.label_40.setText(_translate("DialogGraphics", "记录点数"))
-        self.label_47.setText(_translate("DialogGraphics", "显示点数"))
+        self.label_47.setText(_translate("DialogGraphics", "最小显示点数"))
         self.spinDataLength.setSuffix(_translate("DialogGraphics", "pts"))
         self.spinDisplayLength.setSuffix(_translate("DialogGraphics", "pts"))
         self.labelNumba.setText(_translate("DialogGraphics", "Numba 加速已启用"))
