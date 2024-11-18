@@ -684,11 +684,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.lcdEnerge,
         ]:
             widget.display("")
-        self.ui.horizontalSlider.setVisible(False)
         self.ui.horizontalSlider.setRange(0, 10)
         self.ui.horizontalSlider.setValue((0, 10))
-        self.ui.labelBufferSize.setVisible(False)
-        self.ui.labelDisplayRange.setVisible(False)
+        self.ui.labelBufferSize.setText("N/A")
+        self.ui.labelDisplayRange.setText("N/A")
+        set_color(self.ui.labelBufferSize, None)
+        self.ui.frameGraphControl.setEnabled(False)
 
     def open_state_ui(self):
         self.ui.labelConnectState.setText(self.tr("已连接"))
@@ -699,10 +700,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.frameOutputSetting.setEnabled(True)
         self.ui.frameGraph.setEnabled(True)
         self.ui.frameSystemState.setEnabled(True)
-        self.ui.horizontalSlider.setVisible(True)
-        self.ui.labelBufferSize.setVisible(True)
-        self.ui.labelDisplayRange.setVisible(True)
-        set_color(self.ui.labelBufferSize, None)
+        self.ui.frameGraphControl.setEnabled(True)
 
     @QtCore.pyqtSlot()
     def on_btnConnect_clicked(self):
@@ -1186,13 +1184,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.btnGraphKeep.setText(self.tr("解除"))
             self.ui.comboGraph1Data.setEnabled(False)
             self.ui.comboGraph2Data.setEnabled(False)
-            self.ui.horizontalSlider.setVisible(False)
         else:
             self.ui.btnGraphKeep.setText(self.tr("保持"))
             self.ui.comboGraph1Data.setEnabled(True)
             self.ui.comboGraph2Data.setEnabled(True)
-            self.ui.horizontalSlider.setVisible(True)
         mouse_enabled = self.graph_keep_flag or (not self._graph_auto_scale_flag)
+        self.ui.frameGraphControl.setEnabled(not mouse_enabled)
         self.ui.widgetGraph1.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
         self.ui.widgetGraph2.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
 
@@ -1204,6 +1201,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         else:
             self.ui.btnGraphAutoScale.setText(self.tr("手动"))
         mouse_enabled = self.graph_keep_flag or (not self._graph_auto_scale_flag)
+        self.ui.frameGraphControl.setEnabled(not mouse_enabled)
         self.ui.widgetGraph1.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
         self.ui.widgetGraph2.setMouseEnabled(x=mouse_enabled, y=mouse_enabled)
 
@@ -1213,7 +1211,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if self.graph_record_flag:
             self.graph_record_data = RecordData()
             time_str = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
-            self.graph_record_filename = f"./record_{time_str}.csv"
+            self.graph_record_filename = os.path.join(
+                ARG_PATH, f"record_{time_str}.csv"
+            )
             self.ui.btnGraphRecord.setText(self.tr("停止"))
             self.graph_record_save_timer.start(30000)
         else:
@@ -1224,7 +1224,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             CustomMessageBox(
                 self,
                 self.tr("录制完成"),
-                self.tr("数据已保存至：") + f"{self.graph_record_filename[2:]}",
+                self.tr("数据已保存至：")
+                + f"\n{os.path.basename(self.graph_record_filename)}",
                 additional_actions=[
                     (
                         self.tr("打开文件路径"),
@@ -1233,6 +1234,42 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 ],
             )
             self.ui.btnGraphRecord.setText(self.tr("录制"))
+
+    @QtCore.pyqtSlot()
+    def on_btnGraphDump_clicked(self):
+        path, ok = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            self.tr("保存数据"),
+            os.path.join(ARG_PATH, "mdp_buffer_dump.csv"),
+            "CSV Files (*.csv)",
+        )
+        if not ok:
+            return
+        with self.data.sync_lock:
+            voltages = self.data.voltages[: self.data.update_count]
+            currents = self.data.currents[: self.data.update_count]
+            powers = self.data.powers[: self.data.update_count]
+            resistances = self.data.resistances[: self.data.update_count]
+            times = self.data.times[: self.data.update_count]
+            np.savetxt(
+                path,
+                np.c_[times, voltages, currents, powers, resistances],
+                delimiter=",",
+                header="time/s,voltage/V,current/A,power/W,resistance/ohm",
+                comments="",
+                fmt="%f",
+            )
+        CustomMessageBox(
+            self,
+            self.tr("保存完成"),
+            self.tr("数据已保存至：") + f"\n{os.path.basename(path)}",
+            additional_actions=[
+                (
+                    self.tr("打开文件路径"),
+                    partial(self._handle_open_filebase, path),
+                ),
+            ],
+        )
 
     def _handle_open_filebase(self, file):
         folder = os.path.dirname(file)
@@ -2703,10 +2740,10 @@ def set_theme(theme):
         "   border-radius: 4px;"
         "}"
         "QSlider::add-page:horizontal {"
-        "   background: #20ffffff;"
+        "   background: #36ff8888;"
         "}"
         "QSlider::sub-page:horizontal {"
-        "   background: #20ffffff;"
+        "   background: #368888ff;"
         "}"
         if theme == "dark"
         else "QToolTip {"
@@ -2716,10 +2753,10 @@ def set_theme(theme):
         "   border-radius: 4px;"
         "}"
         "QSlider::add-page:horizontal {"
-        "   background: #28000000;"
+        "   background: #36880000;"
         "}"
         "QSlider::sub-page:horizontal {"
-        "   background: #28000000;"
+        "   background: #36000088;"
         "}"
     )
     qdarktheme.setup_theme(
