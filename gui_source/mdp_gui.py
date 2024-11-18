@@ -2472,8 +2472,6 @@ class TransparentFloatingWindow(QtWidgets.QWidget):
         self.setWindowOpacity(0.95)
 
     def update_values(self, u, i, p):
-        if not self.label_visable:
-            return
         self.voltage_label.setText(f"{u:06.3f} V")
         self.current_label.setText(f"{i:06.3f} A")
         if p < 100:
