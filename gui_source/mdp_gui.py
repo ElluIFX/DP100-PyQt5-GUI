@@ -75,7 +75,7 @@ SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
 BAT_EXAMPLE_PATH = os.path.join(ABS_PATH, "Li-ion.csv")
-VERSION = "Ver3.7"
+VERSION = "Ver4.0"
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
