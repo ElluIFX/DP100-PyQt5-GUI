@@ -142,7 +142,7 @@ class RecordData:
             data,
             delimiter=",",
             fmt="%f",
-            header="time,voltage,current",
+            header="time/s,voltage/V,current/A",
             comments="",
         )
 
@@ -572,8 +572,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def update_state(self):
         if self.api is None:
             return
-        self.ui.labelComSpeed.setText(f"{self.api._adp.speed_counter.KBps:.1f}kBps")
-        errrate = self.api._adp.speed_counter.error_rate * 100
+        self.ui.labelComSpeed.setText(f"{self.api.speed_counter.KBps:.1f}kBps")
+        errrate = self.api.speed_counter.error_rate * 100
         self.ui.labelErrRate.setText(f"CON-ERR {errrate:.0f}%")
         clr = (
             setting.color_palette_v2[setting.theme]["general_red"]
@@ -685,7 +685,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         ]:
             widget.display("")
         self.ui.horizontalSlider.setRange(0, 10)
-        self.ui.horizontalSlider.setValue((0, 10))
+        self.ui.horizontalSlider.setValue((2, 8))
         self.ui.labelBufferSize.setText("N/A")
         self.ui.labelDisplayRange.setText("N/A")
         set_color(self.ui.labelBufferSize, None)
@@ -993,6 +993,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 data,
                 time,
                 start_index,
+                to_index,
                 np.max(eval_data),
                 np.min(eval_data),
                 np.mean(eval_data),
