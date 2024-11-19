@@ -365,7 +365,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxVoltage.setSingleStep(0.001)
         self.ui.spinBoxCurrent.setSingleStep(0.001)
 
-        # hide tabWidget's tabBar
         self.ui.tabWidget.tabBar().setVisible(False)
         self.ui.labelTab.setText(
             self.ui.tabWidget.tabText(self.ui.tabWidget.currentIndex())
@@ -1017,15 +1016,28 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     _typename_dict = None
 
+    _left_last = -1
+
     def on_horizontalSlider_sliderMoved(self, values):
         left = int(values[0])
         right = int(values[1])
+        left_moved = left != self._left_last
         if right - left < setting.display_pts:
-            right = min(left + setting.display_pts, self.ui.horizontalSlider._maximum)
-            if right - left < setting.display_pts:
+            if left_moved:
+                right = min(
+                    left + setting.display_pts, self.ui.horizontalSlider._maximum
+                )
+                if right - left < setting.display_pts:
+                    left = max(right - setting.display_pts, 0)
+            else:
                 left = max(right - setting.display_pts, 0)
+                if right - left < setting.display_pts:
+                    right = min(
+                        left + setting.display_pts, self.ui.horizontalSlider._maximum
+                    )
             with signals_blocked(self.ui.horizontalSlider):
                 self.ui.horizontalSlider.setValue((left, right))
+        self._left_last = left
 
     def draw_graph(self):
         if self._typename_dict is None:
@@ -1064,6 +1076,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                     left = max(0, right - display_pts)
                 else:
                     left = 0
+                self.ui.horizontalSlider.setRange(0, update_count)
             else:
                 display_pts = update_count
                 r_offset = 0
@@ -1072,7 +1085,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 left = 0
                 right = update_count
                 self.ui.horizontalSlider.setEnabled(False)
-            self.ui.horizontalSlider.setRange(0, update_count)
+                self.ui.horizontalSlider.setRange(0, 10)
             if syncing:
                 self.ui.horizontalSlider.setValue((left, update_count))
             data1, time1, start_index1, to_index1, max1, min1, avg1 = self.get_data(
@@ -2618,6 +2631,10 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
 
         self.hlayout = QtWidgets.QHBoxLayout()
 
+        self.btnXYSwap = QtWidgets.QPushButton("X/Y")
+        self.hlayout.addWidget(self.btnXYSwap)
+        self.btnXYSwap.clicked.connect(self.swapXY)
+
         label = QtWidgets.QLabel(self.tr("多项式拟合次数:"))
         label.setFont(global_font)
         self.hlayout.addWidget(label)
@@ -2634,7 +2651,8 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
 
         self.hlayout.setStretch(0, 0)
         self.hlayout.setStretch(1, 0)
-        self.hlayout.setStretch(2, 1)
+        self.hlayout.setStretch(2, 0)
+        self.hlayout.setStretch(3, 1)
 
         self.main_layout.addLayout(self.hlayout)
 
@@ -2673,9 +2691,13 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.labelFitResult.setText(f"rmse={rmse:0.4f} {self.format_fit_result(z)}")
 
     def showData(self, x, y, x_label, y_label, x_unit, y_unit, title):
-        self.spinBoxFit.setValue(0)
         self.x_data = x
         self.y_data = y
+        self.x_label = x_label
+        self.y_label = y_label
+        self.x_unit = x_unit
+        self.y_unit = y_unit
+        self.title = title
         self.curve.setData(x, y)
         self.plot_widget.setLabel("bottom", x_label, units=x_unit)
         self.plot_widget.setLabel("left", y_label, units=y_unit)
@@ -2685,10 +2707,26 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
             self.plot_widget.removeItem(self.vLine)
         if hasattr(self, "hLine"):
             self.plot_widget.removeItem(self.hLine)
+        if not self.isVisible():
+            self.spinBoxFit.setValue(0)
         self.update_fit_result()
         if not self.isVisible():
             self.show()
             center_window(self, 800, 600)
+
+    def swapXY(self):
+        self.x_data, self.y_data = self.y_data, self.x_data
+        self.x_label, self.y_label = self.y_label, self.x_label
+        self.x_unit, self.y_unit = self.y_unit, self.x_unit
+        self.showData(
+            self.x_data,
+            self.y_data,
+            self.x_label,
+            self.y_label,
+            self.x_unit,
+            self.y_unit,
+            self.title,
+        )
 
     def highlightPoint(self, x, y):
         if hasattr(self, "vLine"):

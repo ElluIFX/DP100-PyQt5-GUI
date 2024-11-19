@@ -94,7 +94,11 @@ Refer to the code and the comments.
 
 I have released a PyInstaller packaged version, you can just download and run it. Everything is out of the box.
 
-> Set environment variable `MDP_FORCE_ENGLISH` to `1` can force the interface to be English if it fails to detect your system language.
+#### GUI Environment Variables
+
+- `MDP_ENABLE_LOG`: Enable debug log output (or use `--debug` parameter)
+- `MDP_FORCE_ENGLISH`: Force use English UI (or use `--english` parameter)
+- `MDP_SIM_MODE`: Enable simulation mode, allowing testing UI functions without connecting to real device (or use `--sim` parameter)
 
 ## References (Thanks)
 

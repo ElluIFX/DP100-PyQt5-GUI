@@ -10,6 +10,7 @@ from mdp_controller.nrf24_adapter import (
     NRF24Adapter,
     NRF24AdapterError,
     NRF24AdapterSetting,
+    SpeedCounter,
 )
 
 
@@ -108,6 +109,10 @@ class MDP_P906:
         )
         self._adp.nrf_set_settings(setting)
         time.sleep(0.1)
+
+    @property
+    def speed_counter(self) -> SpeedCounter:
+        return self._adp.speed_counter
 
     def _callback(self, data: bytes):
         try:

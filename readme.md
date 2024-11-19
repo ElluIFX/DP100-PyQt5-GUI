@@ -96,6 +96,12 @@
 
 在release中可以直接下载打包好的版本，开箱即用
 
+#### GUI 环境变量
+
+- `MDP_ENABLE_LOG`: 启用调试日志输出 (或用`--debug`参数启动)
+- `MDP_FORCE_ENGLISH`: 强制使用英文UI (或用`--english`参数启动)
+- `MDP_SIM_MODE`: 启用模拟模式, 允许在不连接设备的情况下测试UI功能 (或用`--sim`参数启动)
+
 ## References (Thanks)
 
 [leommxj/mdp_commander](https://github.com/leommxj/mdp_commander) 中的协议实现
