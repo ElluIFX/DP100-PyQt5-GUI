@@ -4,7 +4,7 @@
 
 不需要MDP-M01显控模块即可对电源进行无线控制，同时支持P905(已测试, 见[#1](https://github.com/ElluIFX/MDP-P906-Controller/issues/1)和[#2](https://github.com/ElluIFX/MDP-P906-Controller/issues/2))
 
-![1721971701832](image/readme/1721971701832.png)
+![1732027234613](image/readme/1732027234613.png)
 
 ![1721844452863](image/readme/1721844452863.png)
 
@@ -34,6 +34,8 @@
 - 函数发生器（正弦/方波/三角波/锯齿波/随机波）
 - 操作序列（以单次或循环执行动作序列）
 - 电池模拟器 (支持自定义电池电压曲线/容量/内阻/串联)
+- 数据悬浮窗
+- 自定义波形缓冲区长度
 - 两种主题的Material Design风格
 - i18n支持 (中文/英文)
 - 开箱即用的便携可执行文件 (Win Only / 源码跨平台可用)

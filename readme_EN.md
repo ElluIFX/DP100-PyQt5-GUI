@@ -2,7 +2,7 @@
 
 Wireless control of the power supply without the MDP-M01 display module, supporting P905 as well (tested, see [#1](https://github.com/ElluIFX/MDP-P906-Controller/issues/1) and [#2](https://github.com/ElluIFX/MDP-P906-Controller/issues/2)).
 
-![1721995272301](image/readme_EN/1721995272301.png)
+![1732027356466](image/readme_EN/1732027356466.png)
 
 ![1721844452863](image/readme/1721844452863.png)
 
@@ -32,6 +32,8 @@ A lot of time was spent optimizing the communication quality based on this proje
 - Function generator (sine/square/triangle/sawtooth/random)
 - Operation sequence (single or loop execution of action sequences)
 - Battery simulator (supports custom battery voltage curves/capacity/internal resistance/series-connection settings)
+- Data floating window
+- Customizable waveform buffer length
 - Material Design style with two color themes
 - i18n support (zh-CN/en-US)
 - Portable executable files ready to use (Win Only / Source Code Cross-Platform)

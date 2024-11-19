@@ -237,8 +237,8 @@ class Setting:
         self.m01ch = "CH-0"
         self.blink = False
 
-        self.data_pts = 50000
-        self.display_pts = 1000
+        self.data_pts = 100000
+        self.display_pts = 600
         self.graph_max_fps = 50
         self.state_fps = 15
         self.interp = 1
@@ -2768,6 +2768,8 @@ MainWindow.display_data_signal.connect(DialogResult.showData)
 MainWindow.highlight_point_signal.connect(DialogResult.highlightPoint)
 MainWindow.close_signal.connect(FloatingWindow.close)
 MainWindow.close_signal.connect(DialogResult.close)
+MainWindow.close_signal.connect(DialogGraphics.close)
+MainWindow.close_signal.connect(DialogSettings.close)
 app.setWindowIcon(QtGui.QIcon(ICON_PATH))
 
 
