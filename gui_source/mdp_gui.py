@@ -75,7 +75,7 @@ SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
 BAT_EXAMPLE_PATH = os.path.join(ABS_PATH, "Li-ion.csv")
-VERSION = "Ver4.0"
+VERSION = "Ver4.1"
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -714,7 +714,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.i_set = 0.0
                 self.model = "Unknown"
                 self.ui.spinBoxCurrent.setRange(0, 10)
-                self.CustomTitleBar.set_name(self.tr("MDP-P906 数控电源上位机"))
+                self.CustomTitleBar.set_name(
+                    self.tr("MDP-P906 数控电源上位机") + f" {VERSION}"
+                )
             else:
                 if not setting.idcode:
                     CustomMessageBox(
