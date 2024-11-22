@@ -318,7 +318,7 @@ update_pyqtgraph_setting()
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     uip_values_signal = QtCore.pyqtSignal(float, float, float)
-    display_data_signal = QtCore.pyqtSignal(list, list, str, str, str, str, str)
+    display_data_signal = QtCore.pyqtSignal(list, list, str, str, str, str, str, bool)
     highlight_point_signal = QtCore.pyqtSignal(float, float)
     close_signal = QtCore.pyqtSignal()
     data = RealtimeData(setting.data_pts)
@@ -1433,6 +1433,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self._sweep_response_x_unit,
             self._sweep_response_y_unit,
             self.tr("扫描响应结果曲线"),
+            False,
         )
 
     @QtCore.pyqtSlot(str)
@@ -1711,6 +1712,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             "%",
             "V",
             f"{curve_name} Voltage-SOC (State of Charge) Curve",
+            True,
         )
 
     def set_batsim_widget_enabled(self, enabled):
@@ -1765,6 +1767,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 "%",
                 "V",
                 f"{curve_name} Battery Simulation Real-Time Curve",
+                True,
             )
 
     def func_bat_sim(self):
@@ -2626,8 +2629,13 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.pen = pg.mkPen(
             color=setting.color_palette_v2[setting.theme]["line1"], width=2
         )
+        self.fit_pen = pg.mkPen(
+            color=setting.color_palette_v2[setting.theme]["line2"], width=2
+        )
         self.curve = self.plot_widget.plot(pen=self.pen)
         self.curve.setData([], [])
+        self.curve_fit = self.plot_widget.plot(pen=self.fit_pen)
+        self.curve_fit.setData([], [])
         self.plot_widget.autoRange()
         self.main_layout.addWidget(self.plot_widget)
 
@@ -2662,6 +2670,7 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.y_data = []
 
     def format_fit_result(self, result):
+        result = list(result)
         for i in range(len(result)):
             if abs(result[i]) < 1e-9:
                 result[i] = 0
@@ -2681,6 +2690,7 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
     def update_fit_result(self, _=None):
         if len(self.x_data) + len(self.y_data) < 4 or self.spinBoxFit.value() < 1:
             self.labelFitResult.setText("N/A")
+            self.curve_fit.setData([], [])
             return
         logger.info(
             f"fit {len(self.x_data)} points with {self.spinBoxFit.value()} order"
@@ -2691,8 +2701,12 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         rmse = np.sqrt(np.mean((np.array(self.y_data) - y_pred) ** 2))
         logger.info(f"fit result: {z} with rmse={rmse:0.4g}")
         self.labelFitResult.setText(f"rmse={rmse:0.4f} {self.format_fit_result(z)}")
+        SAMPLE_N = 1000
+        x_fit = np.linspace(min(self.x_data), max(self.x_data), SAMPLE_N)
+        y_fit = np.polyval(z, x_fit)
+        self.curve_fit.setData(x_fit, y_fit)
 
-    def showData(self, x, y, x_label, y_label, x_unit, y_unit, title):
+    def showData(self, x, y, x_label, y_label, x_unit, y_unit, title, disable_swap):
         self.x_data = x
         self.y_data = y
         self.x_label = x_label
@@ -2705,6 +2719,10 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.plot_widget.setLabel("left", y_label, units=y_unit)
         self.plot_widget.autoRange()
         self.CustomTitleBar.set_name(title)
+        if disable_swap:
+            self.btnXYSwap.setVisible(False)
+        else:
+            self.btnXYSwap.setVisible(True)
         if hasattr(self, "vLine"):
             self.plot_widget.removeItem(self.vLine)
         if hasattr(self, "hLine"):
@@ -2728,6 +2746,7 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
             self.x_unit,
             self.y_unit,
             self.title,
+            False,
         )
 
     def highlightPoint(self, x, y):
