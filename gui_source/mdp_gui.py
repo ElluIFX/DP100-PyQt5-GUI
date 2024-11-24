@@ -75,7 +75,7 @@ SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
 BAT_EXAMPLE_PATH = os.path.join(ABS_PATH, "Li-ion.csv")
-VERSION = "Ver4.1"
+VERSION = "Ver4.2"
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -207,7 +207,7 @@ def float_str(value, limit=1e5):
 
 
 def set_color(widget: QtWidgets.QWidget, rgb):
-    if rgb is None:
+    if not rgb or rgb == "default":
         widget.setStyleSheet("")
         return
     color = f"rgb({rgb[0]},{rgb[1]},{rgb[2]})" if isinstance(rgb, tuple) else rgb
@@ -258,13 +258,22 @@ class Setting:
         self.vset_cali_b = 0.0
         self.iset_cali_k = 1.0
         self.iset_cali_b = 0.0
-        self.theme = "dark"
-        self.color_palette_v2 = {
+        self.output_warning = False
+        self.lock_when_output = False
+        self.ignore_hw_lock = False
+        self.theme = "Dark"
+        self.color_palette = {
             "dark": {
                 "off": "khaki",
                 "on": "lightgreen",
                 "cv": "skyblue",
                 "cc": "tomato",
+                "lcd_voltage": "default",
+                "lcd_current": "default",
+                "lcd_power": "default",
+                "lcd_energy": "default",
+                "lcd_avg_power": "default",
+                "lcd_resistance": "default",
                 "general_green": "mediumaquamarine",
                 "general_red": "orangered",
                 "general_yellow": "yellow",
@@ -273,6 +282,12 @@ class Setting:
                 "line2": "turquoise",
             },
             "light": {
+                "lcd_voltage": "default",
+                "lcd_current": "default",
+                "lcd_power": "default",
+                "lcd_energy": "default",
+                "lcd_avg_power": "default",
+                "lcd_resistance": "default",
                 "off": "darkgoldenrod",
                 "on": "darkgreen",
                 "cv": "darkblue",
@@ -284,17 +299,42 @@ class Setting:
                 "line1": "orangered",
                 "line2": "darkcyan",
             },
+            "modify_this_to_add_your_custom_theme": {
+                "based_on_dark_or_light": "dark",
+                "any_other_item": "any_other_color",
+            },
         }
 
     def save(self, filename):
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             json.dump(self.__dict__, f, indent=4, ensure_ascii=False)
 
     def load(self, filename):
         if not os.path.exists(filename):
             self.save(filename)
             return
-        self.__dict__.update(json.load(open(filename, "r")))
+        def_colorplate = self.color_palette
+        self.__dict__.update(json.load(open(filename, "r", encoding="utf-8")))
+        for k, v in def_colorplate.items():
+            if k not in self.color_palette:
+                self.color_palette[k] = v
+            elif len(self.color_palette[k]) < len(v):
+                v.update(self.color_palette[k])
+                self.color_palette[k] = v
+
+    def get_color(self, key, override_theme=None):
+        t = override_theme or self.theme
+        if t in ("dark", "light"):
+            return self.color_palette[t].get(key)
+        else:
+            if "based_on_dark_or_light" not in self.color_palette[t]:
+                self.color_palette[t]["based_on_dark_or_light"] = "dark"
+            return self.color_palette[t].get(
+                key,
+                self.color_palette[self.color_palette[t]["based_on_dark_or_light"]].get(
+                    key
+                ),
+            )
 
     def __repr__(self) -> str:
         return f"Setting({self.__dict__})"
@@ -325,10 +365,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     data_fps = 50
     graph_keep_flag = False
     graph_record_flag = False
-    output_state = False
     locked = False
     _v_set = 0.0
     _i_set = 0.0
+    _output_state = False
+    output_state_str = ""
     open_r = 1e7
     continuous_energy_counter = 0
     model = "Unknown"
@@ -453,6 +494,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.func_bat_sim_timer.timeout.connect(self.func_bat_sim)
         self.graph_record_save_timer = QtCore.QTimer(self)
         self.graph_record_save_timer.timeout.connect(self.graph_record_save)
+        self.stable_checker_timer = QtCore.QTimer(self)
+        self.stable_checker_timer.timeout.connect(self.stable_checker)
 
     def initSignals(self):
         self.ui.comboDataFps.currentTextChanged.connect(self.set_data_fps)
@@ -496,6 +539,14 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.stop_func_wave_gen()
         if self.func_keep_power_timer.isActive():
             self.stop_func_keep_power()
+        if self.func_seq_timer.isActive():
+            self.stop_func_seq()
+        if self.func_bat_sim_timer.isActive():
+            self.stop_func_bat_sim()
+        if self.graph_record_save_timer.isActive():
+            self.on_btnGraphRecord_clicked()
+        if self.stable_checker_timer.isActive():
+            self.stable_checker_timer.stop()
 
     def switch_fullscreen(self):
         if self.isFullScreen():
@@ -544,10 +595,11 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     @v_set.setter
     def v_set(self, value):
-        self._v_set = value
-        self.ui.spinBoxVoltage.setValue(value)
         if self.api is None or self.locked:
             return
+        value = max(0, min(value, 30))
+        self._v_set = value
+        self.ui.spinBoxVoltage.setValue(value)
         if setting.use_cali:
             value = value * setting.vset_cali_k + setting.vset_cali_b
         self.api.set_voltage(value)
@@ -559,14 +611,38 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     @i_set.setter
     def i_set(self, value):
-        self._i_set = value
-        self.ui.spinBoxCurrent.setValue(value)
         if self.api is None or self.locked:
             return
+        value = max(0, min(value, 10))
+        self._i_set = value
+        self.ui.spinBoxCurrent.setValue(value)
         if setting.use_cali:
             value = value * setting.iset_cali_k + setting.iset_cali_b
         self.api.set_current(value)
         self._last_state_change_t = time.perf_counter()
+
+    @property
+    def output_state(self):
+        return self._output_state
+
+    @output_state.setter
+    def output_state(self, value):
+        if self.api is None or value == self._output_state:
+            return
+        if setting.output_warning and not self._output_state:
+            ok = CustomMessageBox.question(
+                self,
+                self.tr("警告"),
+                self.tr("确定要打开输出?")
+                + f"\n{self.tr('电压')}: {self.v_set:.3f}V"
+                + f"\n{self.tr('电流')}: {self.i_set:.3f}A",
+            )
+            if not ok:
+                return
+        self._output_state = value
+        self._last_state_change_t = time.perf_counter()
+        self.api.set_output(self._output_state)
+        self.update_state()
 
     def update_state(self):
         if self.api is None:
@@ -575,13 +651,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         errrate = self.api.speed_counter.error_rate * 100
         self.ui.labelErrRate.setText(f"CON-ERR {errrate:.0f}%")
         clr = (
-            setting.color_palette_v2[setting.theme]["general_red"]
+            setting.get_color("general_red")
             if errrate > 50
-            else (
-                setting.color_palette_v2[setting.theme]["general_yellow"]
-                if errrate > 10
-                else None
-            )
+            else (setting.get_color("general_yellow") if errrate > 10 else None)
         )
         set_color(self.ui.labelErrRate, clr)
         set_color(self.ui.labelComSpeed, clr)
@@ -612,11 +684,18 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.btnOutput.setText(f"-  {State.upper()}  -")
         set_color(
             self.ui.btnOutput,
-            setting.color_palette_v2[setting.theme][State],
+            setting.get_color(State),
         )
-        self.output_state = State != "off"
-        self.locked = Locked
-        self.ui.frameOutputSetting.setEnabled(not Locked)
+        self._output_state = State != "off"
+        self.output_state_str = State
+        self.locked = False
+        if not setting.ignore_hw_lock and Locked:
+            self.locked = True
+        self.ui.frameOutputSetting.setEnabled(not self.locked)
+        if setting.lock_when_output and self._output_state:
+            self.locked = True
+        self.ui.spinBoxVoltage.setEnabled(not self.locked)
+        self.ui.spinBoxCurrent.setEnabled(not self.locked)
         if SetVoltage >= 0:
             if setting.use_cali:
                 SetVoltage = (SetVoltage - setting.vset_cali_b) / setting.vset_cali_k
@@ -632,7 +711,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.labelLockState.setText("[LOCKED]" if Locked else "UNLOCKED")
         set_color(
             self.ui.labelLockState,
-            setting.color_palette_v2[setting.theme]["general_red"] if Locked else None,
+            setting.get_color("general_red") if Locked else None,
         )
         self.ui.labelInputVals.setText(f"{InputVoltage:.2f}V {InputCurrent:.2f}A")
         self.ui.labelTemperature.setText(f"TEMP {Temperature:.1f}℃")
@@ -643,12 +722,30 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     @QtCore.pyqtSlot()
     def on_btnOutput_clicked(self):
-        if self.api is None:
-            return
         self.output_state = not self.output_state
-        self._last_state_change_t = time.perf_counter()
-        self.api.set_output(self.output_state)
-        self.update_state()
+
+    _stable_callback = None
+    _stable_start_t = 0
+
+    def stable_checker(self):
+        dt = time.perf_counter() - self._stable_start_t
+        stable = (
+            self.output_state_str == "cc"
+            or abs(self.data.voltages[self.data.update_count - 1] - self.v_set) < 0.1
+            or dt > 10
+        )
+        if stable:
+            logger.info(f"Output is stable after {dt:.3f}s")
+            if self._stable_callback is not None:
+                self._stable_callback()
+                self._stable_callback = None
+            self.stable_checker_timer.stop()
+
+    def wait_output_stable(self, func):
+        self.output_state = True
+        self._stable_callback = func
+        self._stable_start_t = time.perf_counter()
+        self.stable_checker_timer.start(50)
 
     def close_state_ui(self):
         self.ui.labelConnectState.setText(self.tr("未连接"))
@@ -694,7 +791,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.labelConnectState.setText(self.tr("已连接"))
         set_color(
             self.ui.labelConnectState,
-            setting.color_palette_v2[setting.theme]["general_green"],
+            setting.get_color("general_green"),
         )
         self.ui.frameOutputSetting.setEnabled(True)
         self.ui.frameGraph.setEnabled(True)
@@ -945,12 +1042,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.widgetGraph2.showGrid(x=True, y=True)
         self.ui.widgetGraph1.setMouseEnabled(x=False, y=False)
         self.ui.widgetGraph2.setMouseEnabled(x=False, y=False)
-        self.pen1 = pg.mkPen(
-            color=setting.color_palette_v2[setting.theme]["line1"], width=1
-        )
-        self.pen2 = pg.mkPen(
-            color=setting.color_palette_v2[setting.theme]["line2"], width=1
-        )
+        self.pen1 = pg.mkPen(color=setting.get_color("line1"), width=1)
+        self.pen2 = pg.mkPen(color=setting.get_color("line2"), width=1)
         self.curve1 = self.ui.widgetGraph1.plot(pen=self.pen1, clear=True)
         self.curve2 = self.ui.widgetGraph2.plot(pen=self.pen2, clear=True)
         self._graph_auto_scale_flag = True
@@ -964,12 +1057,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.set_graph2_data(self.tr("电流"), skip_update=True)
 
     def update_pen(self):
-        self.pen1.setColor(
-            QtGui.QColor(setting.color_palette_v2[setting.theme]["line1"])
-        )
-        self.pen2.setColor(
-            QtGui.QColor(setting.color_palette_v2[setting.theme]["line2"])
-        )
+        self.pen1.setColor(QtGui.QColor(setting.get_color("line1")))
+        self.pen2.setColor(QtGui.QColor(setting.get_color("line2")))
 
     def get_data(self, text: str, display_pts: int, r_offset: int = 0):
         if text == self.tr("电压"):
@@ -1106,7 +1195,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if update_count > self.data.data_length * 0.95:
             set_color(
                 self.ui.labelBufferSize,
-                setting.color_palette_v2[setting.theme]["general_yellow"],
+                setting.get_color("general_yellow"),
             )
 
         _ = self._typename_dict.get(type1)
@@ -1409,13 +1498,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             elif self._sweep_target == self.tr("电流"):
                 self.ui.spinBoxCurrent.setEnabled(False)
             self.ui.scrollAreaSweep.setEnabled(False)
+
+            def start_sweep():
+                self.func_sweep_timer.start(round(self._sweep_delay * 1000))
+
             self.v_set = self._sweep_start
-            if not self.output_state:
-                self.on_btnOutput_clicked()
-            QtCore.QTimer.singleShot(
-                200,  # wait for 0.2s to ensure output is stable
-                lambda: self.func_sweep_timer.start(round(self._sweep_delay * 1000)),
-            )
+            self.wait_output_stable(start_sweep)
 
     @QtCore.pyqtSlot()
     def on_btnSweepShowRecord_clicked(self):
@@ -1527,14 +1615,18 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                     1000, lambda: self.ui.btnWaveGen.setText(self.tr("功能已关闭"))
                 )
                 return
-            self._wavegen_start_time = time.perf_counter()
-            self.func_wave_gen_timer.start(round(1000 / self._wavegen_loopfreq))
             self.ui.btnWaveGen.setText(self.tr("功能已开启"))
             self.ui.spinBoxWaveGenLoopFreq.setEnabled(False)
             self.ui.spinBoxVoltage.setEnabled(False)
-            if not self.output_state:
+            self._wavegen_start_time = 0
+
+            def start_wave_gen():
+                self._wavegen_start_time = time.perf_counter()
+                self.func_wave_gen_timer.start(round(1000 / self._wavegen_loopfreq))
                 self.v_set = self._wavegen_lowlevel
-                self.on_btnOutput_clicked()
+
+            self.v_set = self._wavegen_lowlevel
+            self.wait_output_stable(start_wave_gen)
 
     def stop_func_wave_gen(self):
         self.func_wave_gen_timer.stop()
@@ -1749,15 +1841,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self._bat_sim_internal_r = (
                 self.ui.spinBoxBatSimRes.value() / 1000
             )  # mOhm->Ohm
-            self.func_bat_sim_timer.start(
-                round(1000 / self.ui.spinBoxBatSimLoopFreq.value())
-            )
             self._bat_sim_last_e_temp = self.continuous_energy_counter
-            self._bat_sim_start_time = time.perf_counter()
             self.ui.labelBatSimTime.setText("Discharge Time: 00:00:00")
             self.ui.btnBatSim.setText(self.tr("功能已开启"))
-            if not self.output_state:
-                self.on_btnOutput_clicked()
             self.set_batsim_widget_enabled(False)
             self.display_data_signal.emit(
                 self._bat_sim_soc.tolist(),
@@ -1770,13 +1856,21 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 True,
             )
 
+            def start_bat_sim():
+                self.func_bat_sim_timer.start(
+                    round(1000 / self.ui.spinBoxBatSimLoopFreq.value())
+                )
+                self._bat_sim_start_time = time.perf_counter()
+
+            self.v_set = 0
+            self.wait_output_stable(start_bat_sim)
+
     def func_bat_sim(self):
         add_e = self.continuous_energy_counter - self._bat_sim_last_e_temp
         self._bat_sim_last_e_temp += add_e
         self._bat_sim_used_energy += add_e
         if self._bat_sim_used_energy >= self._bat_sim_stop_energy:
-            if self.output_state:
-                self.on_btnOutput_clicked()
+            self.output_state = False
             self.on_btnBatSim_clicked()
         new_percent = (
             (self._bat_sim_total_energy - self._bat_sim_used_energy)
@@ -2149,6 +2243,9 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
         self.ui.comboBoxBlink.setCurrentText(
             self.tr("闪烁") if setting.blink else self.tr("常亮")
         )
+        self.ui.checkBoxOutputWarn.setChecked(setting.output_warning)
+        self.ui.checkBoxSetLock.setChecked(setting.lock_when_output)
+        self.ui.checkBoxIgnoreHWLock.setChecked(setting.ignore_hw_lock)
 
     def refreshPorts(self):
         self.ui.comboBoxPort.clear()
@@ -2241,6 +2338,9 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
             else ""
         )
         setting.blink = self.ui.comboBoxBlink.currentText() == self.tr("闪烁")
+        setting.output_warning = self.ui.checkBoxOutputWarn.isChecked()
+        setting.lock_when_output = self.ui.checkBoxSetLock.isChecked()
+        setting.ignore_hw_lock = self.ui.checkBoxIgnoreHWLock.isChecked()
         setting.save(SETTING_FILE)
 
     @QtCore.pyqtSlot()
@@ -2256,6 +2356,18 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
     def on_btnOk_clicked(self):
         self.save_settings()
         self.close()
+
+    @QtCore.pyqtSlot(int)
+    def on_checkBoxIgnoreHWLock_stateChanged(self, state: int):
+        setting.ignore_hw_lock = state == QtCore.Qt.CheckState.Checked
+
+    @QtCore.pyqtSlot(int)
+    def on_checkBoxSetLock_stateChanged(self, state: int):
+        setting.lock_when_output = state == QtCore.Qt.CheckState.Checked
+
+    @QtCore.pyqtSlot(int)
+    def on_checkBoxOutputWarn_stateChanged(self, state: int):
+        setting.output_warning = state == QtCore.Qt.CheckState.Checked
 
 
 class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
@@ -2286,6 +2398,10 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
             self.ui.checkBoxOpenGL.setEnabled(False)
             self.ui.checkBoxOpenGL.setChecked(False)
 
+        for k in setting.color_palette:
+            if k not in ("dark", "light", "modify_this_to_add_your_custom_theme"):
+                self.ui.comboTheme.addItem(k)
+
     def initValues(self):
         self.ui.spinMaxFps.setValue(setting.graph_max_fps)
         self.ui.spinStateFps.setValue(setting.state_fps)
@@ -2308,7 +2424,7 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
         self.ui.checkBoxAntialias.setChecked(setting.antialias)
         self.ui.checkBoxOpenGL.setChecked(setting.opengl)
         self.ui.comboTheme.setCurrentIndex(
-            {"light": 1, "dark": 0}.get(setting.theme, 0)
+            {"light": 1, "dark": 0}.get(setting.theme, setting.theme)
         )
         self.ui.comboInput.setCurrentIndex(int(not setting.bitadjust))
 
@@ -2323,7 +2439,7 @@ class MDPGraphics(QtWidgets.QDialog, FramelessWindow):
 
     @QtCore.pyqtSlot(int)
     def on_comboTheme_currentIndexChanged(self, index):
-        set_theme({0: "dark", 1: "light"}[index])
+        set_theme({0: "dark", 1: "light"}.get(index, self.ui.comboTheme.currentText()))
 
     @QtCore.pyqtSlot(int)
     def on_checkBoxAntialias_stateChanged(self, state: int):
@@ -2488,29 +2604,29 @@ class TransparentFloatingWindow(QtWidgets.QWidget):
 
         self.v_label = QtWidgets.QLabel(self.tr("电压 U"), self)
         self.v_label.setFont(font_title)
-        set_color(self.v_label, setting.color_palette_v2["dark"]["general_red"])
+        set_color(self.v_label, setting.get_color("general_red", "dark"))
         layout.addWidget(self.v_label)
         self.voltage_label = QtWidgets.QLabel("", self)
         self.voltage_label.setFont(font_value)
-        set_color(self.voltage_label, setting.color_palette_v2["dark"]["general_red"])
+        set_color(self.voltage_label, setting.get_color("general_red", "dark"))
         layout.addWidget(self.voltage_label)
 
         self.i_label = QtWidgets.QLabel(self.tr("电流 I"), self)
         self.i_label.setFont(font_title)
-        set_color(self.i_label, setting.color_palette_v2["dark"]["general_green"])
+        set_color(self.i_label, setting.get_color("general_green", "dark"))
         layout.addWidget(self.i_label)
         self.current_label = QtWidgets.QLabel("", self)
         self.current_label.setFont(font_value)
-        set_color(self.current_label, setting.color_palette_v2["dark"]["general_green"])
+        set_color(self.current_label, setting.get_color("general_green", "dark"))
         layout.addWidget(self.current_label)
 
         self.p_label = QtWidgets.QLabel(self.tr("功率 P"), self)
         self.p_label.setFont(font_title)
-        set_color(self.p_label, setting.color_palette_v2["dark"]["general_blue"])
+        set_color(self.p_label, setting.get_color("general_blue", "dark"))
         layout.addWidget(self.p_label)
         self.power_label = QtWidgets.QLabel("", self)
         self.power_label.setFont(font_value)
-        set_color(self.power_label, setting.color_palette_v2["dark"]["general_blue"])
+        set_color(self.power_label, setting.get_color("general_blue", "dark"))
         layout.addWidget(self.power_label)
 
         self.setLayout(window_layout)
@@ -2626,12 +2742,8 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.plot_widget.setLabel("bottom", "X-Axis")
 
         # 创建曲线
-        self.pen = pg.mkPen(
-            color=setting.color_palette_v2[setting.theme]["line1"], width=2
-        )
-        self.fit_pen = pg.mkPen(
-            color=setting.color_palette_v2[setting.theme]["line2"], width=2
-        )
+        self.pen = pg.mkPen(color=setting.get_color("line1"), width=2)
+        self.fit_pen = pg.mkPen(color=setting.get_color("line2"), width=2)
         self.curve = self.plot_widget.plot(pen=self.pen)
         self.curve.setData([], [])
         self.curve_fit = self.plot_widget.plot(pen=self.fit_pen)
@@ -2758,12 +2870,12 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
         self.vLine = pg.InfiniteLine(
             angle=90,
             movable=False,
-            pen=pg.mkPen(setting.color_palette_v2[setting.theme]["line2"]),
+            pen=pg.mkPen(setting.get_color("line2")),
         )
         self.hLine = pg.InfiniteLine(
             angle=0,
             movable=False,
-            pen=pg.mkPen(setting.color_palette_v2[setting.theme]["line2"]),
+            pen=pg.mkPen(setting.get_color("line2")),
         )
         self.vLine.setPos(x)
         self.hLine.setPos(y)
@@ -2794,6 +2906,10 @@ app.setWindowIcon(QtGui.QIcon(ICON_PATH))
 
 def set_theme(theme):
     setting.theme = theme
+    if theme not in ("dark", "light"):
+        sys_theme = setting.color_palette[theme]["based_on_dark_or_light"]
+    else:
+        sys_theme = theme
     additional_qss = (
         "QToolTip {"
         "   color: rgb(228, 231, 235);"
@@ -2807,7 +2923,7 @@ def set_theme(theme):
         "QSlider::sub-page:horizontal {"
         "   background: #368888ff;"
         "}"
-        if theme == "dark"
+        if sys_theme == "dark"
         else "QToolTip {"
         "   color: rgb(32, 33, 36);"
         "   background-color: white;"
@@ -2822,29 +2938,40 @@ def set_theme(theme):
         "}"
     )
     qdarktheme.setup_theme(
-        theme,
+        sys_theme,
         additional_qss=additional_qss,
     )
     MainWindow.ui.widgetGraph1.setBackground(None)
     MainWindow.ui.widgetGraph2.setBackground(None)
-    MainWindow.CustomTitleBar.set_theme(theme)
-    DialogSettings.CustomTitleBar.set_theme(theme)
-    DialogGraphics.CustomTitleBar.set_theme(theme)
+    MainWindow.CustomTitleBar.set_theme(sys_theme)
+    DialogSettings.CustomTitleBar.set_theme(sys_theme)
+    DialogGraphics.CustomTitleBar.set_theme(sys_theme)
     set_color(
         DialogGraphics.ui.labelNumba,
-        setting.color_palette_v2[setting.theme]["general_green"],
+        setting.get_color("general_green"),
     )
     if MainWindow.api is not None:
         set_color(
             MainWindow.ui.labelConnectState,
-            setting.color_palette_v2[setting.theme]["general_green"],
+            setting.get_color("general_green"),
         )
     MainWindow.update_pen()
-    DialogResult.pen.setColor(
-        QtGui.QColor(setting.color_palette_v2[setting.theme]["line1"])
-    )
+    DialogResult.pen.setColor(QtGui.QColor(setting.get_color("line1")))
     MainWindow.ui.horizontalSlider.setStyleSheet("background: none;")
     MainWindow.ui.horizontalSlider.setBarVisible(False)
+
+    set_color(MainWindow.ui.lcdVoltage, setting.get_color("lcd_voltage"))
+    set_color(MainWindow.ui.lcdCurrent, setting.get_color("lcd_current"))
+    set_color(MainWindow.ui.lcdPower, setting.get_color("lcd_power"))
+    set_color(MainWindow.ui.lcdEnerge, setting.get_color("lcd_energy"))
+    set_color(
+        MainWindow.ui.lcdAvgPower,
+        setting.get_color("lcd_avg_power"),
+    )
+    set_color(
+        MainWindow.ui.lcdResistence,
+        setting.get_color("lcd_resistance"),
+    )
 
 
 set_theme(setting.theme)

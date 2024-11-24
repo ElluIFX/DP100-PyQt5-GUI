@@ -74,6 +74,7 @@ class CustomMessageBox(QtWidgets.QDialog, FramelessWindow):
         message,
         question=False,
         additional_actions: List[Tuple[str, Callable[[], bool]]] = [],
+        override_key_strs: List[str] = [],
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle(title)
@@ -113,17 +114,23 @@ class CustomMessageBox(QtWidgets.QDialog, FramelessWindow):
         self.horizontalLayout.setSpacing(8)
         layout.addLayout(self.horizontalLayout)
         if not question:
-            self.okButton = QtWidgets.QPushButton(self.tr("确定"), self)
+            self.okButton = QtWidgets.QPushButton(
+                self.tr("确定") if not override_key_strs else override_key_strs[0], self
+            )
             self.okButton.setFont(global_font)
             self.okButton.clicked.connect(self.close)
             self.horizontalLayout.addWidget(self.okButton)
         else:
-            self.okButton = QtWidgets.QPushButton(self.tr("是"), self)
+            self.okButton = QtWidgets.QPushButton(
+                self.tr("是") if not override_key_strs else override_key_strs[0], self
+            )
             self.okButton.setFont(global_font)
             self.okButton.clicked.connect(self.accept)
             self.horizontalLayout.addWidget(self.okButton)
 
-            self.cancelButton = QtWidgets.QPushButton(self.tr("否"), self)
+            self.cancelButton = QtWidgets.QPushButton(
+                self.tr("否") if not override_key_strs else override_key_strs[1], self
+            )
             self.cancelButton.setFont(global_font)
             self.cancelButton.clicked.connect(self.reject)
             self.horizontalLayout.addWidget(self.cancelButton)

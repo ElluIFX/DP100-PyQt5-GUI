@@ -12,20 +12,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>335</width>
-    <height>434</height>
+    <width>340</width>
+    <height>584</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>335</width>
-    <height>434</height>
+    <width>340</width>
+    <height>584</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>335</width>
-    <height>448</height>
+    <width>340</width>
+    <height>584</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -879,6 +879,109 @@
          <string>闪烁</string>
         </property>
        </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_43" stretch="2,3">
+     <item>
+      <widget class="QLabel" name="label_49">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>其它设置</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>6</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="frame_2">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>3</number>
+        </property>
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item>
+         <widget class="QCheckBox" name="checkBoxOutputWarn">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>开启输出前显示警告</string>
+          </property>
+          <property name="text">
+           <string>输出开启警告</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxSetLock">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>输出状态下不允许包括辅助功能在内的设定值修改操作</string>
+          </property>
+          <property name="text">
+           <string>输出时锁定参数</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxIgnoreHWLock">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>硬件锁定时仍允许上位机修改输出状态</string>
+          </property>
+          <property name="text">
+           <string>忽略硬件锁定</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>

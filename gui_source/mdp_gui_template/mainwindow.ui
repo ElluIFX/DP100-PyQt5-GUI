@@ -1035,7 +1035,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="text">
-                  <string>设定电压</string>
+                  <string>Title</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
@@ -1576,7 +1576,7 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>152</width>
+                         <width>177</width>
                          <height>162</height>
                         </rect>
                        </property>
@@ -1910,7 +1910,7 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>146</width>
+                         <width>177</width>
                          <height>263</height>
                         </rect>
                        </property>
@@ -2388,7 +2388,7 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>152</width>
+                         <width>177</width>
                          <height>198</height>
                         </rect>
                        </property>
@@ -3191,7 +3191,7 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>176</width>
+                         <width>177</width>
                          <height>301</height>
                         </rect>
                        </property>
