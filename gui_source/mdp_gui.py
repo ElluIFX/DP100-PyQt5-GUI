@@ -261,7 +261,7 @@ class Setting:
         self.output_warning = False
         self.lock_when_output = False
         self.ignore_hw_lock = False
-        self.theme = "Dark"
+        self.theme = "dark"
         self.color_palette = {
             "dark": {
                 "off": "khaki",
