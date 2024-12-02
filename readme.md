@@ -1,6 +1,6 @@
 # Miniware MDP-P906 数控电源上位机
 
-**[English Version](./readme_EN.md)**
+## **[English Version](./readme_EN.md)**
 
 不需要MDP-M01显控模块即可对电源进行无线控制，同时支持P905(已测试, 见[#1](https://github.com/ElluIFX/MDP-P906-Controller/issues/1)和[#2](https://github.com/ElluIFX/MDP-P906-Controller/issues/2))
 
