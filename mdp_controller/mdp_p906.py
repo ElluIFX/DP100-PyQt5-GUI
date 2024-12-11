@@ -322,7 +322,7 @@ class MDP_P906:
         Register a callback function to handle the realtime values of output in async mode.
 
         Args:
-            callback (Callable[[list], None]): A function that takes a list of (voltage in mV, current in mA) as input.
+            callback (Callable[[list], None]): A function that takes a list of (voltage in V, current in A) as input.
 
         Note:
             The callback will be called in a separate thread. get_realtime_value() will also trigger the callback like request_realtime_value(), but in blocking mode.
