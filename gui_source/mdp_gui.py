@@ -243,7 +243,7 @@ class Setting:
         self.state_fps = 15
         self.interp = 1
         self.avgmode = 1
-        self.opengl = OPENGL_AVALIABLE
+        self.opengl = False
         self.antialias = True
         self.bitadjust = True
 
@@ -1732,7 +1732,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         else:
             if not self._keep_power_pid.auto_mode:
                 self._keep_power_pid.set_auto_mode(True, last_output=self.v_set)
-            voltage = self._keep_power_pid(self.data.powers[-1])
+            voltage = self._keep_power_pid(self.data.powers[self.data.update_count - 1])
         self.v_set = voltage
 
     @QtCore.pyqtSlot()
