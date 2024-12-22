@@ -223,6 +223,20 @@ class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
             self.inputField = QtWidgets.QDoubleSpinBox(self)
             if decimals is not None:
                 self.inputField.setDecimals(decimals)
+        elif input_type == "datetime":
+            self.inputField = QtWidgets.QDateTimeEdit(self)
+            self.inputField.setCalendarPopup(True)
+            self.inputField.setDisplayFormat("yyyy-MM-dd HH:mm:ss")
+            self.resize(self.size().width() + 80, self.size().height())
+            if default_value is not None:
+                self.inputField.setDateTime(default_value)
+            else:
+                now = QtCore.QDateTime.currentDateTime()
+                self.inputField.setDateTime(now)
+            if min_value is not None:
+                self.inputField.setMinimumDateTime(min_value)
+            if max_value is not None:
+                self.inputField.setMaximumDateTime(max_value)
         if input_type in ("int", "double"):
             if min_value is not None:
                 self.inputField.setMinimum(min_value)
@@ -268,6 +282,8 @@ class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
             return self.inputField.value(), self.ret
         elif isinstance(self.inputField, QtWidgets.QDoubleSpinBox):
             return self.inputField.value(), self.ret
+        elif isinstance(self.inputField, QtWidgets.QDateTimeEdit):
+            return self.inputField.dateTime(), self.ret
 
     def accept(self):
         self.ret = True
@@ -342,5 +358,20 @@ class CustomInputDialog(QtWidgets.QDialog, FramelessWindow):
             step=step,
             prefix=prefix,
             suffix=suffix,
+        )
+        return dialog.result()
+
+    @staticmethod
+    def getDateTime(
+        parent, title, label, default_value=None, min_value=None, max_value=None
+    ) -> Tuple[QtCore.QDateTime, bool]:
+        dialog = CustomInputDialog(
+            parent,
+            title,
+            label,
+            input_type="datetime",
+            default_value=default_value,
+            min_value=min_value,
+            max_value=max_value,
         )
         return dialog.result()

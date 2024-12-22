@@ -1962,15 +1962,69 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             return
         item = self.ui.listSeq.item(row)
         text = item.text()
-        text, ok = CustomInputDialog.getText(
-            self,
-            self.tr("编辑动作"),
-            self.tr("请确保修改后动作文本格式正确,否则无法识别动作"),
-            default_value=text,
-        )
-        if not ok:
-            return
-        item.setText(text)
+        if text.split()[0] == "DELAY":
+            delay, ok = CustomInputDialog.getInt(
+                self,
+                self.tr("编辑动作"),
+                self.tr("请输入延时时间:"),
+                default_value=int(text.split()[1]),
+                min_value=0,
+                max_value=100000,
+                step=1,
+                suffix="ms",
+            )
+            if not ok:
+                return
+            item.setText(f"DELAY {delay} ms")
+        elif text.split()[0] == "WAIT":
+            default_value = QtCore.QDateTime.fromString(
+                " ".join(text.split()[1:]), "%Y-%m-%d %H:%M:%S"
+            )
+            wait_time, ok = CustomInputDialog.getDateTime(
+                self,
+                self.tr("编辑动作"),
+                self.tr("请输入等待时间:"),
+                default_value=default_value,
+            )
+            if not ok:
+                return
+            item.setText(f"WAIT  {wait_time.toString('yyyy-MM-dd HH:mm:ss')}")
+        elif text.split()[0] == "SET-V":
+            voltage, ok = CustomInputDialog.getDouble(
+                self,
+                self.tr("编辑动作"),
+                self.tr("请输入电压值:"),
+                default_value=float(text.split()[1]),
+                min_value=0,
+                max_value=30,
+                step=0.001,
+                decimals=3,
+                suffix="V",
+            )
+            if not ok:
+                return
+            item.setText(f"SET-V {voltage:.3f} V")
+        elif text.split()[0] == "SET-I":
+            current, ok = CustomInputDialog.getDouble(
+                self,
+                self.tr("编辑动作"),
+                self.tr("请输入电流值:"),
+                default_value=float(text.split()[1]),
+                min_value=0,
+                max_value=10,
+                step=0.001,
+                decimals=3,
+                suffix="A",
+            )
+            if not ok:
+                return
+            item.setText(f"SET-I {current:.3f} A")
+        else:
+            CustomMessageBox(
+                self,
+                self.tr("错误"),
+                self.tr("无法识别动作"),
+            )
 
     def seq_clear_all(self):
         if CustomMessageBox.question(
@@ -2029,23 +2083,15 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     @QtCore.pyqtSlot()
     def on_btnSeqWaitTime_clicked(self):
         row = self.ui.listSeq.currentRow()
-        time_now_str = datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S")
-        wait_time, ok = CustomInputDialog.getText(
+        wait_time, ok = CustomInputDialog.getDateTime(
             self,
             self.tr("添加动作"),
             self.tr("请输入等待时间:") + "\n" + self.tr("格式: 年-月-日 时:分:秒"),
-            default_value=time_now_str,
         )
         if not ok:
             return
-        try:
-            datetime.datetime.strptime(wait_time, "%y-%m-%d %H:%M:%S")
-        except ValueError:
-            CustomMessageBox(self, self.tr("错误"), self.tr("时间格式错误"))
-            return
-        if not ok:
-            return
-        self.ui.listSeq.insertItem(row + 1, f"WAIT  {wait_time}")
+        wait_time_str = wait_time.toString("yyyy-MM-dd HH:mm:ss")
+        self.ui.listSeq.insertItem(row + 1, f"WAIT  {wait_time_str}")
         self.ui.listSeq.setCurrentRow(row + 1)
         self.seq_set_item_font(row + 1)
 
@@ -2101,7 +2147,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self._seq_type = text.split()[0]
         if self._seq_type == "WAIT":
             self._seq_value = datetime.datetime.strptime(
-                " ".join(text.split()[1:]), "%y-%m-%d %H:%M:%S"
+                " ".join(text.split()[1:]), "%Y-%m-%d %H:%M:%S"
             )
         else:
             self._seq_value = float(text.split()[1])
