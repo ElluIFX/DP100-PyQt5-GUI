@@ -13,7 +13,7 @@ on:
 
 jobs:
   build-mdp-p906:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Build MDP-P906
         uses: sayyid5416/pyinstaller@v1
@@ -25,7 +25,7 @@ jobs:
           compression_level: 9
 
   build-mdp-p906-numba:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Build MDP-P906-Numba
         uses: sayyid5416/pyinstaller@v1
