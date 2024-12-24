@@ -20,7 +20,7 @@ jobs:
         with:
           python_ver: "3.11"
           spec: "gui_source/mdp.spec"
-          requirements: "gui_source/requirements.txt"
+          requirements: "gui_source/requirements_linux.txt"
           upload_exe_with_name: "MDP-P906"
           compression_level: 9
 
@@ -32,6 +32,6 @@ jobs:
         with:
           python_ver: "3.11"
           spec: "gui_source/mdp_numba.spec"
-          requirements: "gui_source/requirements.txt"
+          requirements: "gui_source/requirements_linux.txt"
           upload_exe_with_name: "MDP-P906-Numba"
           compression_level: 9
