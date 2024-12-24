@@ -3,7 +3,7 @@ def main():
         import pyi_splash  # only available when packaged with pyinstaller # type: ignore
 
         im_ok = True
-    except ImportError:
+    except Exception:
         im_ok = False
 
     if im_ok:

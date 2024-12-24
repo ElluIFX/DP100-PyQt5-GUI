@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ["mdp_main.py", "mdp_gui.py"],
+    ["mdp_gui.py"],
     pathex=["..", "."],  # for github action
     binaries=[],
     datas=[
