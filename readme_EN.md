@@ -36,7 +36,7 @@ A lot of time was spent optimizing the communication quality based on this proje
 - Customizable waveform buffer length
 - Material Design style with two color themes
 - i18n support (zh-CN/en-US)
-- Portable executable files ready to use (Win Only / Source Code Cross-Platform)
+- Portable executable files ready to use (Win/Linux / Source Code Cross-Platform)
 
 ## Usage Instructions
 
