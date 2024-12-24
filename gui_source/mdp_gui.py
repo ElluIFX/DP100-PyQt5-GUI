@@ -79,20 +79,100 @@ VERSION = "Ver4.2"
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
-# get system language
-system_lang = QtCore.QLocale.system().name()
-logger.info(f"System language: {system_lang}")
-ENGLISH = False
-if (
-    not system_lang.startswith("zh")
-    or os.environ.get("MDP_FORCE_ENGLISH") == "1"
-    or "--english" in sys.argv
-):
-    trans = QtCore.QTranslator()
-    trans.load(os.path.join(ABS_PATH, "en_US.qm"))
-    app.installTranslator(trans)
-    ENGLISH = True
+from PyQt5.QtCore import QLibraryInfo, QTranslator
 
+
+def compile_ts_to_qm(ts_file: str, qm_file: str) -> bool:
+    """Compile .ts file to .qm file using Qt lrelease"""
+    try:
+        from PyQt5.QtCore import QProcess
+
+        lrelease_path = os.path.join(
+            QLibraryInfo.location(QLibraryInfo.LibraryLocation.BinariesPath),
+            "lrelease",
+        )
+        logger.info(f"lrelease path: {lrelease_path}")
+
+        if not os.path.exists(lrelease_path):
+            # Fallback to command line tool if available
+            logger.warning("lrelease not found, using command line tool")
+            lrelease_path = "lreleasexxx"
+
+        process = QProcess()
+        process.start(lrelease_path, [ts_file, "-qm", qm_file])
+        process.waitForFinished()
+        logger.debug(f"lrelease process exit code: {process.exitCode()}")
+        return process.exitCode() == 0
+
+    except ImportError:
+        # Pure Python fallback using lupdate module
+        logger.warning("lrelease not found, fallback to pure python")
+        try:
+            import sys
+
+            from PyQt5.pylupdate_main import main as lupdate_main
+
+            old_argv = sys.argv
+            sys.argv = ["lrelease", ts_file, "-qm", qm_file]
+            try:
+                lupdate_main()
+                return True
+            except SystemExit:
+                return True  # lupdate uses sys.exit(0) for success
+            finally:
+                sys.argv = old_argv
+
+        except ImportError:
+            logger.error("Could not find Qt lrelease tool or pylupdate module")
+            return False
+
+
+def load_language(lang_code: str) -> bool:
+    """Load language file dynamically
+
+    Args:
+        lang_code: Language code like 'en_US', 'zh_CN'
+
+    Returns:
+        bool: True if loading succeeded
+    """
+    ts_file = os.path.join(ARG_PATH, f"{lang_code}.ts")
+    qm_file = os.path.join(ARG_PATH, f"{lang_code}.qm")
+
+    if not os.path.exists(ts_file):
+        logger.error(f"Translation source file not found: {ts_file}")
+        return ""
+
+    # Compile if qm doesn't exist or ts is newer
+    if (
+        not os.path.exists(qm_file)
+        or os.path.getmtime(ts_file) > os.path.getmtime(qm_file)
+        or True
+    ):
+        if not compile_ts_to_qm(ts_file, qm_file):
+            logger.error(f"Failed to compile translation file: {ts_file}")
+            return ""
+
+    return qm_file
+
+
+# get system language
+# system_lang = QtCore.QLocale.system().name()
+# logger.info(f"System language: {system_lang}")
+# ENGLISH = False
+# if (
+#     not system_lang.startswith("zh")
+#     or os.environ.get("MDP_FORCE_ENGLISH") == "1"
+#     or "--english" in sys.argv
+# ):
+#     trans = QtCore.QTranslator()
+#     trans.load(os.path.join(ABS_PATH, "en_US.qm"))
+#     app.installTranslator(trans)
+#     ENGLISH = True
+trans = QtCore.QTranslator()
+trans.load(load_language("en_US"))
+app.installTranslator(trans)
+ENGLISH = True
 # load custom font
 _ = QtGui.QFontDatabase.addApplicationFont(FONT_PATH)
 fonts = QtGui.QFontDatabase.applicationFontFamilies(_)
