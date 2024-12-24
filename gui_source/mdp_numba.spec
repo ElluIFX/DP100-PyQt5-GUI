@@ -8,10 +8,10 @@ a = Analysis(
     pathex=["..", "."],  # for github action
     binaries=[],
     datas=[
-        (".\\icon.ico", "."),
-        (".\\en_US.qm", "."),
-        (".\\SarasaFixedSC-SemiBold.ttf", "."),
-        (".\\Li-ion.csv", "."),
+        ("./icon.ico", "."),
+        ("./en_US.qm", "."),
+        ("./SarasaFixedSC-SemiBold.ttf", "."),
+        ("./Li-ion.csv", "."),
     ],
     hiddenimports=["pyi_splash"],
     hookspath=[],
