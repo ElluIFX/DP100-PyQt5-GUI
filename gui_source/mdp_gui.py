@@ -15,7 +15,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 ARG_PATH = os.path.dirname(sys.argv[0])
 ABS_PATH = os.path.dirname(__file__)
-
 import richuru
 from loguru import logger
 
@@ -29,12 +28,15 @@ else:
     richuru.install(level="INFO")
     DEBUG = False
 logger.info("---- NEW SESSION ----")
+logger.info(f"ARG_PATH: {ARG_PATH}")
+logger.info(f"ABS_PATH: {ABS_PATH}")
 
 try:
     from mdp_controller import MDP_P906
 except ImportError:
     logger.info("Redirecting to repo mdp_controller")
     sys.path.append(os.path.dirname(ABS_PATH))
+    sys.path.append(os.path.dirname(os.path.dirname(ABS_PATH)))
     from mdp_controller import MDP_P906
 
     logger.success("Found mdp_controller in repo")
@@ -44,13 +46,16 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from qframelesswindow import FramelessWindow
 
 OPENGL_AVALIABLE = False
-try:
-    import OpenGL  # noqa: F401
+if sys.platform == "win32":  # OpenGL is not available on Linux
+    try:
+        import OpenGL  # noqa: F401
 
-    OPENGL_AVALIABLE = True
-    logger.success("OpenGL successfully enabled")
-except Exception as e:
-    logger.warning(f"Enabling OpenGL failed with {e}.")
+        OPENGL_AVALIABLE = True
+        logger.success("OpenGL successfully enabled")
+    except Exception as e:
+        logger.warning(f"Enabling OpenGL failed with {e}.")
+else:
+    logger.info("OpenGL disabled on Linux")
 
 NUMBA_ENABLED = False
 try:
