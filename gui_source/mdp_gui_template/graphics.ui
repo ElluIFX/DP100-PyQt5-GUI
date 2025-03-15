@@ -299,37 +299,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QLabel" name="label_45">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>999</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Sarasa Fixed SC SemiBold</family>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>平滑方式</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="margin">
-        <number>6</number>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -366,43 +335,6 @@
        <property name="value">
         <double>60.000000000000000</double>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboAvgMode">
-       <property name="font">
-        <font>
-         <family>Sarasa Fixed SC SemiBold</family>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
-       </property>
-       <item>
-        <property name="text">
-         <string>不进行平滑</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>三值平均</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>九值平均</string>
-        </property>
-       </item>
       </widget>
      </item>
     </layout>

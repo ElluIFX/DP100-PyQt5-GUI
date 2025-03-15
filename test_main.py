@@ -1,6 +1,6 @@
 import time
 
-from mdp_controller import MDP_P906
+from controller import MDP_P906
 
 if __name__ == "__main__":
     mdp = MDP_P906(

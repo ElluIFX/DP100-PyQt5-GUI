@@ -538,7 +538,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,1">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_12" stretch="1,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_12" stretch="1,0">
         <property name="spacing">
          <number>6</number>
         </property>
@@ -737,7 +737,7 @@
                     <string>V</string>
                    </property>
                    <property name="decimals">
-                    <number>3</number>
+                    <number>2</number>
                    </property>
                    <property name="minimum">
                     <double>0.000000000000000</double>
@@ -806,7 +806,7 @@
                     <string>A</string>
                    </property>
                    <property name="decimals">
-                    <number>3</number>
+                    <number>2</number>
                    </property>
                    <property name="minimum">
                     <double>0.000000000000000</double>
@@ -1271,8 +1271,8 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>177</width>
-                         <height>155</height>
+                         <width>194</width>
+                         <height>230</height>
                         </rect>
                        </property>
                        <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -1412,7 +1412,7 @@
                              <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
@@ -1476,7 +1476,7 @@
                              <string>A</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
@@ -1576,8 +1576,8 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>177</width>
-                         <height>162</height>
+                         <width>194</width>
+                         <height>240</height>
                         </rect>
                        </property>
                        <layout class="QVBoxLayout" name="verticalLayout_15">
@@ -2024,7 +2024,7 @@
                              <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
@@ -2037,6 +2037,9 @@
                             </property>
                             <property name="stepType">
                              <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                            </property>
+                            <property name="value">
+                             <double>1.000000000000000</double>
                             </property>
                            </widget>
                           </item>
@@ -2090,7 +2093,7 @@
                              <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
@@ -2159,10 +2162,10 @@
                              <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
-                             <double>0.001000000000000</double>
+                             <double>0.100000000000000</double>
                             </property>
                             <property name="maximum">
                              <double>30.000000000000000</double>
@@ -2174,7 +2177,7 @@
                              <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
                             </property>
                             <property name="value">
-                             <double>0.001000000000000</double>
+                             <double>0.100000000000000</double>
                             </property>
                            </widget>
                           </item>
@@ -2231,7 +2234,7 @@
                              <number>2</number>
                             </property>
                             <property name="minimum">
-                             <double>0.010000000000000</double>
+                             <double>0.100000000000000</double>
                             </property>
                             <property name="maximum">
                              <double>999999.000000000000000</double>
@@ -2388,8 +2391,8 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>177</width>
-                         <height>198</height>
+                         <width>194</width>
+                         <height>240</height>
                         </rect>
                        </property>
                        <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -2580,7 +2583,7 @@
                              <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
@@ -2649,7 +2652,7 @@
                              <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
@@ -2662,6 +2665,9 @@
                             </property>
                             <property name="stepType">
                              <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                            </property>
+                            <property name="value">
+                             <double>2.000000000000000</double>
                             </property>
                            </widget>
                           </item>
@@ -3703,185 +3709,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frameSystemState">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Sarasa Fixed SC SemiBold</family>
-           </font>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_23" stretch="0">
-           <property name="spacing">
-            <number>3</number>
-           </property>
-           <property name="leftMargin">
-            <number>3</number>
-           </property>
-           <property name="topMargin">
-            <number>3</number>
-           </property>
-           <property name="rightMargin">
-            <number>3</number>
-           </property>
-           <property name="bottomMargin">
-            <number>3</number>
-           </property>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_24">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_27">
-               <property name="minimumSize">
-                <size>
-                 <width>206</width>
-                 <height>22</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Sarasa Fixed SC SemiBold</family>
-                 <pointsize>10</pointsize>
-                 <italic>false</italic>
-                </font>
-               </property>
-               <property name="text">
-                <string>系统状态 / SYSTEM STATE</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_40">
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="labelComSpeed">
-                 <property name="font">
-                  <font>
-                   <family>Sarasa Fixed SC SemiBold</family>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>0kBps</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="labelErrRate">
-                 <property name="font">
-                  <font>
-                   <family>Sarasa Fixed SC SemiBold</family>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>CON-ERR 0%</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_31">
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="labelError">
-                 <property name="font">
-                  <font>
-                   <family>Sarasa Fixed SC SemiBold</family>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>NO ERROR</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="labelInputVals">
-                 <property name="font">
-                  <font>
-                   <family>Sarasa Fixed SC SemiBold</family>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>0.00V 0.00A</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_34">
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="labelLockState">
-                 <property name="font">
-                  <font>
-                   <family>Sarasa Fixed SC SemiBold</family>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>UNLOCKED</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="labelTemperature">
-                 <property name="font">
-                  <font>
-                   <family>Sarasa Fixed SC SemiBold</family>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>TEMP 30.0℃</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
          <widget class="QFrame" name="frameSystemSetting">
           <property name="minimumSize">
            <size>
@@ -3967,7 +3794,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>连接设置</string>
+                  <string>电源设置</string>
                  </property>
                 </widget>
                </item>
@@ -4243,80 +4070,22 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="comboDataFps">
-               <property name="minimumSize">
-                <size>
-                 <width>60</width>
-                 <height>0</height>
-                </size>
+              <widget class="QDoubleSpinBox" name="doubleSpinBoxSampleRate">
+               <property name="suffix">
+                <string>Hz</string>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>55</width>
-                 <height>16777215</height>
-                </size>
+               <property name="decimals">
+                <number>1</number>
                </property>
-               <property name="font">
-                <font>
-                 <family>Sarasa Fixed SC SemiBold</family>
-                </font>
+               <property name="maximum">
+                <double>200.000000000000000</double>
                </property>
-               <property name="toolTip">
-                <string>设备输出数据请求频率</string>
+               <property name="stepType">
+                <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
                </property>
-               <property name="currentIndex">
-                <number>5</number>
+               <property name="value">
+                <double>50.000000000000000</double>
                </property>
-               <item>
-                <property name="text">
-                 <string>10Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>20Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>30Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>40Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>50Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>60Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>70Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>80Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>90Hz</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>100Hz</string>
-                </property>
-               </item>
               </widget>
              </item>
              <item>
