@@ -8,23 +8,25 @@ from serial.tools import list_ports
 from controller.serial_reader import SerialReader
 
 
-def _convert_to_rgb565(r: int, g: int, b: int) -> int:
-    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-
-
-def _hex_to_bytes(s: str) -> bytes:
-    s = s.replace("0x", "").replace(":", "").replace(" ", "")
-    return bytes.fromhex(s)
-
-
 def _find_port_name() -> str:
     PID = 0x5740
     VID = 0x0483
     for port in list_ports.comports():
-        logger.debug(f"Port: {port}")
         if PID == port.pid and VID == port.vid:
             return port.device
-    raise Exception("No USB port found")
+    listinfo = ""
+    for port in list_ports.comports():
+        if not port.pid or not port.vid:
+            listinfo += f"{port.device}: {port.description}: No ID provided\n"
+        else:
+            listinfo += (
+                f"{port.device}: {port.description} {port.vid:04X}:{port.pid:04X}\n"
+            )
+    if not listinfo:
+        listinfo = "No device found"
+    raise Exception(
+        f"Cannot find PD Pocket (Target PID:VID = {PID:04X}:{VID:04X})\nDevice List:\n{listinfo}"
+    )
 
 
 class PDPocket:
@@ -127,6 +129,30 @@ class PDPocket:
         Set the output state of the PD Pocket.
         """
         self._ser.write(b"OUTP ON\r\n" if state else b"OUTP OFF\r\n")
+
+    def set_short_protect(self, state: bool):
+        """
+        Set the short protection state of the PD Pocket.
+        """
+        self._ser.write(b"setSFB 1\r\n" if state else b"setSFB 0\r\n")
+
+    def set_key_lock(self, state: bool):
+        """
+        Set the key lock state of the PD Pocket.
+        """
+        self._ser.write(b"lockkey 1\r\n" if state else b"lockkey 0\r\n")
+
+    def calibrate_output(self):
+        """
+        Calibrate the output of the PD Pocket. (Use 7V)
+        """
+        self._ser.write(b"calibus 1\r\n")
+
+    def calibrate_input(self):
+        """
+        Calibrate the input of the PD Pocket. (Use 20V)
+        """
+        self._ser.write(b"calibus 2\r\n")
 
     @property
     def a(self) -> Self:

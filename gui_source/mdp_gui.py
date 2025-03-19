@@ -83,7 +83,7 @@ SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
 BAT_EXAMPLE_PATH = os.path.join(ABS_PATH, "Li-ion.csv")
-VERSION = "Ver0.5"
+VERSION = "Ver0.7.2"
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -113,37 +113,44 @@ from mdp_custom import CustomInputDialog, CustomMessageBox, CustomTitleBar, FmtA
 
 
 class RealtimeData:
+    """实时数据存储和管理类，用于存储电压、电流等实时数据"""
+
     def __init__(self, data_length) -> None:
-        self.start_time = time.perf_counter()
-        self.eng_start_time = time.perf_counter()
-        self.last_time = 0
-        self.voltage_tmp = []
-        self.current_tmp = []
-        self.energy = 0
-        self.sync_lock = Lock()
-        self.voltages = np.zeros(data_length, np.float64)
-        self.currents = np.zeros(data_length, np.float64)
-        self.powers = np.zeros(data_length, np.float64)
-        self.resistances = np.zeros(data_length, np.float64)
-        self.times = np.zeros(data_length, np.float64)
-        self.update_count = 0
-        self.data_length = data_length
+        # 初始化数据存储区，包括时间戳、临时数据和各种测量值的数组
+        self.start_time = time.perf_counter()  # 记录开始时间
+        self.eng_start_time = time.perf_counter()  # 记录能量计算开始时间
+        self.last_time = 0  # 上次更新时间
+        self.voltage_tmp = []  # 临时电压数据
+        self.current_tmp = []  # 临时电流数据
+        self.energy = 0  # 累计能量
+        self.sync_lock = Lock()  # 线程同步锁，防止数据读写冲突
+        self.voltages = np.zeros(data_length, np.float64)  # 电压数组
+        self.currents = np.zeros(data_length, np.float64)  # 电流数组
+        self.powers = np.zeros(data_length, np.float64)  # 功率数组
+        self.resistances = np.zeros(data_length, np.float64)  # 电阻数组
+        self.times = np.zeros(data_length, np.float64)  # 时间数组
+        self.update_count = 0  # 更新计数器
+        self.data_length = data_length  # 数据长度
 
 
 class RecordData:
+    """数据记录类，用于存储和导出数据到CSV文件"""
+
     def __init__(self) -> None:
-        self.voltages: List[float] = []
-        self.currents: List[float] = []
-        self.times: List[float] = []
-        self.start_time = 0
-        self.last_time = 0
+        self.voltages: List[float] = []  # 电压列表
+        self.currents: List[float] = []  # 电流列表
+        self.times: List[float] = []  # 时间列表
+        self.start_time = 0  # 记录开始时间
+        self.last_time = 0  # 上次记录时间
 
     def add_values(self, voltage, current, time):
+        """添加一组测量值到记录中"""
         self.voltages.append(voltage)
         self.currents.append(current)
         self.times.append(time)
 
     def to_csv(self, filename):
+        """将记录的数据保存为CSV文件"""
         data = np.array([self.times, self.voltages, self.currents]).T
         np.savetxt(
             filename,
@@ -156,18 +163,22 @@ class RecordData:
 
 
 class FPSCounter(object):
+    """帧率计数器，用于计算和平滑显示FPS（每秒帧数）"""
+
     def __init__(self, max_sample=40) -> None:
-        self.t = time.perf_counter()
-        self.max_sample = max_sample
-        self.t_list: List[float] = []
-        self._fps = 0
+        self.t = time.perf_counter()  # 初始时间戳
+        self.max_sample = max_sample  # 最大样本数量
+        self.t_list: List[float] = []  # 时间间隔列表
+        self._fps = 0  # 当前FPS值
 
     def clear(self) -> None:
+        """清空计数器"""
         self.t = time.perf_counter()
         self.t_list = []
         self._fps = 0
 
     def tick(self) -> None:
+        """记录一帧，更新计数器"""
         t = time.perf_counter()
         self.t_list.append(t - self.t)
         self.t = t
@@ -176,6 +187,7 @@ class FPSCounter(object):
 
     @property
     def fps(self) -> float:
+        """计算并返回当前FPS值，带有平滑处理"""
         length = len(self.t_list)
         sum_t = sum(self.t_list)
         if length == 0 or sum_t == 0:
@@ -190,6 +202,7 @@ class FPSCounter(object):
 
 
 def center_window(instance: QtWidgets.QWidget, width=None, height=None) -> None:
+    """将窗口居中显示在屏幕上，可选指定宽度和高度"""
     if instance.isMaximized():  # restore window size
         instance.showNormal()
     if instance.isVisible():  # bring window to front
@@ -208,6 +221,7 @@ def center_window(instance: QtWidgets.QWidget, width=None, height=None) -> None:
 
 
 def float_str(value, limit=1e5):
+    """格式化浮点数字符串，大于limit的值使用科学计数法"""
     if value > limit:
         return f"{value:.1e}"
     else:
@@ -215,6 +229,7 @@ def float_str(value, limit=1e5):
 
 
 def set_color(widget: QtWidgets.QWidget, rgb):
+    """设置控件的文本颜色"""
     if not rgb or rgb == "default":
         widget.setStyleSheet("")
         return
@@ -223,7 +238,10 @@ def set_color(widget: QtWidgets.QWidget, rgb):
 
 
 class Setting:
+    """应用程序设置类，管理和持久化所有用户配置"""
+
     def __init__(self) -> None:
+        # 预设组配置
         self.presets = {
             "1": (3.3, 2),
             "2": (3.3, 5),
@@ -235,35 +253,44 @@ class Setting:
             "8": (24, 10),
             "9": (30, 10),
         }
+        # 通信设置
         self.baudrate = 921600
         self.comport = ""
 
-        self.data_pts = 100000
-        self.display_pts = 400
-        self.graph_max_fps = 50
-        self.state_fps = 10
-        self.interp = 0
-        self.opengl = False
-        self.antialias = True
-        self.bitadjust = False
+        # 图表设置
+        self.data_pts = 100000  # 数据点数
+        self.display_pts = 400  # 显示点数
+        self.graph_max_fps = 50  # 图表最大刷新率
+        self.state_fps = 10  # 状态刷新率
+        self.interp = 0  # 插值设置
+        self.opengl = False  # 是否使用OpenGL
+        self.antialias = True  # 是否使用抗锯齿
+        self.bitadjust = False  # 位调整设置
 
-        self.last_vset = 5
-        self.last_iset = 2
+        # 输出设置
+        self.last_vset = 5  # 上次电压设置
+        self.last_iset = 2  # 上次电流设置
+        self.output_sync = False  # 输出同步设置
+        self.default_off = False  # 默认关闭设置
 
-        self.v_threshold = 0.002
-        self.i_threshold = 0.002
-        self.use_cali = False
-        self.v_cali_k = 1.0
-        self.v_cali_b = 0.0
-        self.i_cali_k = 1.0
-        self.i_cali_b = 0.0
-        self.vset_cali_k = 1.0
-        self.vset_cali_b = 0.0
-        self.iset_cali_k = 1.0
-        self.iset_cali_b = 0.0
-        self.output_warning = False
-        self.lock_when_output = False
+        # 校准和阈值设置
+        self.v_threshold = 0.002  # 电压阈值
+        self.i_threshold = 0.002  # 电流阈值
+        self.use_cali = False  # 是否使用校准
+        self.v_cali_k = 1.0  # 电压校准系数k
+        self.v_cali_b = 0.0  # 电压校准偏移b
+        self.i_cali_k = 1.0  # 电流校准系数k
+        self.i_cali_b = 0.0  # 电流校准偏移b
+        self.vset_cali_k = 1.0  # 电压设置校准系数k
+        self.vset_cali_b = 0.0  # 电压设置校准偏移b
+        self.iset_cali_k = 1.0  # 电流设置校准系数k
+        self.iset_cali_b = 0.0  # 电流设置校准偏移b
+        self.output_warning = False  # 输出警告设置
+        self.lock_when_output = False  # 输出时锁定设置
+
+        # 主题设置
         self.theme = "dark"
+        # 颜色配置
         self.color_palette = {
             "dark": {
                 "off": "khaki",
@@ -308,10 +335,12 @@ class Setting:
         }
 
     def save(self, filename):
+        """保存设置到文件"""
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(self.__dict__, f, indent=4, ensure_ascii=False)
 
     def load(self, filename):
+        """从文件加载设置"""
         if not os.path.exists(filename):
             self.save(filename)
             return
@@ -325,6 +354,7 @@ class Setting:
                 self.color_palette[k] = v
 
     def get_color(self, key, override_theme=None):
+        """获取指定主题下的颜色"""
         t = override_theme or self.theme
         if t in ("dark", "light"):
             return self.color_palette[t].get(key)
@@ -348,6 +378,7 @@ setting.save(SETTING_FILE)
 
 
 def update_pyqtgraph_setting():
+    """更新PyQtGraph设置，包括抗锯齿和OpenGL支持"""
     pg.setConfigOption("antialias", setting.antialias)
     if OPENGL_AVALIABLE:
         pg.setConfigOption("enableExperimental", setting.opengl)
@@ -359,56 +390,84 @@ update_pyqtgraph_setting()
 
 
 class MDPThread(QtCore.QThread):
-    data_signal = QtCore.pyqtSignal(float, float, float)
+    """用于与PD Pocket设备通信的线程类，实现异步数据采集"""
+
+    data_signal = QtCore.pyqtSignal(float, float, float)  # 电压、电流、时间戳信号
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.api: Optional[PDPocket] = None
-        self.data_timer = QtCore.QTimer(self)
-        self.data_timer.setTimerType(QtCore.Qt.PreciseTimer)
-        self.data_timer.timeout.connect(self.data_callback)
+        self.api: Optional[PDPocket] = None  # PD Pocket API接口
+        self.data_timer = QtCore.QTimer(self)  # 定时器，用于定期读取数据
+        self.data_timer.setTimerType(QtCore.Qt.PreciseTimer)  # 使用精确定时器
+        self.data_timer.timeout.connect(self.data_callback)  # 连接回调函数
 
     def run(self):
+        """线程主循环，保持线程运行"""
         while True:
             time.sleep(1)
-            logger.debug("MDPThread running")
+            logger.debug("MDPThread ticking")
 
     def set_api(self, api: Optional[PDPocket]):
+        """设置PD Pocket API接口"""
         logger.info(f"Setting API to {api}")
         if not api and self.data_timer.isActive():
             self.data_timer.stop()
         self.api = api
 
     def data_callback(self):
+        """定时数据采集回调，读取电压电流并发送信号"""
         if self.api is not None:
-            volt = self.api.a.get_output_voltage()
-            curr = self.api.a.get_output_current()
-            self.data_signal.emit(volt, curr, time.perf_counter())
+            volt = self.api.a.get_output_voltage()  # 获取输出电压
+            curr = self.api.a.get_output_current()  # 获取输出电流
+            self.data_signal.emit(volt, curr, time.perf_counter())  # 发送信号
 
     def set_voltage(self, volt: float):
+        """设置输出电压"""
         if self.api is not None:
             self.api.a.set_voltage(volt)
 
     def set_current(self, curr: float):
+        """设置输出电流"""
         if self.api is not None:
             self.api.a.set_current(curr)
 
     def set_output(self, state: bool):
+        """设置输出状态（开/关）"""
         if self.api is not None:
             self.api.a.set_output(state)
 
     def set_data_freq(self, freq: float):
+        """设置数据采集频率"""
         if self.api is not None:
             if freq > 0:
                 if self.data_timer.isActive():
                     self.data_timer.stop()
-                self.data_timer.setInterval(round(1000 / freq))
+                self.data_timer.setInterval(round(1000 / freq))  # 计算定时器间隔
                 self.data_timer.start()
             else:
                 self.data_timer.stop()
 
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
+    """PD Pocket上位机主窗口类，管理UI界面和所有功能"""
+
+    uip_values_signal = QtCore.pyqtSignal(float, float, float)  # 电压、电流、功率信号
+    display_data_signal = QtCore.pyqtSignal(
+        list, list, str, str, str, str, str, bool
+    )  # 显示数据信号
+    highlight_point_signal = QtCore.pyqtSignal(float, float)  # 高亮点信号
+
+    set_voltage_signal = QtCore.pyqtSignal(float)  # 设置电压信号
+    set_current_signal = QtCore.pyqtSignal(float)  # 设置电流信号
+    set_output_signal = QtCore.pyqtSignal(bool)  # 设置输出状态信号
+    set_data_freq_signal = QtCore.pyqtSignal(float)  # 设置数据频率信号
+
+    close_signal = QtCore.pyqtSignal()  # 关闭信号
+    data = RealtimeData(setting.data_pts)  # 实时数据对象
+    data_fps = 50.0  # 数据刷新率
+    graph_keep_flag = False  # 图表保持标志
+    graph_record_flag = False  # 图表记录标志
+    locked = False  # 锁定标志
     uip_values_signal = QtCore.pyqtSignal(float, float, float)
     display_data_signal = QtCore.pyqtSignal(list, list, str, str, str, str, str, bool)
     highlight_point_signal = QtCore.pyqtSignal(float, float)
@@ -444,7 +503,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.fps_counter = FPSCounter()
         self.CustomTitleBar = CustomTitleBar(
             self,
-            self.tr("PDPocket 数控电源上位机") + f" {VERSION}",
+            self.tr("PD Pocket 数控电源上位机") + f" {VERSION} By Ellu",
         )
         self.CustomTitleBar.set_theme("dark")
         self.setTitleBar(self.CustomTitleBar)
@@ -540,25 +599,41 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         return super().closeEvent(a0)
 
     def initTimer(self):
-        # self.state_request_sender_timer = QtCore.QTimer(self)
-        # self.state_request_sender_timer.setTimerType(QtCore.Qt.PreciseTimer)
-        # self.state_request_sender_timer.timeout.connect(self.request_state)
+        """初始化所有定时器"""
+        # 状态更新定时器
         self.update_state_timer = QtCore.QTimer(self)
         self.update_state_timer.timeout.connect(self.update_state)
+
+        # 图表绘制定时器
         self.draw_graph_timer = QtCore.QTimer(self)
         self.draw_graph_timer.timeout.connect(self.draw_graph)
+
+        # LCD状态更新定时器
         self.state_lcd_timer = QtCore.QTimer(self)
         self.state_lcd_timer.timeout.connect(self.update_state_lcd)
+
+        # 扫描功能定时器
         self.func_sweep_timer = QtCore.QTimer(self)
         self.func_sweep_timer.timeout.connect(self.func_sweep)
+
+        # 波形生成定时器
         self.func_wave_gen_timer = QtCore.QTimer(self)
         self.func_wave_gen_timer.timeout.connect(self.func_wave_gen)
+
+        # 功率保持定时器
         self.func_keep_power_timer = QtCore.QTimer(self)
         self.func_keep_power_timer.timeout.connect(self.func_keep_power)
+
+        # 序列执行定时器
         self.func_seq_timer = QtCore.QTimer(self)
         self.func_seq_timer.timeout.connect(self.func_seq)
+
+        # 电池模拟定时器
         self.func_bat_sim_timer = QtCore.QTimer(self)
         self.func_bat_sim_timer.timeout.connect(self.func_bat_sim)
+
+        # 记录保存定时器
+        self.graph_record_save_timer = QtCore.QTimer(self)
         self.graph_record_save_timer = QtCore.QTimer(self)
         self.graph_record_save_timer.timeout.connect(self.graph_record_save)
         self.stable_checker_timer = QtCore.QTimer(self)
@@ -589,7 +664,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.data.eng_start_time = t
         self.data.last_time = t
         self.data.energy = 0
-        # self.state_request_sender_timer.start(round(1000 / self.data_fps))
         self.set_data_freq_signal.emit(self.data_fps)
         self.draw_graph_timer.start(
             round(1000 / min(self.data_fps, setting.graph_max_fps))
@@ -597,7 +671,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.state_lcd_timer.start(round(1000 / min(self.data_fps, setting.state_fps)))
 
     def stopMyTimer(self):
-        # self.state_request_sender_timer.stop()
         self.draw_graph_timer.stop()
         self.state_lcd_timer.stop()
         if self.func_sweep_timer.isActive():
@@ -663,13 +736,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def v_set(self, value):
         if self.api is None or self.locked:
             return
-        value = max(0, min(value, 30))
+        value = max(0, min(value, self.ui.spinBoxVoltage.maximum()))
         self._v_set = value
         setting.last_vset = value
         self.ui.spinBoxVoltage.setValue(value)
         if setting.use_cali:
             value = value * setting.vset_cali_k + setting.vset_cali_b
-        # self.api.a.set_voltage(value)
         self.set_voltage_signal.emit(value)
         self._last_state_change_t = time.perf_counter()
 
@@ -681,13 +753,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def i_set(self, value):
         if self.api is None or self.locked:
             return
-        value = max(0, min(value, 10))
+        value = max(0, min(value, self.ui.spinBoxCurrent.maximum()))
         self._i_set = value
         setting.last_iset = value
         self.ui.spinBoxCurrent.setValue(value)
         if setting.use_cali:
             value = value * setting.iset_cali_k + setting.iset_cali_b
-        # self.api.a.set_current(value)
         self.set_current_signal.emit(value)
         self._last_state_change_t = time.perf_counter()
 
@@ -711,7 +782,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 return
         self._output_state = value
         self._last_state_change_t = time.perf_counter()
-        # self.api.a.set_output(self._output_state)
+        if setting.output_sync and self._output_state:
+            self.set_voltage_signal.emit(self.v_set)
+            self.set_current_signal.emit(self.i_set)
         self.set_output_signal.emit(self._output_state)
         self.update_state()
 
@@ -732,18 +805,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.locked = True
         self.ui.spinBoxVoltage.setEnabled(not self.locked)
         self.ui.spinBoxCurrent.setEnabled(not self.locked)
-        # if SetVoltage >= 0:
-        #     if setting.use_cali:
-        #         SetVoltage = (SetVoltage - setting.vset_cali_b) / setting.vset_cali_k
-        #     self._v_set = SetVoltage
-        #     if not self.ui.spinBoxVoltage.hasFocus():
-        #         self.ui.spinBoxVoltage.setValue(SetVoltage)
-        # if SetCurrent >= 0:
-        #     if setting.use_cali:
-        #         SetCurrent = (SetCurrent - setting.iset_cali_b) / setting.iset_cali_k
-        #     self._i_set = SetCurrent
-        #     if not self.ui.spinBoxCurrent.hasFocus():
-        #         self.ui.spinBoxCurrent.setValue(SetCurrent)
 
     @QtCore.pyqtSlot()
     def on_btnOutput_clicked(self):
@@ -755,7 +816,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def stable_checker(self):
         dt = time.perf_counter() - self._stable_start_t
         stable = (
-            # self.output_state_str == "cc" or
             abs(self.data.voltages[self.data.update_count - 1] - self.v_set) < 0.1
             or dt > 10
         )
@@ -814,8 +874,16 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxCurrent.setValue(setting.last_iset)
         self._v_set = setting.last_vset
         self._i_set = setting.last_iset
-        volt = self.api.a.get_output_voltage()
-        State = "on" if volt > 0.01 else "off"
+
+    def judge_output_state(self):
+        if setting.default_off:
+            State = "off"
+            self.api.a.set_output(False)
+            self.api.a.set_voltage(self._v_set)
+            self.api.a.set_current(self._i_set)
+        else:
+            volt = self.api.a.get_output_voltage()
+            State = "on" if volt > 0.01 else "off"
         self._output_state = State != "off"
         self._last_state_change_t = time.perf_counter()
         self.ui.btnOutput.setText(f"-  {State.upper()}  -")
@@ -839,12 +907,13 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.model = "Unknown"
                 self.ui.spinBoxCurrent.setRange(0, 10)
                 self.CustomTitleBar.set_name(
-                    self.tr("PD Pocket 数控电源上位机") + f" {VERSION}"
+                    self.tr("PD Pocket 数控电源上位机") + f" {VERSION} By Ellu"
                 )
             else:
                 api = None
                 try:
                     api = PDPocket(port=setting.comport, baudrate=setting.baudrate)
+                    api.get_output_power()
                 except Exception as e:
                     if api is not None:
                         api.close()
@@ -853,9 +922,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.api = api
                 self.mdp_thread.set_api(api)
                 self._last_state_change_t = time.perf_counter()
+                self.judge_output_state()
+                self.open_state_ui()
                 self.startMyTimer()
                 self.update_state()
-                self.open_state_ui()
                 self.on_btnGraphClear_clicked(skip_confirm=True)
         except Exception as e:
             CustomMessageBox(self, self.tr("连接失败"), str(e))
@@ -960,9 +1030,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if val < 1:
             return
         self.data_fps = val
-        # if self.state_request_sender_timer.isActive():
-        #     self.state_request_sender_timer.stop()
-        #     self.state_request_sender_timer.start(round(1000 / self.data_fps))
         self.set_data_freq_signal.emit(self.data_fps)
         if self.draw_graph_timer.isActive():
             self.draw_graph_timer.stop()
@@ -1017,39 +1084,70 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     ##########  图像绘制  ##########
 
     def initGraph(self):
+        """初始化图表组件和设置"""
+        # 设置图表背景和标签
         self.ui.widgetGraph1.setBackground(None)
         self.ui.widgetGraph2.setBackground(None)
         self.ui.widgetGraph1.setLabel("left", self.tr("电压"), units="V")
         self.ui.widgetGraph2.setLabel("left", self.tr("电流"), units="A")
+
+        # 设置单位字典
         self._graph_units_dict = {
             self.tr("电压"): "V",
             self.tr("电流"): "A",
             self.tr("功率"): "W",
             self.tr("阻值"): "Ω",
         }
+
+        # 设置网格和鼠标交互
         self.ui.widgetGraph1.showGrid(x=True, y=True)
         self.ui.widgetGraph2.showGrid(x=True, y=True)
         self.ui.widgetGraph1.setMouseEnabled(x=False, y=False)
         self.ui.widgetGraph2.setMouseEnabled(x=False, y=False)
+
+        # 创建画笔和曲线
         self.pen1 = pg.mkPen(color=setting.get_color("line1"), width=1)
         self.pen2 = pg.mkPen(color=setting.get_color("line2"), width=1)
         self.curve1 = self.ui.widgetGraph1.plot(pen=self.pen1, clear=True)
         self.curve2 = self.ui.widgetGraph2.plot(pen=self.pen2, clear=True)
+
+        # 设置自动缩放标志
         self._graph_auto_scale_flag = True
+
+        # 创建左侧轴并同步
         axis1 = FmtAxisItem(orientation="left")
         axis2 = FmtAxisItem(orientation="left")
         axis1.syncWith(axis2, left_spacing=True)
         axis2.syncWith(axis1, left_spacing=True)
         self.ui.widgetGraph1.setAxisItems(axisItems={"left": axis1})
         self.ui.widgetGraph2.setAxisItems(axisItems={"left": axis2})
+
+        # 设置初始数据类型
         self.set_graph1_data(self.tr("电压"), skip_update=True)
         self.set_graph2_data(self.tr("电流"), skip_update=True)
 
     def update_pen(self):
+        """更新画笔颜色"""
         self.pen1.setColor(QtGui.QColor(setting.get_color("line1")))
         self.pen2.setColor(QtGui.QColor(setting.get_color("line2")))
 
     def get_data(self, text: str, display_pts: int, r_offset: int = 0):
+        """获取指定类型的数据，用于绘图
+
+        参数:
+            text: 数据类型（电压/电流/功率/阻值）
+            display_pts: 显示点数
+            r_offset: 右侧偏移
+
+        返回:
+            data: 数据数组
+            time: 时间数组
+            start_index: 开始索引
+            to_index: 结束索引
+            max_val: 最大值
+            min_val: 最小值
+            avg_val: 平均值
+        """
         if text == self.tr("电压"):
             data = self.data.voltages[: self.data.update_count]
         elif text == self.tr("电流"):
@@ -1059,7 +1157,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         elif text == self.tr("阻值"):
             data = self.data.resistances[: self.data.update_count]
             time = self.data.times[: self.data.update_count]
-            # find indexs that != self.open_r
+            # 找出非开路的索引
             indexs = np.where(data != self.open_r)[0]
             data = data[indexs]
             if data.size == 0:
@@ -1120,6 +1218,16 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self._left_last = left
 
     def draw_graph(self):
+        """绘制图表，更新数据显示
+
+        主要功能：
+        1. 更新FPS显示
+        2. 处理滑块和显示范围
+        3. 获取并显示数据
+        4. 更新信息标签
+        5. 自动缩放图表
+        """
+        # 初始化类型字典（如果未初始化）
         if self._typename_dict is None:
             self._typename_dict = {
                 self.tr("电压"): "V",
@@ -1127,13 +1235,22 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.tr("功率"): "P",
                 self.tr("阻值"): "R",
             }
+
+        # 更新FPS显示
         self.ui.labelFps.setText(f"{self.fps_counter.fps:.1f}Hz")
+
+        # 如果图表保持标志为真，不更新图表
         if self.graph_keep_flag:
             return
+
+        # 获取图表数据类型
         type1 = self.ui.comboGraph1Data.currentText()
         type2 = self.ui.comboGraph2Data.currentText()
+
+        # 使用同步锁获取数据
         with self.data.sync_lock:
             update_count = self.data.update_count
+
             if update_count > setting.display_pts + 5:
                 left, right = self.ui.horizontalSlider.sliderPosition()
                 max_ = self.ui.horizontalSlider._maximum
@@ -2243,6 +2360,9 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
         self.CustomTitleBar.set_close_btn_enabled(False)
         self.setTitleBar(self.CustomTitleBar)
 
+        # 安装事件过滤器以监听键盘事件
+        self.installEventFilter(self)
+
     def initValues(self):
         self.ui.spinBoxBaud.setValue(setting.baudrate)
         self.ui.comboBoxPort.setCurrentText(
@@ -2250,6 +2370,8 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
         )
         self.ui.checkBoxOutputWarn.setChecked(setting.output_warning)
         self.ui.checkBoxSetLock.setChecked(setting.lock_when_output)
+        self.ui.checkBoxOutputSync.setChecked(setting.output_sync)
+        self.ui.checkBoxDefaultOff.setChecked(setting.default_off)
 
     def refreshPorts(self):
         self.ui.comboBoxPort.clear()
@@ -2266,6 +2388,22 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
     def show(self) -> None:
         self.initValues()
         self.refreshPorts()
+        # 检测shift键是否按下，如果按下则显示最大功率设置控件
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if modifiers & QtCore.Qt.ShiftModifier:
+            self.ui.btnSetMaxP.show()
+            self.ui.spinBoxMaxP.show()
+            self.ui.btnCali1.show()
+            self.ui.btnCali2.show()
+            self.setMinimumHeight(500)
+            self.setMaximumHeight(500)
+        else:
+            self.ui.btnSetMaxP.hide()
+            self.ui.spinBoxMaxP.hide()
+            self.ui.btnCali1.hide()
+            self.ui.btnCali2.hide()
+            self.setMinimumHeight(450)
+            self.setMaximumHeight(450)
         center_window(self)
         super().show()
 
@@ -2280,14 +2418,15 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
         setting.lock_when_output = self.ui.checkBoxSetLock.isChecked()
         setting.save(SETTING_FILE)
 
-    @QtCore.pyqtSlot()
-    def on_btnSave_clicked(self):
-        self.save_settings()
-        self.ui.btnSave.setText(self.tr("重新连接生效"))
-        QtCore.QTimer.singleShot(1000, self._reset_btn_text)
-
-    def _reset_btn_text(self):
-        self.ui.btnSave.setText(self.tr("应用 / Apply"))
+    def check_connection(self):
+        if MainWindow.api is None:
+            CustomMessageBox(
+                self,
+                self.tr("错误"),
+                self.tr("请先连接设备"),
+            )
+            return False
+        return True
 
     @QtCore.pyqtSlot()
     def on_btnOk_clicked(self):
@@ -2301,6 +2440,57 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
     @QtCore.pyqtSlot(int)
     def on_checkBoxOutputWarn_stateChanged(self, state: int):
         setting.output_warning = state == QtCore.Qt.CheckState.Checked
+
+    @QtCore.pyqtSlot(int)
+    def on_checkBoxOutputSync_stateChanged(self, state: int):
+        setting.output_sync = state == QtCore.Qt.CheckState.Checked
+
+    @QtCore.pyqtSlot(int)
+    def on_checkBoxDefaultOff_stateChanged(self, state: int):
+        setting.default_off = state == QtCore.Qt.CheckState.Checked
+
+    @QtCore.pyqtSlot()
+    def on_btnSetMaxP_clicked(self):
+        if not self.check_connection():
+            return
+        max_p = self.ui.spinBoxMaxP.value()
+        MainWindow.api.set_max_power(max_p)
+
+    @QtCore.pyqtSlot()
+    def on_btnEnableShortProtect_clicked(self):
+        if not self.check_connection():
+            return
+        MainWindow.api.set_short_protect(True)
+
+    @QtCore.pyqtSlot()
+    def on_btnDisableShortProtect_clicked(self):
+        if not self.check_connection():
+            return
+        MainWindow.api.set_short_protect(False)
+
+    @QtCore.pyqtSlot()
+    def on_btnLockKey_clicked(self):
+        if not self.check_connection():
+            return
+        MainWindow.api.set_key_lock(True)
+
+    @QtCore.pyqtSlot()
+    def on_btnUnlockKey_clicked(self):
+        if not self.check_connection():
+            return
+        MainWindow.api.set_key_lock(False)
+
+    @QtCore.pyqtSlot()
+    def on_btnCali1_clicked(self):
+        if not self.check_connection():
+            return
+        MainWindow.api.calibrate_output()
+
+    @QtCore.pyqtSlot()
+    def on_btnCali2_clicked(self):
+        if not self.check_connection():
+            return
+        MainWindow.api.calibrate_input()
 
 
 class MDPGraphics(QtWidgets.QDialog, FramelessWindow):

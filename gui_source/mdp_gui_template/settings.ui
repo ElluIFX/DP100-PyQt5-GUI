@@ -12,9 +12,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>251</width>
-    <height>300</height>
+    <width>303</width>
+    <height>500</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>303</width>
+    <height>500</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>303</width>
+    <height>500</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>电源设置</string>
@@ -70,7 +82,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_33" stretch="2,3">
+    <layout class="QHBoxLayout" name="horizontalLayout_33" stretch="1,1">
      <item>
       <widget class="QLabel" name="label_34">
        <property name="minimumSize">
@@ -112,7 +124,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_34" stretch="2,3">
+    <layout class="QHBoxLayout" name="horizontalLayout_34" stretch="1,1">
      <item>
       <widget class="QLabel" name="label_35">
        <property name="minimumSize">
@@ -204,7 +216,140 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_43" stretch="2,3">
+    <layout class="QHBoxLayout" name="horizontalLayout_35" stretch="1,1">
+     <item>
+      <widget class="QPushButton" name="btnSetMaxP">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>设置最大输出功率</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="spinBoxMaxP">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="suffix">
+        <string> W</string>
+       </property>
+       <property name="decimals">
+        <number>0</number>
+       </property>
+       <property name="minimum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>255.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+       </property>
+       <property name="value">
+        <double>255.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_38" stretch="1,1">
+     <item>
+      <widget class="QPushButton" name="btnCali1">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>触发输出校准 (7V)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCali2">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>触发输入校准 (20V)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
+     <item>
+      <widget class="QPushButton" name="btnEnableShortProtect">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>开启短路保护</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnDisableShortProtect">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>关闭短路保护</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_37" stretch="1,1">
+     <item>
+      <widget class="QPushButton" name="btnLockKey">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>锁定设备按键</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnUnlockKey">
+       <property name="font">
+        <font>
+         <family>Sarasa Fixed SC SemiBold</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>解锁设备按键</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_43" stretch="1,1">
      <item>
       <widget class="QLabel" name="label_49">
        <property name="minimumSize">
@@ -239,7 +384,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
-         <number>3</number>
+         <number>0</number>
         </property>
         <property name="leftMargin">
          <number>2</number>
@@ -253,6 +398,38 @@
         <property name="bottomMargin">
          <number>2</number>
         </property>
+        <item>
+         <widget class="QCheckBox" name="checkBoxDefaultOff">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>上位机连接设备时不进行状态推断，而是强制关闭输出并设定电压电流</string>
+          </property>
+          <property name="text">
+           <string>连接时默认关断</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxOutputSync">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>每次开启输出时同步电压电流设置值</string>
+          </property>
+          <property name="text">
+           <string>输出时同步设置</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QCheckBox" name="checkBoxOutputWarn">
           <property name="minimumSize">
@@ -301,25 +478,13 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1">
      <property name="spacing">
       <number>6</number>
      </property>
      <property name="bottomMargin">
       <number>0</number>
      </property>
-     <item>
-      <widget class="QPushButton" name="btnSave">
-       <property name="font">
-        <font>
-         <family>Sarasa Fixed SC SemiBold</family>
-        </font>
-       </property>
-       <property name="text">
-        <string>应用 / Apply</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QPushButton" name="btnOk">
        <property name="font">
