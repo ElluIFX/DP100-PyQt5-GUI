@@ -1,1 +1,0 @@
-# PD Pocket PC Controller
