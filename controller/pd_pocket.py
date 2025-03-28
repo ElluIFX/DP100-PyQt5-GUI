@@ -118,6 +118,20 @@ class PDPocket:
         """
         self._ser.write(f"CURR {current_set:.2f}\r\n".encode())
 
+    def get_set_voltage(self) -> float:
+        """
+        Get the set voltage of the PD Pocket.
+        """
+        self._ser.write(b"get vset\r\n")
+        return float(self._read_until_ok())
+
+    def get_set_current(self) -> float:
+        """
+        Get the set current of the PD Pocket.
+        """
+        self._ser.write(b"get iset\r\n")
+        return float(self._read_until_ok())
+
     def set_max_power(self, power_set: float):
         """
         Set the maximum power of the PD Pocket.

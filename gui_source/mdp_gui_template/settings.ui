@@ -13,19 +13,19 @@
     <x>0</x>
     <y>0</y>
     <width>303</width>
-    <height>500</height>
+    <height>460</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>303</width>
-    <height>500</height>
+    <height>460</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>303</width>
-    <height>500</height>
+    <height>460</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -398,38 +398,6 @@
         <property name="bottomMargin">
          <number>2</number>
         </property>
-        <item>
-         <widget class="QCheckBox" name="checkBoxDefaultOff">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>上位机连接设备时不进行状态推断，而是强制关闭输出并设定电压电流</string>
-          </property>
-          <property name="text">
-           <string>连接时默认关断</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBoxOutputSync">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>28</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>每次开启输出时同步电压电流设置值</string>
-          </property>
-          <property name="text">
-           <string>输出时同步设置</string>
-          </property>
-         </widget>
-        </item>
         <item>
          <widget class="QCheckBox" name="checkBoxOutputWarn">
           <property name="minimumSize">

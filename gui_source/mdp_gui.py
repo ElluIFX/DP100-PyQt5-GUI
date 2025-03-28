@@ -270,8 +270,6 @@ class Setting:
         # 输出设置
         self.last_vset = 5  # 上次电压设置
         self.last_iset = 2  # 上次电流设置
-        self.output_sync = False  # 输出同步设置
-        self.default_off = False  # 默认关闭设置
 
         # 校准和阈值设置
         self.v_threshold = 0.002  # 电压阈值
@@ -393,6 +391,7 @@ class MDPThread(QtCore.QThread):
     """用于与PD Pocket设备通信的线程类，实现异步数据采集"""
 
     data_signal = QtCore.pyqtSignal(float, float, float)  # 电压、电流、时间戳信号
+    state_signal = QtCore.pyqtSignal(float, float, float)  # vout, vset, iset
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -447,6 +446,13 @@ class MDPThread(QtCore.QThread):
             else:
                 self.data_timer.stop()
 
+    def get_state(self):
+        if self.api is not None:
+            vout = self.api.a.get_output_voltage()
+            vset = self.api.a.get_set_voltage()
+            iset = self.api.a.get_set_current()
+            self.state_signal.emit(vout, vset, iset)
+
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
     """PD Pocket上位机主窗口类，管理UI界面和所有功能"""
@@ -460,7 +466,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     set_voltage_signal = QtCore.pyqtSignal(float)  # 设置电压信号
     set_current_signal = QtCore.pyqtSignal(float)  # 设置电流信号
     set_output_signal = QtCore.pyqtSignal(bool)  # 设置输出状态信号
-    set_data_freq_signal = QtCore.pyqtSignal(float)  # 设置数据频率信号
+    set_data_freq_signal = QtCore.pyqtSignal(float)  # 设置数据频率信号\
+    get_state_signal = QtCore.pyqtSignal()  # 获取状态信号
 
     close_signal = QtCore.pyqtSignal()  # 关闭信号
     data = RealtimeData(setting.data_pts)  # 实时数据对象
@@ -533,7 +540,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.set_voltage_signal.connect(self.mdp_thread.set_voltage)
         self.set_current_signal.connect(self.mdp_thread.set_current)
         self.set_output_signal.connect(self.mdp_thread.set_output)
+        self.get_state_signal.connect(self.mdp_thread.get_state)
         self.mdp_thread.data_signal.connect(self.state_callback)
+        self.mdp_thread.state_signal.connect(self.update_state_callback)
         self.mdp_thread.start()
 
         if ENGLISH:
@@ -669,6 +678,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             round(1000 / min(self.data_fps, setting.graph_max_fps))
         )
         self.state_lcd_timer.start(round(1000 / min(self.data_fps, setting.state_fps)))
+        self.update_state_timer.start(100)
 
     def stopMyTimer(self):
         self.draw_graph_timer.stop()
@@ -687,6 +697,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.on_btnGraphRecord_clicked()
         if self.stable_checker_timer.isActive():
             self.stable_checker_timer.stop()
+        if self.update_state_timer.isActive():
+            self.update_state_timer.stop()
 
     def switch_fullscreen(self):
         if self.isFullScreen():
@@ -782,15 +794,16 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 return
         self._output_state = value
         self._last_state_change_t = time.perf_counter()
-        if setting.output_sync and self._output_state:
-            self.set_voltage_signal.emit(self.v_set)
-            self.set_current_signal.emit(self.i_set)
         self.set_output_signal.emit(self._output_state)
         self.update_state()
 
     def update_state(self):
         if self.api is None:
             return
+        self.get_state_signal.emit()
+
+    def update_state_callback(self, vout, vset, iset):
+        self._output_state = vout > 0.01
         State = "on" if self._output_state else "off"
         self.ui.btnOutput.setText(f"-  {State.upper()}  -")
         set_color(
@@ -805,6 +818,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.locked = True
         self.ui.spinBoxVoltage.setEnabled(not self.locked)
         self.ui.spinBoxCurrent.setEnabled(not self.locked)
+        self._v_set = vset
+        self._i_set = iset
+        if not self.ui.spinBoxVoltage.hasFocus():
+            self.ui.spinBoxVoltage.setValue(vset)
+        if not self.ui.spinBoxCurrent.hasFocus():
+            self.ui.spinBoxCurrent.setValue(iset)
 
     @QtCore.pyqtSlot()
     def on_btnOutput_clicked(self):
@@ -875,23 +894,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self._v_set = setting.last_vset
         self._i_set = setting.last_iset
 
-    def judge_output_state(self):
-        if setting.default_off:
-            State = "off"
-            self.api.a.set_output(False)
-            self.api.a.set_voltage(self._v_set)
-            self.api.a.set_current(self._i_set)
-        else:
-            volt = self.api.a.get_output_voltage()
-            State = "on" if volt > 0.01 else "off"
-        self._output_state = State != "off"
-        self._last_state_change_t = time.perf_counter()
-        self.ui.btnOutput.setText(f"-  {State.upper()}  -")
-        set_color(
-            self.ui.btnOutput,
-            setting.get_color(State),
-        )
-
     @QtCore.pyqtSlot()
     def on_btnConnect_clicked(self):
         try:
@@ -922,13 +924,18 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.api = api
                 self.mdp_thread.set_api(api)
                 self._last_state_change_t = time.perf_counter()
-                self.judge_output_state()
                 self.open_state_ui()
                 self.startMyTimer()
                 self.update_state()
                 self.on_btnGraphClear_clicked(skip_confirm=True)
         except Exception as e:
-            CustomMessageBox(self, self.tr("连接失败"), str(e))
+            error = str(e)
+            if not ENGLISH:
+                error = error.replace("Cannot find PD Pocket", "未找到设备")
+                error = error.replace("Target", "目标设备")
+                error = error.replace("Device List", "本机串口设备列表")
+                error = error.replace("No ID provided", "未声明ID")
+            CustomMessageBox(self, self.tr("连接失败"), error)
             return
 
     def request_state(self):
@@ -2370,8 +2377,6 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
         )
         self.ui.checkBoxOutputWarn.setChecked(setting.output_warning)
         self.ui.checkBoxSetLock.setChecked(setting.lock_when_output)
-        self.ui.checkBoxOutputSync.setChecked(setting.output_sync)
-        self.ui.checkBoxDefaultOff.setChecked(setting.default_off)
 
     def refreshPorts(self):
         self.ui.comboBoxPort.clear()
@@ -2395,15 +2400,15 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
             self.ui.spinBoxMaxP.show()
             self.ui.btnCali1.show()
             self.ui.btnCali2.show()
-            self.setMinimumHeight(500)
-            self.setMaximumHeight(500)
+            self.setMinimumHeight(460)
+            self.setMaximumHeight(460)
         else:
             self.ui.btnSetMaxP.hide()
             self.ui.spinBoxMaxP.hide()
             self.ui.btnCali1.hide()
             self.ui.btnCali2.hide()
-            self.setMinimumHeight(450)
-            self.setMaximumHeight(450)
+            self.setMinimumHeight(400)
+            self.setMaximumHeight(400)
         center_window(self)
         super().show()
 
@@ -2440,14 +2445,6 @@ class MDPSettings(QtWidgets.QDialog, FramelessWindow):
     @QtCore.pyqtSlot(int)
     def on_checkBoxOutputWarn_stateChanged(self, state: int):
         setting.output_warning = state == QtCore.Qt.CheckState.Checked
-
-    @QtCore.pyqtSlot(int)
-    def on_checkBoxOutputSync_stateChanged(self, state: int):
-        setting.output_sync = state == QtCore.Qt.CheckState.Checked
-
-    @QtCore.pyqtSlot(int)
-    def on_checkBoxDefaultOff_stateChanged(self, state: int):
-        setting.default_off = state == QtCore.Qt.CheckState.Checked
 
     @QtCore.pyqtSlot()
     def on_btnSetMaxP_clicked(self):
