@@ -390,35 +390,42 @@ update_pyqtgraph_setting()
 class MDPThread(QtCore.QThread):
     """用于与PD Pocket设备通信的线程类，实现异步数据采集"""
 
-    data_signal = QtCore.pyqtSignal(float, float, float)  # 电压、电流、时间戳信号
-    state_signal = QtCore.pyqtSignal(float, float, float)  # vout, vset, iset
+    data_signal = QtCore.pyqtSignal(
+        float, float, float, bool
+    )  # 电压、电流、时间戳、状态信号
+    state_signal = QtCore.pyqtSignal(float, float)  # vset, iset
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.api: Optional[PDPocket] = None  # PD Pocket API接口
-        self.data_timer = QtCore.QTimer(self)  # 定时器，用于定期读取数据
-        self.data_timer.setTimerType(QtCore.Qt.PreciseTimer)  # 使用精确定时器
-        self.data_timer.timeout.connect(self.data_callback)  # 连接回调函数
+        # self.data_timer = QtCore.QTimer(self)  # 定时器，用于定期读取数据
+        # self.data_timer.setTimerType(QtCore.Qt.PreciseTimer)  # 使用精确定时器
+        # self.data_timer.timeout.connect(self.data_callback)  # 连接回调函数
 
     def run(self):
         """线程主循环，保持线程运行"""
         while True:
-            time.sleep(1)
-            logger.debug("MDPThread ticking")
+            time.sleep(0.001)
+            if self.api is not None:
+                ret = self.api.read()
+                if ret & 2:
+                    data = self.api.parse_message()
+                    # logger.info(f"Data: {data}")
+                    self.data_signal.emit(
+                        data["vout"],
+                        data["iout"],
+                        time.perf_counter(),
+                        data["state"],
+                    )
 
     def set_api(self, api: Optional[PDPocket]):
         """设置PD Pocket API接口"""
         logger.info(f"Setting API to {api}")
-        if not api and self.data_timer.isActive():
-            self.data_timer.stop()
+        # if not api and self.data_timer.isActive():
+        #     self.data_timer.stop()
         self.api = api
-
-    def data_callback(self):
-        """定时数据采集回调，读取电压电流并发送信号"""
         if self.api is not None:
-            volt = self.api.a.get_output_voltage()  # 获取输出电压
-            curr = self.api.a.get_output_current()  # 获取输出电流
-            self.data_signal.emit(volt, curr, time.perf_counter())  # 发送信号
+            self.api.async_mode = True
 
     def set_voltage(self, volt: float):
         """设置输出电压"""
@@ -438,20 +445,23 @@ class MDPThread(QtCore.QThread):
     def set_data_freq(self, freq: float):
         """设置数据采集频率"""
         if self.api is not None:
-            if freq > 0:
-                if self.data_timer.isActive():
-                    self.data_timer.stop()
-                self.data_timer.setInterval(round(1000 / freq))  # 计算定时器间隔
-                self.data_timer.start()
-            else:
-                self.data_timer.stop()
+            self.api.request_message(round(freq))
+            # if freq > 0:
+            #     if self.data_timer.isActive():
+            #         self.data_timer.stop()
+            #     self.data_timer.setInterval(round(freq))  # 计算定时器间隔
+            #     self.data_timer.start()
+            # else:
+            #     self.data_timer.stop()
 
     def get_state(self):
-        if self.api is not None:
-            vout = self.api.a.get_output_voltage()
-            vset = self.api.a.get_set_voltage()
-            iset = self.api.a.get_set_current()
-            self.state_signal.emit(vout, vset, iset)
+        try:
+            if self.api is not None:
+                vset = self.api.a.get_set_voltage()
+                iset = self.api.a.get_set_current()
+                self.state_signal.emit(vset, iset)
+        except Exception as e:
+            logger.warning(f"Error getting state: {e}")
 
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
@@ -466,12 +476,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     set_voltage_signal = QtCore.pyqtSignal(float)  # 设置电压信号
     set_current_signal = QtCore.pyqtSignal(float)  # 设置电流信号
     set_output_signal = QtCore.pyqtSignal(bool)  # 设置输出状态信号
-    set_data_freq_signal = QtCore.pyqtSignal(float)  # 设置数据频率信号\
+    set_data_freq_signal = QtCore.pyqtSignal(float)  # 设置数据频率信号
     get_state_signal = QtCore.pyqtSignal()  # 获取状态信号
 
     close_signal = QtCore.pyqtSignal()  # 关闭信号
     data = RealtimeData(setting.data_pts)  # 实时数据对象
-    data_fps = 50.0  # 数据刷新率
+    data_ms = 20.0  # 数据刷新率
     graph_keep_flag = False  # 图表保持标志
     graph_record_flag = False  # 图表记录标志
     locked = False  # 锁定标志
@@ -486,13 +496,13 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     close_signal = QtCore.pyqtSignal()
     data = RealtimeData(setting.data_pts)
-    data_fps = 50.0
     graph_keep_flag = False
     graph_record_flag = False
     locked = False
     _v_set = 0.0
     _i_set = 0.0
     _output_state = False
+    _output_state_cache = False
     output_state_str = ""
     open_r = 1e7
     continuous_energy_counter = 0
@@ -528,7 +538,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.listSeq.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.spinBoxVoltage.setSingleStep(0.001)
         self.ui.spinBoxCurrent.setSingleStep(0.001)
-        self.ui.doubleSpinBoxSampleRate.setValue(self.data_fps)
+        self.ui.doubleSpinBoxSampleRate.setValue(self.data_ms)
 
         self.ui.tabWidget.tabBar().setVisible(False)
         self.ui.labelTab.setText(
@@ -673,16 +683,19 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.data.eng_start_time = t
         self.data.last_time = t
         self.data.energy = 0
-        self.set_data_freq_signal.emit(self.data_fps)
+        self.set_data_freq_signal.emit(self.data_ms)
         self.draw_graph_timer.start(
-            round(1000 / min(self.data_fps, setting.graph_max_fps))
+            min(round(self.data_ms), round(1000 / setting.graph_max_fps))
         )
-        self.state_lcd_timer.start(round(1000 / min(self.data_fps, setting.state_fps)))
+        self.state_lcd_timer.start(
+            min(round(self.data_ms), round(1000 / setting.state_fps))
+        )
         self.update_state_timer.start(100)
 
     def stopMyTimer(self):
         self.draw_graph_timer.stop()
         self.state_lcd_timer.stop()
+        self.set_data_freq_signal.emit(0)
         if self.func_sweep_timer.isActive():
             self.stop_func_sweep()
         if self.func_wave_gen_timer.isActive():
@@ -755,6 +768,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if setting.use_cali:
             value = value * setting.vset_cali_k + setting.vset_cali_b
         self.set_voltage_signal.emit(value)
+        # self.get_state_signal.emit()
         self._last_state_change_t = time.perf_counter()
 
     @property
@@ -772,6 +786,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if setting.use_cali:
             value = value * setting.iset_cali_k + setting.iset_cali_b
         self.set_current_signal.emit(value)
+        # self.get_state_signal.emit()
         self._last_state_change_t = time.perf_counter()
 
     @property
@@ -800,11 +815,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def update_state(self):
         if self.api is None:
             return
-        self.get_state_signal.emit()
-
-    def update_state_callback(self, vout, vset, iset):
-        self._output_state = vout > 0.01
-        State = "on" if self._output_state else "off"
+        State = "on" if self._output_state_cache else "off"
         self.ui.btnOutput.setText(f"-  {State.upper()}  -")
         set_color(
             self.ui.btnOutput,
@@ -818,6 +829,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.locked = True
         self.ui.spinBoxVoltage.setEnabled(not self.locked)
         self.ui.spinBoxCurrent.setEnabled(not self.locked)
+
+    def update_state_callback(self, vset, iset):
         self._v_set = vset
         self._i_set = iset
         if not self.ui.spinBoxVoltage.hasFocus():
@@ -858,7 +871,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.frameGraph.setEnabled(False)
         self.ui.progressBarCurrent.setValue(0)
         self.ui.progressBarVoltage.setValue(0)
-        self.state_callback(0, 0, time.perf_counter())
+        self.state_callback(0, 0, time.perf_counter(), False)
         self.ui.btnOutput.setText("[N/A]")
         set_color(self.ui.btnOutput, None)
         self.curve1.setData(x=[], y=[])
@@ -915,6 +928,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 api = None
                 try:
                     api = PDPocket(port=setting.comport, baudrate=setting.baudrate)
+                    api.request_message(0)
+                    time.sleep(0.05)
                     api.get_output_power()
                 except Exception as e:
                     if api is not None:
@@ -924,6 +939,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 self.api = api
                 self.mdp_thread.set_api(api)
                 self._last_state_change_t = time.perf_counter()
+                self.get_state_signal.emit()
                 self.open_state_ui()
                 self.startMyTimer()
                 self.update_state()
@@ -944,7 +960,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             curr = self.api.a.get_output_current()
             self.state_callback(volt, curr, time.perf_counter())
 
-    def state_callback(self, volt: float, curr: float, timestamp: float):
+    def state_callback(self, volt: float, curr: float, timestamp: float, state: bool):
+        self._output_state_cache = state
         if setting.use_cali:
             volt = volt * setting.v_cali_k + setting.v_cali_b
             curr = curr * setting.i_cali_k + setting.i_cali_b
@@ -1036,17 +1053,17 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def set_data_fps(self, val: float):
         if val < 1:
             return
-        self.data_fps = val
-        self.set_data_freq_signal.emit(self.data_fps)
+        self.data_ms = val
+        self.set_data_freq_signal.emit(self.data_ms)
         if self.draw_graph_timer.isActive():
             self.draw_graph_timer.stop()
             self.draw_graph_timer.start(
-                round(1000 / min(self.data_fps, setting.graph_max_fps))
+                min(round(self.data_ms), round(1000 / setting.graph_max_fps))
             )
         if self.state_lcd_timer.isActive():
             self.state_lcd_timer.stop()
             self.state_lcd_timer.start(
-                round(1000 / min(self.data_fps, setting.state_fps))
+                min(round(self.data_ms), round(1000 / setting.state_fps))
             )
         self.fps_counter.clear()
 

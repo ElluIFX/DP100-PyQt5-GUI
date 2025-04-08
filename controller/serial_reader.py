@@ -1,14 +1,12 @@
+import queue
 import threading
 import time
 from queue import Queue
 from typing import Tuple, Union
 
 from loguru import logger
+from numpy import byte
 from serial import Serial
-
-
-def is_digit(s: int) -> bool:
-    return 48 <= s <= 57 or s == 46  # 0-9, .
 
 
 class SerialReader:
@@ -24,48 +22,57 @@ class SerialReader:
         Returns:
             None
         """
-        self._data = bytes()
+        self.ascii_queue = queue.Queue()
+        self.binary_queue = queue.Queue()
         self._ser = serial_instance
-        self._in_waiting_buffer = bytes()
+        self._ascii_buffer = bytes()
+        self._binary_buffer = bytes()
         while self._ser.in_waiting > 0:  # 清空缓冲区
             self._ser.read(self._ser.in_waiting)
 
-    def read(self) -> bool:
+    def read(self) -> int:
         """
         轮询读取串口数据。
 
         Returns:
-            bool: 是否读取到完整的一包数据。
+            int: 读取到的数据类型。
         """
+        ret = 0
         while self._ser.in_waiting > 0:
             data = self._ser.read(self._ser.in_waiting)
+            # logger.info(f"Read data: {data}")
             for d in data:
-                if is_digit(d):
-                    self._in_waiting_buffer += bytes([d])
+                if 48 <= d <= 57 or d == 46:
+                    self._ascii_buffer += bytes([d])
                 else:
-                    if self._in_waiting_buffer:
-                        self._data = self._in_waiting_buffer
-                        self._in_waiting_buffer = bytes()
-                        logger.debug(f"Read data: {self._data}")
-                        return True
-        return False
+                    if len(self._ascii_buffer) > 4 and 46 in self._ascii_buffer:
+                        self.ascii_queue.put(self._ascii_buffer)
+                        logger.info(f"Read ascii data: {self._ascii_buffer}")
+                        self._binary_buffer = bytes()
+                        ret |= 1
+                    self._ascii_buffer = bytes()
+                self._binary_buffer += bytes([d])
+                if len(self._binary_buffer) >= 24:
+                    rstrip = self._binary_buffer[len(self._binary_buffer) - 24 :]
+                    if all(rstrip[i] == 0 for i in [0, 1, 4, 5]):
+                        self.binary_queue.put(rstrip)
+                        # logger.info(f"Read binary data: {rstrip}")
+                        self._binary_buffer = bytes()
+                        self._ascii_buffer = bytes()
+                        ret |= 2
+            if len(self._ascii_buffer) > 2 and 46 in self._ascii_buffer:
+                self.ascii_queue.put(self._ascii_buffer)
+                logger.info(f"Read ascii data: {self._ascii_buffer}")
+                self._ascii_buffer = bytes()
+                self._binary_buffer = bytes()
+                ret |= 1
+        return ret
 
     def clear(self):
         """
         清空缓冲区。
         """
-        self._in_waiting_buffer = bytes()
-        self._data = bytes()
-
-    @property
-    def result(self) -> bytes:
-        """
-        获取读取到的数据。
-
-        Returns:
-            bytes: 读取到的数据。
-        """
-        return self._data
+        self._ascii_buffer = bytes()
 
     def close(self):
         """
@@ -95,7 +102,7 @@ class SerialReaderThreaded:
     def _worker(self):
         while self._thread_running:
             if self._serial_reader.read():
-                self._queue.put(self._serial_reader.result)
+                self._queue.put(self._serial_reader.ascii_result)
             else:
                 time.sleep(0.001)
 

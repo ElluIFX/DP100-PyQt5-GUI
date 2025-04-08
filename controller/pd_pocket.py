@@ -1,3 +1,4 @@
+import queue
 import time
 from typing import Optional, Self
 
@@ -44,18 +45,30 @@ class PDPocket:
         self._reader = SerialReader(self._ser)
         self._last_readout_v = 0
         self._last_readout_i = 0
+        self._read_msg_queue = queue.Queue()
+        self.async_mode = False
 
     def close(self):
         self._ser.close()
         logger.info("PD Pocket closed")
 
-    def _read_until_ok(self, timeout: float = 1) -> bool:
+    def read(self) -> int:
+        return self._reader.read()
+
+    def _read_until_ok(self, timeout: float = 0.05) -> bool:
         t0 = time.perf_counter()
-        while not self._reader.read():
-            if time.perf_counter() - t0 > timeout:
+        if not self.async_mode:
+            while self._reader.ascii_queue.empty():
+                self.read()
+                if time.perf_counter() - t0 > timeout:
+                    raise TimeoutError("Timeout waiting for response")
+                time.sleep(0.01)
+            return self._reader.ascii_queue.get().decode().strip()
+        else:
+            try:
+                return self._reader.ascii_queue.get(timeout=timeout).decode().strip()
+            except queue.Empty:
                 raise TimeoutError("Timeout waiting for response")
-            time.sleep(0.001)
-        return self._reader.result.decode().strip()
 
     def get_output_voltage(self) -> float:
         """
@@ -167,6 +180,30 @@ class PDPocket:
         Calibrate the input of the PD Pocket. (Use 20V)
         """
         self._ser.write(b"calibus 2\r\n")
+
+    def request_message(self, interval: int = 100):
+        """
+        Request message from the PD Pocket.
+        """
+        assert 0 <= interval <= 65535
+        self._ser.write(f"getmsg {interval}\r\n".encode())
+
+    def parse_message(self):
+        """
+        Parse message from the PD Pocket.
+        """
+        data = self._reader.binary_queue.get(block=False)
+        if not data:
+            return None
+        datas = [int.from_bytes(data[i : i + 4], "big") for i in range(0, 24, 4)]
+        return {
+            "vout": datas[0] / 1000,
+            "iout": datas[1] / 1000,
+            "pout": datas[2] / 1000,
+            "state": datas[3] == 1,
+            "time": datas[4],
+            "vinput": datas[5] / 1000,
+        }
 
     @property
     def a(self) -> Self:

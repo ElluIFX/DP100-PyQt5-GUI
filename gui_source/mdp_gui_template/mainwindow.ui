@@ -4062,7 +4062,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>采样率:</string>
+                <string>采样间隔:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -4072,13 +4072,16 @@
              <item>
               <widget class="QDoubleSpinBox" name="doubleSpinBoxSampleRate">
                <property name="suffix">
-                <string>Hz</string>
+                <string>ms</string>
                </property>
                <property name="decimals">
-                <number>1</number>
+                <number>0</number>
+               </property>
+               <property name="minimum">
+                <double>2.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>200.000000000000000</double>
+                <double>65535.000000000000000</double>
                </property>
                <property name="stepType">
                 <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
