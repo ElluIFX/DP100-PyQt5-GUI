@@ -2951,13 +2951,14 @@ class ResultGraphWindow(QtWidgets.QDialog, FramelessWindow):
             if abs(result[i]) < 1e-9:
                 result[i] = 0
         text = "y = ("
+        DICT = {2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹"}
         for i, coef in enumerate(result):
             if i != 0:
                 text += " + ("
             text += f"{coef:0.4g}"
             ml = len(result) - i - 1
             if ml > 1:
-                text += f"x^{ml}"
+                text += f"x{DICT.get(ml, f'^{ml}')}"
             elif ml == 1:
                 text += "x"
             text += ")"
