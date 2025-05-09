@@ -5,6 +5,7 @@ import sys
 from platform import architecture
 
 from loguru import logger
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 if architecture()[0] == "32bit":
     dll_name = "ATK-DP100DLL(x86)_2.0"
@@ -86,6 +87,7 @@ class DP100:
         """
         return self._api.get_ConnState()
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def connect(self) -> None:
         """
         连接设备
@@ -96,6 +98,7 @@ class DP100:
             assert ret, ConnectionError("连接设备失败")
             logger.info("连接设备成功")
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def disconnect(self) -> None:
         """
         断开设备
@@ -106,6 +109,7 @@ class DP100:
             assert not ret, "断开设备失败"
             logger.info("断开设备成功")
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_device_info(self) -> dict:
         """
         获取设备信息
@@ -129,6 +133,7 @@ class DP100:
             "device_status": str(ret[5]),
         }
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_state(self) -> dict:
         """
         获取设备状态
@@ -156,6 +161,7 @@ class DP100:
         logger.debug(f"获取设备状态: {ret}")
         return ret
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_preset(self, index: int) -> dict:
         """
         获取预设组信息
@@ -179,6 +185,7 @@ class DP100:
             "ocp": float(ret[3]) / 1000,
         }
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def set_preset(
         self, index: int, v_set: float, i_set: float, ovp: float, ocp: float
     ) -> None:
@@ -202,6 +209,7 @@ class DP100:
             ret = self._api.SetGroupInfo(*args)
         assert ret, "设置预设组信息失败"
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def use_preset(self, index: int) -> None:
         """
         使用预设组
@@ -217,6 +225,7 @@ class DP100:
             ret = self._api.UseGroup(*args)
         assert ret, "使用预设组失败"
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def set_output(
         self,
         output: Optional[bool] = None,
@@ -254,6 +263,7 @@ class DP100:
         )
         assert ret, "设置输出状态失败"
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_settings(self) -> dict:
         """
         获取系统设置
@@ -279,6 +289,7 @@ class DP100:
             "auto_output": bool(ret[6]),
         }
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def set_settings(
         self,
         backlight: Optional[int] = None,
@@ -329,6 +340,7 @@ class DP100:
         assert callable(callback), "回调函数必须是可调用的"
         self._api.ReceBasicInfoEvent += self._api.ReceBasicInfo(callback)
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_output_info(self) -> None:
         """
         发送请求获取输出电压电流信息 (需先注册回调函数)
