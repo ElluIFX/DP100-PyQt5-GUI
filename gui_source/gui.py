@@ -738,8 +738,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     ##########  基本功能  ##########
 
-    def sync_state(self, output=None, v_set=None, i_set=None, preset=None):
-        if self.api is None or self.locked:
+    def set_output(self, output=None, v_set=None, i_set=None, preset=None):
+        if self.api is None:
             return
         self.action_signal.emit(
             "set_output",
@@ -765,7 +765,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxVoltage.setValue(value)
         if setting.use_cali:
             value = value * setting.vset_cali_k + setting.vset_cali_b
-        self.sync_state(v_set=value)
+        self.set_output(v_set=value)
         self._last_state_change_t = time.perf_counter()
 
     @property
@@ -782,7 +782,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxCurrent.setValue(value)
         if setting.use_cali:
             value = value * setting.iset_cali_k + setting.iset_cali_b
-        self.sync_state(i_set=value)
+        self.set_output(i_set=value)
         self._last_state_change_t = time.perf_counter()
 
     @property
@@ -805,7 +805,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 return
         self._output_state = value
         self._last_state_change_t = time.perf_counter()
-        self.sync_state(output=value)
+        self.set_output(output=value)
         self.update_state()
 
     @QtCore.pyqtSlot()
@@ -826,7 +826,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     @preset.setter
     def preset(self, value):
         self._preset = value
-        self.sync_state(preset=value)
+        self.set_output(preset=value)
         self.update_state()
 
     def update_state(self):
