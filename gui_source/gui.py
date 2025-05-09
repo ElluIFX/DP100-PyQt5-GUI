@@ -672,10 +672,10 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.data.energy = 0
         self.set_data_freq_signal.emit(self.data_sr)
         self.draw_graph_timer.start(
-            min(round(1000 / self.data_sr), round(1000 / setting.graph_max_fps))
+            max(round(1000 / self.data_sr), round(1000 / setting.graph_max_fps))
         )
         self.state_lcd_timer.start(
-            min(round(1000 / self.data_sr), round(1000 / setting.state_fps))
+            max(round(1000 / self.data_sr), round(1000 / setting.state_fps))
         )
         self.update_state_timer.start(250)
 
@@ -1065,12 +1065,12 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if self.draw_graph_timer.isActive():
             self.draw_graph_timer.stop()
             self.draw_graph_timer.start(
-                min(round(1000 / self.data_sr), round(1000 / setting.graph_max_fps))
+                max(round(1000 / self.data_sr), round(1000 / setting.graph_max_fps))
             )
         if self.state_lcd_timer.isActive():
             self.state_lcd_timer.stop()
             self.state_lcd_timer.start(
-                min(round(1000 / self.data_sr), round(1000 / setting.state_fps))
+                max(round(1000 / self.data_sr), round(1000 / setting.state_fps))
             )
         self.fps_counter.clear()
 
