@@ -692,7 +692,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         if self.func_seq_timer.isActive():
             self.stop_func_seq()
         if self.func_bat_sim_timer.isActive():
-            self.stop_func_bat_sim()
+            self.on_btnBatSim_clicked()
         if self.graph_record_save_timer.isActive():
             self.on_btnGraphRecord_clicked()
         if self.update_state_timer.isActive():
@@ -852,6 +852,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.ui.btnOutput,
             setting.get_color(state_str),
         )
+        if self.ui.comboPreset2.currentIndex() != self._preset:
+            self.ui.comboPreset2.setCurrentIndex(self._preset)
         # check lock
         self.locked = False
         self.ui.frameOutputSetting.setEnabled(not self.locked)
