@@ -1,3 +1,5 @@
+# ruff: noqa: E402
+
 import datetime
 import json
 import math
