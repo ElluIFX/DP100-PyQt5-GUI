@@ -145,7 +145,7 @@ class DP100:
         with self._api_lock:
             ret = self._api.GetCurrentBasic(*args)
         assert ret[0], "获取设备状态失败, 设备可能未连接"
-        return {
+        ret = {
             "preset": int(ret[1]),
             "output": bool(ret[2]),
             "v_set": float(ret[3]) / 1000,
@@ -153,6 +153,8 @@ class DP100:
             "ovp": float(ret[5]) / 1000,
             "ocp": float(ret[6]) / 1000,
         }
+        logger.debug(f"获取设备状态: {ret}")
+        return ret
 
     def get_preset(self, index: int) -> dict:
         """
@@ -239,7 +241,7 @@ class DP100:
         args = [
             Byte(preset),
             UShort(round(i_set * 1000)),
-            UShort(round(v_set * 1000)),
+            UShort(round(v_set * 100) * 10),
         ]
         if output:
             with self._api_lock:
@@ -247,7 +249,9 @@ class DP100:
         else:
             with self._api_lock:
                 ret = self._api.CloseOut(*args)
-        # logger.debug(f"设置输出: {output}, {v_set}, {i_set}, {preset}")
+        logger.debug(
+            f"设置输出: {output}, {v_set}, {i_set}, {preset} -> {args} -> {ret}"
+        )
         assert ret, "设置输出状态失败"
 
     def get_settings(self) -> dict:

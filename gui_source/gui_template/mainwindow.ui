@@ -737,7 +737,7 @@
                     <string>V</string>
                    </property>
                    <property name="decimals">
-                    <number>3</number>
+                    <number>2</number>
                    </property>
                    <property name="minimum">
                     <double>0.000000000000000</double>
@@ -1412,13 +1412,13 @@
                              <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
                             </property>
                             <property name="maximum">
-                             <double>30.000000000000000</double>
+                             <double>36.000000000000000</double>
                             </property>
                             <property name="singleStep">
                              <double>0.100000000000000</double>
@@ -1805,13 +1805,13 @@
                              <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
                             </property>
                             <property name="maximum">
-                             <double>30.000000000000000</double>
+                             <double>36.000000000000000</double>
                             </property>
                             <property name="singleStep">
                              <double>0.100000000000000</double>
@@ -1933,16 +1933,16 @@
                              <set>Qt::AlignCenter</set>
                             </property>
                             <property name="suffix">
-                             <string>A</string>
+                             <string>V</string>
                             </property>
                             <property name="decimals">
-                             <number>3</number>
+                             <number>2</number>
                             </property>
                             <property name="minimum">
                              <double>0.000000000000000</double>
                             </property>
                             <property name="maximum">
-                             <double>10.000000000000000</double>
+                             <double>36.000000000000000</double>
                             </property>
                             <property name="singleStep">
                              <double>0.100000000000000</double>

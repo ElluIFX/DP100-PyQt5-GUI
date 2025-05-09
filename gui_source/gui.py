@@ -398,6 +398,7 @@ update_pyqtgraph_setting()
 class MDPThread(QtCore.QThread):
     """用于与设备通信的线程类，实现异步数据采集"""
 
+    error_signal = QtCore.pyqtSignal(str)  # 错误信号
     data_signal = QtCore.pyqtSignal(float, float, float)  # 电压、电流、时间戳
     state_signal = QtCore.pyqtSignal(dict)  # 状态信号
 
@@ -434,18 +435,27 @@ class MDPThread(QtCore.QThread):
 
     def request_callback(self):
         if self.api is not None:
-            self.api.get_output_info()
+            try:
+                self.api.get_output_info()
+            except Exception as e:
+                self.error_signal.emit(str(e))
 
     def data_callback(self, v_mv: int, i_ma: int):
         self.data_signal.emit(v_mv / 1000, i_ma / 1000, time.perf_counter())
 
     def state_callback(self):
         if self.api is not None:
-            self.state_signal.emit(self.api.get_state())
+            try:
+                self.state_signal.emit(self.api.get_state())
+            except Exception as e:
+                self.error_signal.emit(str(e))
 
     def action_proxy(self, func: str, args: dict):
         if self.api is not None:
-            getattr(self.api, func)(**args)
+            try:
+                getattr(self.api, func)(**args)
+            except Exception as e:
+                self.error_signal.emit(str(e))
 
 
 class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainWindow
@@ -529,6 +539,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.action_signal.connect(self.mdp_thread.action_proxy)
         self.mdp_thread.data_signal.connect(self.data_callback)
         self.mdp_thread.state_signal.connect(self.update_state_cbk)
+        self.mdp_thread.error_signal.connect(self.error_handler)
         self.mdp_thread.start()
 
         if ENGLISH:
@@ -666,7 +677,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.state_lcd_timer.start(
             min(round(1000 / self.data_sr), round(1000 / setting.state_fps))
         )
-        self.update_state_timer.start(100)
+        self.update_state_timer.start(250)
 
     def stopMyTimer(self):
         self.draw_graph_timer.stop()
@@ -727,16 +738,16 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     ##########  基本功能  ##########
 
-    def sync_state(self):
+    def sync_state(self, output=None, v_set=None, i_set=None, preset=None):
         if self.api is None or self.locked:
             return
         self.action_signal.emit(
             "set_output",
             {
-                "output": self._output_state,
-                "v_set": self._v_set,
-                "i_set": self._i_set,
-                "preset": self._preset,
+                "output": output if output is not None else self._output_state,
+                "v_set": v_set if v_set is not None else self._v_set,
+                "i_set": i_set if i_set is not None else self._i_set,
+                "preset": preset if preset is not None else self._preset,
             },
         )
 
@@ -754,7 +765,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxVoltage.setValue(value)
         if setting.use_cali:
             value = value * setting.vset_cali_k + setting.vset_cali_b
-        self.sync_state()
+        self.sync_state(v_set=value)
         self._last_state_change_t = time.perf_counter()
 
     @property
@@ -771,7 +782,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxCurrent.setValue(value)
         if setting.use_cali:
             value = value * setting.iset_cali_k + setting.iset_cali_b
-        self.sync_state()
+        self.sync_state(i_set=value)
         self._last_state_change_t = time.perf_counter()
 
     @property
@@ -794,7 +805,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 return
         self._output_state = value
         self._last_state_change_t = time.perf_counter()
-        self.sync_state()
+        self.sync_state(output=value)
         self.update_state()
 
     @QtCore.pyqtSlot()
@@ -815,7 +826,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     @preset.setter
     def preset(self, value):
         self._preset = value
-        self.sync_state()
+        self.sync_state(preset=value)
         self.update_state()
 
     def update_state(self):
@@ -1569,8 +1580,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
 
     def set_preset_hw(self, _):
         if self.api is not None:
-            text = self.ui.comboPreset2.currentText()
-            preset = int(text.split("-")[1])
+            preset = self.ui.comboPreset2.currentIndex()
             if preset == 0:
                 preset = self.preset
                 self.ui.comboPreset2.setCurrentIndex(preset)
@@ -1588,10 +1598,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def on_btnPreset2Save_clicked(self):
         if self.api is None:
             return
-        preset = self.ui.comboPresetEdit2.currentText()
-        if not preset:
-            return
-        idx = int(preset.split("-")[1])
+        idx = self.ui.comboPresetEdit2.currentIndex()
         v_set = self.ui.spinBoxPreset2Voltage.value()
         i_set = self.ui.spinBoxPreset2Current.value()
         ovp = self.ui.spinBoxPreset2OVP.value()
@@ -1599,7 +1606,6 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         try:
             self.api.set_preset(idx, v_set, i_set, ovp, ocp)
             self.ui.btnPreset2Save.setText(self.tr("保存成功"))
-            self.refresh_preset_hw()
         except Exception:
             logger.exception(self.tr("保存预设失败"))
             self.ui.btnPreset2Save.setText(self.tr("保存失败"))

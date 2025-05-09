@@ -245,82 +245,82 @@
     <message>
         <location filename="gui_template/settings_ui.py" line="351"/>
         <source>- 电源信息 -</source>
-        <translation type="unfinished"></translation>
+        <translation>- Device Info -</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="352"/>
         <source>设备型号:</source>
-        <translation type="unfinished"></translation>
+        <translation>Model:</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="353"/>
         <source>硬件版本:</source>
-        <translation type="unfinished"></translation>
+        <translation>HW Version:</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="354"/>
         <source>软件版本:</source>
-        <translation type="unfinished"></translation>
+        <translation>SW Version:</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="355"/>
         <source>序列号:</source>
-        <translation type="unfinished"></translation>
+        <translation>S/N:</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="357"/>
         <source>背光等级</source>
-        <translation type="unfinished"></translation>
+        <translation>Backlight</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="360"/>
         <source>Level </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="359"/>
         <source>音量等级</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="361"/>
         <source>过功率保护</source>
-        <translation type="unfinished"></translation>
+        <translation>OPP</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="362"/>
         <source>过热保护</source>
-        <translation type="unfinished"></translation>
+        <translation>OTP</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="363"/>
         <source>反接保护</source>
-        <translation type="unfinished"></translation>
+        <translation>Reverse Protection</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="366"/>
         <source>开启</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="365"/>
         <source>上电输出</source>
-        <translation type="unfinished"></translation>
+        <translation>Power-on Output</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="367"/>
         <source>提交 / Submit</source>
-        <translation type="unfinished"></translation>
+        <translation>Submit</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="373"/>
         <source>允许OPP设置超出官方设定的105W范围</source>
-        <translation type="unfinished"></translation>
+        <translation>Allow OPP settings beyond the official 105W limit</translation>
     </message>
     <message>
         <location filename="gui_template/settings_ui.py" line="374"/>
         <source>解锁过功率上限</source>
-        <translation type="unfinished"></translation>
+        <translation>Unlock Power Limit</translation>
     </message>
 </context>
 <context>
@@ -616,17 +616,17 @@
     <message>
         <location filename="gui.py" line="918"/>
         <source>DP100 数控电源上位机</source>
-        <translation type="unfinished"></translation>
+        <translation>DP100 Digital Power Supply Controller</translation>
     </message>
     <message>
         <location filename="gui.py" line="803"/>
         <source>请先连接设备</source>
-        <translation type="unfinished">Please connect device first</translation>
+        <translation>Please connect device first</translation>
     </message>
     <message>
         <location filename="gui.py" line="953"/>
         <source>无法与设备建立通信, 请检查USB连接是否正常</source>
-        <translation type="unfinished"></translation>
+        <translation>Cannot establish communication with the device, please check if the USB connection is working properly</translation>
     </message>
 </context>
 <context>
@@ -649,23 +649,24 @@
     <message>
         <location filename="gui.py" line="2466"/>
         <source>成功</source>
-        <translation type="unfinished"></translation>
+        <translation>Success</translation>
     </message>
     <message>
         <location filename="gui.py" line="2466"/>
         <source>设置已保存</source>
-        <translation type="unfinished"></translation>
+        <translation>Settings saved</translation>
     </message>
     <message>
         <location filename="gui.py" line="2514"/>
         <source>警告</source>
-        <translation type="unfinished">Warning</translation>
+        <translation>Warning</translation>
     </message>
     <message>
         <location filename="gui.py" line="2514"/>
         <source>在超出官方允许的功率范围外使用设备极有可能会对设备造成不可逆的损坏!
 本软件不承担解锁造成的任何损失, 是否继续?</source>
-        <translation type="unfinished"></translation>
+        <translation>Using the device beyond the officially allowed power range is very likely to cause irreversible damage to the device!
+This software does not assume any liability for losses caused by unlocking. Do you want to continue?</translation>
     </message>
 </context>
 <context>
@@ -1238,22 +1239,22 @@
     <message>
         <location filename="gui_template/mainwindow_ui.py" line="2118"/>
         <source>预设组 (软件)</source>
-        <translation type="unfinished"></translation>
+        <translation>Preset Group (SW)</translation>
     </message>
     <message>
         <location filename="gui_template/mainwindow_ui.py" line="2143"/>
         <source>过压保护</source>
-        <translation type="unfinished"></translation>
+        <translation>OVP</translation>
     </message>
     <message>
         <location filename="gui_template/mainwindow_ui.py" line="2145"/>
         <source>过流保护</source>
-        <translation type="unfinished"></translation>
+        <translation>OCP</translation>
     </message>
     <message>
         <location filename="gui_template/mainwindow_ui.py" line="2148"/>
         <source>预设组 (硬件)</source>
-        <translation type="unfinished"></translation>
+        <translation>Preset Group (HW)</translation>
     </message>
 </context>
 <context>
