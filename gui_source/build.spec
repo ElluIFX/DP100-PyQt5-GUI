@@ -4,10 +4,11 @@ block_cipher = None
 
 
 a = Analysis(
-    ["mdp_gui.py"],
+    ["main.py", "gui.py"],
     pathex=["..", "."],  # for github action
     binaries=[],
     datas=[
+        ("./icon.ico", "."),
         ("./en_US.qm", "."),
         ("./SarasaFixedSC-SemiBold.ttf", "."),
         ("./Li-ion.csv", "."),
@@ -16,11 +17,26 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["matplotlib"],
+    excludes=[
+        "llvm",
+        "llvmlite",
+        "numba",
+        "matplotlib",
+    ],  #
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
     noarchive=True,
+)
+splash = Splash(
+    "booting.png",
+    binaries=a.binaries,
+    datas=a.datas,
+    text_pos=(166, 473),
+    text_size=12,
+    text_color="#5ac7ff",
+    max_img_size=(760, 480),
+    always_on_top=False,
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
@@ -29,20 +45,23 @@ exe = EXE(
     a.binaries,
     a.zipfiles,
     a.datas,
+    splash,  # <-- both, splash target
+    splash.binaries,  # <-- and splash binaries
     [],
-    name="MDP-P906-Numba",
+    name="DP100GUI",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=False,
+    upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon="icon.ico",
 )
 # coll = COLLECT(
 #     exe,

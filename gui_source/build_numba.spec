@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ["mdp_main.py", "mdp_gui.py"],
+    ["main.py", "gui.py"],
     pathex=["..", "."],  # for github action
     binaries=[],
     datas=[
@@ -17,12 +17,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[
-        "llvm",
-        "llvmlite",
-        "numba",
-        "matplotlib",
-    ],  #
+    excludes=["matplotlib"],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -48,7 +43,7 @@ exe = EXE(
     splash,  # <-- both, splash target
     splash.binaries,  # <-- and splash binaries
     [],
-    name="MDP-P906",
+    name="DP100GUI-Numba",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

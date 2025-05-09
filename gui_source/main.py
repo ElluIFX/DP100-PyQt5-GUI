@@ -10,7 +10,7 @@ def main():
         pyi_splash.update_text("Initializing UI...")
 
     ##### INITIALIZE #####
-    from mdp_gui import show_app
+    from gui import show_app
 
     if im_ok:
         pyi_splash.close()
