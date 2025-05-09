@@ -2,7 +2,14 @@
 
 A PyQt5-based PC GUI for Aliantek DP100 digital power supply
 
-Check [ketukil's fork](https://github.com/ketukil/Alientek-DP100-PyQT5-english-gui) if you need an English gui.
+Check [ketukil's fork](https://github.com/ketukil/Alientek-DP100-PyQT5-english-gui) if you need an English GUI.
+
+> [!IMPORTANT]
+> 本项目停止更新，新功能将使用Pyside6重新开发，以匹配我其他上位机的最新代码，同时支持多语言
+>
+> This project has been achieved, and new features will be redeveloped using PySide6 to match the latest code of my other upper-level machines, with support for multiple languages.
+>
+> 😊👉 https://github.com/ElluIFX/DP100-PySide6-GUI
 
 ## 功能
 
