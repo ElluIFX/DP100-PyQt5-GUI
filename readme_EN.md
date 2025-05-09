@@ -6,7 +6,7 @@ PyQt5-based PC Controller for Aliantek DP100 Digital Power Supply
 
 ![1746780655831](image/readme/1746780655831.png)
 
-**(GUI in English available if your system language is non-Chinese)**
+**(GUI in English is available if your system language is non-Chinese)**
 
 ## Features
 
