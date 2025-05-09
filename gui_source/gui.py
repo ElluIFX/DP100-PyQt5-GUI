@@ -37,10 +37,10 @@ logger.info(f"ARG_PATH: {ARG_PATH}")
 logger.info(f"ABS_PATH: {ABS_PATH}")
 
 try:
+    sys.path.append(os.path.dirname(ABS_PATH))
     from dp100 import DP100
 except ImportError:
     logger.info("Redirecting to repo")
-    sys.path.append(os.path.dirname(ABS_PATH))
     sys.path.append(os.path.dirname(os.path.dirname(ABS_PATH)))
     from dp100 import DP100
 

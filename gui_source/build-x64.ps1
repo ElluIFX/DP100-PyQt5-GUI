@@ -10,12 +10,12 @@ echo "> Building DP100 and DP100-Numba in parallel"
 # Start both builds in parallel
 $job1 = Start-Job -ScriptBlock {
     Set-Location $using:PWD
-    .\.venv\Scripts\pyinstaller.exe --noconfirm --upx-dir C:\Toolchains\upx .\mdp.spec --log-level WARN
+    .\.venv\Scripts\pyinstaller.exe --noconfirm --upx-dir C:\Toolchains\upx .\build.spec --log-level WARN
 }
 
 $job2 = Start-Job -ScriptBlock {
     Set-Location $using:PWD
-    .\.venv\Scripts\pyinstaller.exe --noconfirm --upx-dir C:\Toolchains\upx .\mdp_numba.spec --log-level WARN
+    .\.venv\Scripts\pyinstaller.exe --noconfirm --upx-dir C:\Toolchains\upx .\build_numba.spec --log-level WARN
 }
 
 # Wait for both jobs to complete

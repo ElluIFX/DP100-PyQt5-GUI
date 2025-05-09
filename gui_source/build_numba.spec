@@ -12,6 +12,8 @@ a = Analysis(
         ("./en_US.qm", "."),
         ("./SarasaFixedSC-SemiBold.ttf", "."),
         ("./Li-ion.csv", "."),
+        ("../dp100/ATK-DP100DLL(x64)_2.0.dll", "."),
+        ("../dp100/ATK-DP100DLL(x86)_2.0.dll", "."),
     ],
     hiddenimports=["pyi_splash"],
     hookspath=[],
