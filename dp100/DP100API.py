@@ -34,7 +34,7 @@ from System import Byte, String, UInt16  # type: ignore
 UShort = UInt16
 
 
-class Fake_Lock:
+class FakeLock:
     def __enter__(self) -> bool:
         return True
 
@@ -51,7 +51,7 @@ class Fake_Lock:
 class DP100:
     def __init__(self, use_lock: bool = False) -> None:
         self._api = ATKDP100API()
-        self._api_lock = Lock() if use_lock else Fake_Lock()
+        self._api_lock = Lock() if use_lock else FakeLock()
         self._callback: Optional[Callable] = None
         self._api.DevStateChanageEvent = self._api.DevStateChanage(self._callback_proxy)
 
@@ -83,51 +83,51 @@ class DP100:
     @property
     def connected(self) -> bool:
         """
-        设备是否连接
+        Whether the device is connected
         """
         return self._api.get_ConnState()
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def connect(self) -> None:
         """
-        连接设备
+        Connect device
         """
         if not self.connected:
             with self._api_lock:
                 ret = self._api.DevOpenOrClose()
-            logger.debug(f"连接设备: {ret}")
-            assert ret, ConnectionError("连接设备失败")
-            logger.info("连接设备成功")
+            logger.debug(f"Connect device: {ret}")
+            assert ret, ConnectionError("Failed to connect to device")
+            logger.info("Device connected successfully")
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def disconnect(self) -> None:
         """
-        断开设备
+        Disconnect device
         """
         if self.connected:
             with self._api_lock:
                 ret = self._api.DevOpenOrClose()
-            logger.debug(f"断开设备: {ret}")
-            assert not ret, "断开设备失败"
-            logger.info("断开设备成功")
+            logger.debug(f"Disconnect device: {ret}")
+            assert not ret, "Failed to disconnect device"
+            logger.info("Device disconnected successfully")
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_device_info(self) -> dict:
         """
-        获取设备信息
+        Get device information
         return: dict(
-            device_name: str, 设备型号
-            hardware_version: str, 硬件版本
-            application_version: str, 软件版本
-            device_SN: str, 设备序列号
-            device_status: str, 设备状态(APP/BOOT)
+            device_name: str, Device model
+            hardware_version: str, Hardware version
+            application_version: str, Software version
+            device_SN: str, Device serial number
+            device_status: str, Device status (APP/BOOT)
         )
         """
         string_vars = [String(" " * 32) for _ in range(5)]
         with self._api_lock:
             ret = self._api.GetDevInfo(*string_vars)
-        logger.debug(f"获取设备信息: {ret}")
-        assert ret[0], "获取设备信息失败, 设备可能未连接"
+        logger.debug(f"Get device info: {ret}")
+        assert ret[0], "Failed to get device information, device may not be connected"
         return {
             "device_name": str(ret[1]).replace("\uf8f5", "").replace("\x00", ""),
             "hardware_version": str(ret[2]),
@@ -139,21 +139,21 @@ class DP100:
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_state(self) -> dict:
         """
-        获取设备状态
+        Get device status
         return: dict(
-            preset: int, 当前预设组
-            output: bool, 输出状态
-            v_set: float, 设定电压 V
-            i_set: float, 设定电流 A
-            ovp: float, 设定过压保护 V
-            ocp: float, 设定过流保护 A
+            preset: int, Current preset group
+            output: bool, Output status
+            v_set: float, Set voltage V
+            i_set: float, Set current A
+            ovp: float, Set overvoltage protection V
+            ocp: float, Set overcurrent protection A
         )
         """
         args = [Byte(0), Byte(0), UInt16(0), UInt16(0), UInt16(0), UInt16(0)]
         with self._api_lock:
             ret = self._api.GetCurrentBasic(*args)
-        logger.debug(f"获取设备状态: {ret}")
-        assert ret[0], "获取设备状态失败, 设备可能未连接"
+        logger.debug(f"Get device status: {ret}")
+        assert ret[0], "Failed to get device status, device may not be connected"
         return {
             "preset": int(ret[1]),
             "output": bool(ret[2]),
@@ -166,21 +166,21 @@ class DP100:
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_preset(self, index: int) -> dict:
         """
-        获取预设组信息
-        index: 预设组索引
+        Get preset group information
+        index: Preset group index
         return: dict(
-            v_set: float, 设定电压 V
-            i_set: float, 设定电流 A
-            ovp: float, 设定过压保护 V
-            ocp: float, 设定过流保护 A
+            v_set: float, Set voltage V
+            i_set: float, Set current A
+            ovp: float, Set overvoltage protection V
+            ocp: float, Set overcurrent protection A
         )
         """
-        assert 0 <= index <= 9, "预设组索引必须在0-9之间"
+        assert 0 <= index <= 9, "Preset group index must be between 0-9"
         args = [Byte(index), UInt16(0), UInt16(0), UInt16(0), UInt16(0)]
         with self._api_lock:
             ret = self._api.GetGroupInfo(*args)
-        logger.debug(f"获取预设组: {index} -> {ret}")
-        assert ret[0], "获取预设组信息失败"
+        logger.debug(f"Get preset group: {index} -> {ret}")
+        assert ret[0], "Failed to get preset group information"
         return {
             "v_set": float(ret[2]) / 1000,
             "i_set": float(ret[1]) / 1000,
@@ -193,14 +193,14 @@ class DP100:
         self, index: int, v_set: float, i_set: float, ovp: float, ocp: float
     ) -> None:
         """
-        设置预设组（必须是当前未使用的预设组）
-        index: 预设组索引
-        v_set: 设定电压 V
-        i_set: 设定电流 A
-        ovp: 设定过压保护 V
-        ocp: 设定过流保护 A
+        Set preset group (must be a currently unused preset group)
+        index: Preset group index
+        v_set: Set voltage V
+        i_set: Set current A
+        ovp: Set overvoltage protection V
+        ocp: Set overcurrent protection A
         """
-        assert 0 <= index <= 9, "预设组索引必须在0-9之间"
+        assert 0 <= index <= 9, "Preset group index must be between 0-9"
         args = [
             Byte(index),
             UInt16(round(i_set * 1000)),
@@ -210,13 +210,15 @@ class DP100:
         ]
         with self._api_lock:
             ret = self._api.SetGroupInfo(*args)
-        logger.debug(f"设置预设组: {index}, {v_set}, {i_set}, {ovp}, {ocp} -> {ret}")
-        assert ret, "设置预设组信息失败"
+        logger.debug(
+            f"Set preset group: {index}, {v_set}, {i_set}, {ovp}, {ocp} -> {ret}"
+        )
+        assert ret, "Failed to set preset group information"
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def use_preset(self, index: int) -> None:
         """
-        使用预设组
+        Use preset group
         """
         args = [
             Byte(index),
@@ -227,8 +229,8 @@ class DP100:
         ]
         with self._api_lock:
             ret = self._api.UseGroup(*args)
-        logger.debug(f"使用预设组: {index} -> {ret}")
-        assert ret, "使用预设组失败"
+        logger.debug(f"Use preset group: {index} -> {ret}")
+        assert ret, "Failed to use preset group"
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def set_output(
@@ -239,12 +241,12 @@ class DP100:
         preset: Optional[int] = None,
     ) -> None:
         """
-        设置输出状态
-        output: 输出使能
-        v_set: 设定电压 V
-        i_set: 设定电流 A
-        preset: 使用的预设组
-        (上述参数均为可选参数，若不传入则不修改)
+        Set output status
+        output: Output enable
+        v_set: Set voltage V
+        i_set: Set current A
+        preset: Used preset group
+        (The above parameters are optional, if not passed, they will not be modified)
         """
         if output is None or v_set is None or i_set is None or preset is None:
             state = self.get_state()
@@ -263,27 +265,27 @@ class DP100:
         else:
             with self._api_lock:
                 ret = self._api.CloseOut(*args)
-        logger.debug(f"设置输出: {output}, {v_set}, {i_set}, {preset} -> {ret}")
-        assert ret, "设置输出状态失败"
+        logger.debug(f"Set output: {output}, {v_set}, {i_set}, {preset} -> {ret}")
+        assert ret, "Failed to set output status"
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_settings(self) -> dict:
         """
-        获取系统设置
+        Get system settings
         return: dict(
-            backlight: int, 背光等级(0-4)
-            volume: int, 音量等级(0-4)
-            opp: float, 过功率保护值 <=105W
-            otp: int, 过热保护值 50-80C
-            reverse_protect: bool, 反接保护
-            auto_output: bool, 上电自动输出
+            backlight: int, Backlight level (0-4)
+            volume: int, Volume level (0-4)
+            opp: float, Over power protection value <=105W
+            otp: int, Over temperature protection value 50-80C
+            reverse_protect: bool, Reverse connection protection
+            auto_output: bool, Auto output on power-on
         )
         """
         args = [Byte(0), Byte(0), UInt16(0), UInt16(0), Byte(0), Byte(0)]
         with self._api_lock:
             ret = self._api.GetSysPar(*args)
-        logger.debug(f"获取系统设置: {ret}")
-        assert ret[0], "获取系统设置失败"
+        logger.debug(f"Get system settings: {ret}")
+        assert ret[0], "Failed to get system settings"
         return {
             "backlight": int(ret[1]),
             "volume": int(ret[2]),
@@ -304,14 +306,14 @@ class DP100:
         auto_output: Optional[bool] = None,
     ) -> None:
         """
-        设置系统设置
-        backlight: 背光等级(0-4)
-        volume: 音量等级(0-4)
-        opp: 过功率保护值 <=105W
-        otp: 过热保护值 50-80C
-        reverse_protect: bool, 反接保护
-        auto_output: bool, 上电自动输出
-        (上述参数均为可选参数，若不传入则不修改)
+        Set system settings
+        backlight: Backlight level (0-4)
+        volume: Volume level (0-4)
+        opp: Over power protection value <=105W
+        otp: Over temperature protection value 50-80C
+        reverse_protect: bool, Reverse connection protection
+        auto_output: bool, Auto output on power-on
+        (The above parameters are optional, if not passed, they will not be modified)
         """
         settings = self.get_settings()
         appver = self.get_device_info()["application_version"]
@@ -335,22 +337,22 @@ class DP100:
         with self._api_lock:
             ret = self._api.SetSysPar(*args)
         logger.debug(
-            f"设置系统设置: {{backlight: {backlight}, volume: {volume}, opp: {opp}, otp: {otp}, reverse_protect: {reverse_protect}, auto_output: {auto_output}}} -> {ret}"
+            f"Set system settings: {{backlight: {backlight}, volume: {volume}, opp: {opp}, otp: {otp}, reverse_protect: {reverse_protect}, auto_output: {auto_output}}} -> {ret}"
         )
-        assert ret, "设置系统设置失败"
+        assert ret, "Failed to set system settings"
 
     def register_output_info_callback(self, callback) -> None:
         """
-        注册输出信息回调函数
-        callback: 回调函数, 传入参数为 Uint16: 电压 mV, Uint16: 电流 mA
+        Register output information callback function
+        callback: Callback function, input parameters are Uint16: voltage mV, Uint16: current mA
         """
-        assert callable(callback), "回调函数必须是可调用的"
+        assert callable(callback), "Callback function must be callable"
         self._api.ReceBasicInfoEvent += self._api.ReceBasicInfo(callback)
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_output_info(self) -> None:
         """
-        发送请求获取输出电压电流信息 (需先注册回调函数)
+        Send request to get output voltage and current information (callback function needs to be registered first)
         """
         with self._api_lock:
             self._api.GetBasicInfo()
@@ -361,21 +363,21 @@ class DP100:
 
     def register_state_change_callback(self, callback) -> None:
         """
-        注册连接状态变化回调函数
-        callback: 回调函数
+        Register connection status change callback function
+        callback: Callback function
         """
-        assert callable(callback), "回调函数必须是可调用的"
+        assert callable(callback), "Callback function must be callable"
         self._callback = callback
 
     def unregister_callback(self) -> None:
         """
-        注销回调函数
+        Unregister callback function
         """
         self._callback = None
 
 
 if __name__ == "__main__":
-    # 用于测试
+    # For testing
     api = DP100()
     api.connect()
     print(api.get_device_info())
