@@ -95,6 +95,7 @@ class DP100:
         if not self.connected:
             with self._api_lock:
                 ret = self._api.DevOpenOrClose()
+            logger.debug(f"连接设备: {ret}")
             assert ret, ConnectionError("连接设备失败")
             logger.info("连接设备成功")
 
@@ -106,6 +107,7 @@ class DP100:
         if self.connected:
             with self._api_lock:
                 ret = self._api.DevOpenOrClose()
+            logger.debug(f"断开设备: {ret}")
             assert not ret, "断开设备失败"
             logger.info("断开设备成功")
 
@@ -124,6 +126,7 @@ class DP100:
         string_vars = [String(" " * 32) for _ in range(5)]
         with self._api_lock:
             ret = self._api.GetDevInfo(*string_vars)
+        logger.debug(f"获取设备信息: {ret}")
         assert ret[0], "获取设备信息失败, 设备可能未连接"
         return {
             "device_name": str(ret[1]).replace("\uf8f5", "").replace("\x00", ""),
@@ -149,8 +152,9 @@ class DP100:
         args = [Byte(0), Byte(0), UInt16(0), UInt16(0), UInt16(0), UInt16(0)]
         with self._api_lock:
             ret = self._api.GetCurrentBasic(*args)
+        logger.debug(f"获取设备状态: {ret}")
         assert ret[0], "获取设备状态失败, 设备可能未连接"
-        ret = {
+        return {
             "preset": int(ret[1]),
             "output": bool(ret[2]),
             "v_set": float(ret[3]) / 1000,
@@ -158,8 +162,6 @@ class DP100:
             "ovp": float(ret[5]) / 1000,
             "ocp": float(ret[6]) / 1000,
         }
-        logger.debug(f"获取设备状态: {ret}")
-        return ret
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_preset(self, index: int) -> dict:
@@ -177,6 +179,7 @@ class DP100:
         args = [Byte(index), UInt16(0), UInt16(0), UInt16(0), UInt16(0)]
         with self._api_lock:
             ret = self._api.GetGroupInfo(*args)
+        logger.debug(f"获取预设组: {index} -> {ret}")
         assert ret[0], "获取预设组信息失败"
         return {
             "v_set": float(ret[2]) / 1000,
@@ -207,6 +210,7 @@ class DP100:
         ]
         with self._api_lock:
             ret = self._api.SetGroupInfo(*args)
+        logger.debug(f"设置预设组: {index}, {v_set}, {i_set}, {ovp}, {ocp} -> {ret}")
         assert ret, "设置预设组信息失败"
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
@@ -223,6 +227,7 @@ class DP100:
         ]
         with self._api_lock:
             ret = self._api.UseGroup(*args)
+        logger.debug(f"使用预设组: {index} -> {ret}")
         assert ret, "使用预设组失败"
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
@@ -258,9 +263,7 @@ class DP100:
         else:
             with self._api_lock:
                 ret = self._api.CloseOut(*args)
-        logger.debug(
-            f"设置输出: {output}, {v_set}, {i_set}, {preset} -> {args} -> {ret}"
-        )
+        logger.debug(f"设置输出: {output}, {v_set}, {i_set}, {preset} -> {ret}")
         assert ret, "设置输出状态失败"
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
@@ -279,6 +282,7 @@ class DP100:
         args = [Byte(0), Byte(0), UInt16(0), UInt16(0), Byte(0), Byte(0)]
         with self._api_lock:
             ret = self._api.GetSysPar(*args)
+        logger.debug(f"获取系统设置: {ret}")
         assert ret[0], "获取系统设置失败"
         return {
             "backlight": int(ret[1]),
@@ -330,6 +334,9 @@ class DP100:
         ]
         with self._api_lock:
             ret = self._api.SetSysPar(*args)
+        logger.debug(
+            f"设置系统设置: {{backlight: {backlight}, volume: {volume}, opp: {opp}, otp: {otp}, reverse_protect: {reverse_protect}, auto_output: {auto_output}}} -> {ret}"
+        )
         assert ret, "设置系统设置失败"
 
     def register_output_info_callback(self, callback) -> None:
@@ -345,11 +352,10 @@ class DP100:
         """
         发送请求获取输出电压电流信息 (需先注册回调函数)
         """
-        self._api_lock.acquire()
-        self._api.GetBasicInfo()
+        with self._api_lock:
+            self._api.GetBasicInfo()
 
     def _callback_proxy(self, a: int, b: int):
-        self._api_lock.release()
         if self._callback:
             self._callback(a, b)
 
