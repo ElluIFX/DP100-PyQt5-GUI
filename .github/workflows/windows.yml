@@ -22,7 +22,6 @@ jobs:
           spec: "gui_source/build.spec"
           requirements: "gui_source/requirements.txt"
           upload_exe_with_name: "DP100GUI"
-          compression_level: 9
           options: --upx-dir "./.upx"
 
   build-numba:
@@ -35,5 +34,4 @@ jobs:
           spec: "gui_source/build_numba.spec"
           requirements: "gui_source/requirements.txt"
           upload_exe_with_name: "DP100GUI-Numba"
-          compression_level: 9
           options: --upx-dir "./.upx"
