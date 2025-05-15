@@ -2,6 +2,7 @@
 
 import os
 import sys
+import time
 from platform import architecture
 
 from loguru import logger
@@ -263,8 +264,15 @@ class DP100:
             with self._api_lock:
                 ret = self._api.OpenOut(*args)
         else:
+            close_args = [
+                Byte(preset),
+                UShort(0),
+                UShort(0),
+            ]
             with self._api_lock:
-                ret = self._api.CloseOut(*args)
+                ret = self._api.CloseOut(*close_args)
+                time.sleep(0.04)
+                ret &= self._api.CloseOut(*args)
         logger.debug(f"Set output: {output}, {v_set}, {i_set}, {preset} -> {ret}")
         assert ret, "Failed to set output status"
 

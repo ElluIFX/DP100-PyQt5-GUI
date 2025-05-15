@@ -115,3 +115,5 @@ if __name__ == "__main__":
         print(f"Update URL: {url}")
     else:
         print("Failed to check for updates")
+
+    print(compare_versions("V2.0.0", "V2.0.1"))
