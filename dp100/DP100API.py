@@ -54,7 +54,7 @@ class DP100:
         self._api = ATKDP100API()
         self._api_lock = Lock() if use_lock else FakeLock()
         self._callback: Optional[Callable] = None
-        self._api.DevStateChanageEvent = self._api.DevStateChanage(self._callback_proxy)
+        self._api.ReceBasicInfoEvent += self._api.ReceBasicInfo(self._callback_proxy)
 
     def __enter__(self) -> "DP100":
         self.connect()
@@ -272,7 +272,7 @@ class DP100:
             with self._api_lock:
                 ret = self._api.CloseOut(*close_args)
                 time.sleep(0.04)
-                ret &= self._api.CloseOut(*args)
+                ret = self._api.CloseOut(*args)
         logger.debug(f"Set output: {output}, {v_set}, {i_set}, {preset} -> {ret}")
         assert ret, "Failed to set output status"
 
@@ -355,7 +355,13 @@ class DP100:
         callback: Callback function, input parameters are Uint16: voltage mV, Uint16: current mA
         """
         assert callable(callback), "Callback function must be callable"
-        self._api.ReceBasicInfoEvent += self._api.ReceBasicInfo(callback)
+        self._callback = callback
+
+    def unregister_output_info_callback(self) -> None:
+        """
+        Unregister callback function
+        """
+        self._callback = None
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(0))
     def get_output_info(self) -> None:
@@ -368,20 +374,6 @@ class DP100:
     def _callback_proxy(self, a: int, b: int):
         if self._callback:
             self._callback(a, b)
-
-    def register_state_change_callback(self, callback) -> None:
-        """
-        Register connection status change callback function
-        callback: Callback function
-        """
-        assert callable(callback), "Callback function must be callable"
-        self._callback = callback
-
-    def unregister_callback(self) -> None:
-        """
-        Unregister callback function
-        """
-        self._callback = None
 
 
 if __name__ == "__main__":
