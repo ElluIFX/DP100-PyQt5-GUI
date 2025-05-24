@@ -1114,7 +1114,7 @@
                    <enum>QTabWidget::Rounded</enum>
                   </property>
                   <property name="currentIndex">
-                   <number>0</number>
+                   <number>3</number>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -2692,13 +2692,13 @@
                              <number>2</number>
                             </property>
                             <property name="minimum">
-                             <double>0.100000000000000</double>
+                             <double>0.010000000000000</double>
                             </property>
                             <property name="maximum">
                              <double>30.000000000000000</double>
                             </property>
                             <property name="singleStep">
-                             <double>0.100000000000000</double>
+                             <double>0.010000000000000</double>
                             </property>
                             <property name="stepType">
                              <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
@@ -2918,8 +2918,8 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>196</width>
-                         <height>240</height>
+                         <width>152</width>
+                         <height>198</height>
                         </rect>
                        </property>
                        <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -3724,7 +3724,7 @@
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>179</width>
+                         <width>176</width>
                          <height>301</height>
                         </rect>
                        </property>
