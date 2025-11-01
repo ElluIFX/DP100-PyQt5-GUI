@@ -85,7 +85,7 @@ SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
 BAT_EXAMPLE_PATH = os.path.join(ABS_PATH, "Li-ion.csv")
-VERSION = "Ver2.0.1"
+VERSION = "2025-11-01"
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -506,7 +506,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.fps_counter = FPSCounter()
         self.CustomTitleBar = CustomTitleBar(
             self,
-            self.tr("DP100 数控电源上位机") + f" {VERSION} By Ellu",
+            self.tr("数控电源") + f" {VERSION}",
         )
         self.CustomTitleBar.set_theme("dark")
         self.setTitleBar(self.CustomTitleBar)
@@ -929,7 +929,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.model = "Unknown"
         self.ui.spinBoxCurrent.setRange(0, 10)
         self.CustomTitleBar.set_name(
-            self.tr("DP100 数控电源上位机") + f" {VERSION} By Ellu"
+            self.tr("数控电源") + f" {VERSION}"
         )
         if DialogSettings.visible:
             DialogSettings.close()
