@@ -506,7 +506,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.fps_counter = FPSCounter()
         self.CustomTitleBar = CustomTitleBar(
             self,
-            self.tr("数控电源") + f" {VERSION}",
+            self.tr("数控电源") + f" {VERSION}By Davy",
         )
         self.CustomTitleBar.set_theme("dark")
         self.setTitleBar(self.CustomTitleBar)
@@ -929,7 +929,7 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.model = "Unknown"
         self.ui.spinBoxCurrent.setRange(0, 10)
         self.CustomTitleBar.set_name(
-            self.tr("数控电源") + f" {VERSION}"
+            self.tr("数控电源") + f" {VERSION}By Davy"
         )
         if DialogSettings.visible:
             DialogSettings.close()
