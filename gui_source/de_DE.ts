@@ -708,7 +708,7 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     </message>
     <message>
         <source>电源设置</source>
-        <translation>GERÄTE EIN</translation>
+        <translation>GERÄTE EINSTELLUNGEN</translation>
     </message>
     <message>
         <source>闭环参数</source>
@@ -832,11 +832,11 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     </message>
     <message>
         <source>连接/断开</source>
-        <translation>LINK/UNLINK</translation>
+        <translation>VERBINDEN/VERBINDUNG AUFHEBEN</translation>
     </message>
     <message>
         <source>清空波形数据缓冲区</source>
-        <translation>Wellenformdatenpuffer löschen</translation>
+        <translation>CLEAR</translation>
     </message>
     <message>
         <source>输出设定 / OUTPUT</source>
@@ -956,7 +956,7 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     </message>
     <message>
         <source>电压</source>
-        <translation>Spannung</translation>
+        <translation>Voltage</translation>
     </message>
     <message>
         <source>电流</source>
