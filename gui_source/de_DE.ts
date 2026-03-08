@@ -452,7 +452,7 @@
     </message>
     <message>
         <source>电压</source>
-        <translation>Spannung</translation>
+        <translation>Voltage</translation>
     </message>
     <message>
         <source>电流</source>
@@ -511,7 +511,7 @@
     <name>MDPSettings</name>
     <message>
         <source>电源设置</source>
-        <translation>GERÄTE EIN</translation>
+        <translation>GERÄTE EINSTELLUNGEN</translation>
     </message>
     <message>
         <source>在超出官方允许的功率范围外使用设备极有可能会对设备造成不可逆的损坏!
@@ -1000,7 +1000,7 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     </message>
     <message>
         <source>图形设置</source>
-        <translation>GRAFIK EIN</translation>
+        <translation>GRAFIK EINSTELLUNGEN</translation>
     </message>
     <message>
         <source>切换数据监控悬浮窗</source>
