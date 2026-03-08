@@ -25,15 +25,15 @@ jobs:
           compression_level: 0
           options: --upx-dir "./.upx"
 
-#  build-numba:
-#    runs-on: windows-latest
-#    steps:
-#      - name: Build Numba
-#        uses: sayyid5416/pyinstaller@v1
-#        with:
-#          python_ver: "3.11"
-#          spec: "gui_source/build_numba.spec"
-#          requirements: "gui_source/requirements.txt"
-#          upload_exe_with_name: "DP100GUI-Numba"
-#          compression_level: 0
-#          options: --upx-dir "./.upx"
+  build-numba:
+    runs-on: windows-latest
+    steps:
+      - name: Build Numba
+        uses: sayyid5416/pyinstaller@v1
+        with:
+          python_ver: "3.11"
+          spec: "gui_source/build_numba.spec"
+          requirements: "gui_source/requirements.txt"
+          upload_exe_with_name: "DP100GUI-Numba"
+          compression_level: 0
+          options: --upx-dir "./.upx"
