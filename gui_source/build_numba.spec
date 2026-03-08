@@ -10,6 +10,7 @@ a = Analysis(
     datas=[
         ("./icon.ico", "."),
         ("./en_US.qm", "."),
+        ("./de_DE.qm", "."),
         ("./SarasaFixedSC-SemiBold.ttf", "."),
         ("./Li-ion.csv", "."),
         ("../dp100/ATK-DP100DLL(x64)_2.0.dll", "."),
