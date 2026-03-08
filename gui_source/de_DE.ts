@@ -265,7 +265,7 @@
     <name>MDPGraphics</name>
     <message>
         <source>图形设置</source>
-        <translation>GRAPHICS SET</translation>
+        <translation>GRAFIK EIN</translation>
     </message>
 </context>
 <context>
@@ -511,7 +511,7 @@
     <name>MDPSettings</name>
     <message>
         <source>电源设置</source>
-        <translation>DEVICE SET</translation>
+        <translation>GERÄTE EIN</translation>
     </message>
     <message>
         <source>在超出官方允许的功率范围外使用设备极有可能会对设备造成不可逆的损坏!
@@ -544,471 +544,471 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     <name>MainWindow</name>
     <message>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>V</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Hz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Wh</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>mΩ</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>◀</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>▶</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>无</source>
-        <translation type="unfinished"></translation>
+        <translation>Aus</translation>
     </message>
     <message>
         <source>0.0%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>0.0Hz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>波形类型</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <source>显示数据:</source>
-        <translation type="unfinished"></translation>
+        <translation>Data:</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>功率 (W)</source>
-        <translation type="unfinished"></translation>
+        <translation>POWER (W)</translation>
     </message>
     <message>
         <source>过流保护</source>
-        <translation type="unfinished"></translation>
+        <translation>OCP</translation>
     </message>
     <message>
         <source>采样率:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beispiel:</translation>
     </message>
     <message>
         <source>停止数据波形刷新（数据缓冲区仍在更新）</source>
-        <translation type="unfinished"></translation>
+        <translation>Beenden Sie die Aktualisierung der Datensignalform (der Datenpuffer wird weiterhin aktualisiert)</translation>
     </message>
     <message>
         <source>将原始数据记录到CSV文件，不受图形缓冲区限制</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Rohdaten in einer CSV-Datei speichern, ohne durch den Grafikpuffer eingeschränkt zu sein</translation>
     </message>
     <message>
         <source>直流扫描</source>
-        <translation type="unfinished"></translation>
+        <translation>DC Sweep</translation>
     </message>
     <message>
         <source>电流 (A)</source>
-        <translation type="unfinished"></translation>
+        <translation>IOUT (A)</translation>
     </message>
     <message>
         <source>辅助功能 / AUX FUNC</source>
-        <translation type="unfinished"></translation>
+        <translation>ZUSATZFUNKTION</translation>
     </message>
     <message>
         <source>结束点</source>
-        <translation type="unfinished"></translation>
+        <translation>Ende</translation>
     </message>
     <message>
         <source>能量 (J)</source>
-        <translation type="unfinished"></translation>
+        <translation>ENERGIE (J)</translation>
     </message>
     <message>
         <source>正弦波</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinus</translation>
     </message>
     <message>
         <source>电池模拟</source>
-        <translation type="unfinished"></translation>
+        <translation>Batteriesimulator</translation>
     </message>
     <message>
         <source>电源设置</source>
-        <translation type="unfinished"></translation>
+        <translation>GERÄTE EIN</translation>
     </message>
     <message>
         <source>闭环参数</source>
-        <translation type="unfinished"></translation>
+        <translation>PID K</translation>
     </message>
     <message>
         <source>扫描响应</source>
-        <translation type="unfinished"></translation>
+        <translation>Antwort</translation>
     </message>
     <message>
         <source>数据波形 / LINE CHART</source>
-        <translation type="unfinished"></translation>
+        <translation>LINIENDIAGRAMM</translation>
     </message>
     <message>
         <source>函数发生器</source>
-        <translation type="unfinished"></translation>
+        <translation>Funktionsgenerator</translation>
     </message>
     <message>
         <source>查看响应曲线</source>
-        <translation type="unfinished"></translation>
+        <translation>Antwortkurve anzeigen</translation>
     </message>
     <message>
         <source>导出当前数据缓冲区的有效数据</source>
-        <translation type="unfinished"></translation>
+        <translation>Gültige Daten aus dem Datenpuffer exportieren</translation>
     </message>
     <message>
         <source>步进值</source>
-        <translation type="unfinished"></translation>
+        <translation>Schritt</translation>
     </message>
     <message>
         <source>快速设定：当设定电压/电流变化时立刻提交</source>
-        <translation type="unfinished"></translation>
+        <translation>Schnelleinrichtung: Bei Änderung der V/I-Einstellung sofort übermitteln</translation>
     </message>
     <message>
         <source>No Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Informationen</translation>
     </message>
     <message>
         <source>当前电量</source>
-        <translation type="unfinished"></translation>
+        <translation>Cur Level</translation>
     </message>
     <message>
         <source>加载曲线</source>
-        <translation type="unfinished"></translation>
+        <translation>Lastkurve</translation>
     </message>
     <message>
         <source>负载阻值</source>
-        <translation type="unfinished"></translation>
+        <translation>LOAD-R</translation>
     </message>
     <message>
         <source>预设组 (硬件)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voreingestellte Gruppe (HW)</translation>
     </message>
     <message>
         <source>执行频率</source>
-        <translation type="unfinished"></translation>
+        <translation>Act Freq</translation>
     </message>
     <message>
         <source>起始点</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
         <source>过压保护</source>
-        <translation type="unfinished"></translation>
+        <translation>OVP</translation>
     </message>
     <message>
         <source>电压上限</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. Volt</translation>
     </message>
     <message>
         <source>查看曲线</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurve anzeigen</translation>
     </message>
     <message>
         <source>高电平</source>
-        <translation type="unfinished"></translation>
+        <translation>High</translation>
     </message>
     <message>
         <source>输出状态</source>
-        <translation type="unfinished"></translation>
+        <translation>Spannungs- und Stromänderungen sind bei eingeschaltetem Ausgang nicht zulässig</translation>
     </message>
     <message>
         <source>Discharge Time: 00:00:00</source>
-        <translation type="unfinished"></translation>
+        <translation>Entladungszeit: 00:00:00</translation>
     </message>
     <message>
         <source>显示范围</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzeigebereich / Punkte</translation>
     </message>
     <message>
         <source>三角波</source>
-        <translation type="unfinished"></translation>
+        <translation>Triangle</translation>
     </message>
     <message>
         <source>设定电压</source>
-        <translation type="unfinished"></translation>
+        <translation>Voltage</translation>
     </message>
     <message>
         <source>设定电流</source>
-        <translation type="unfinished"></translation>
+        <translation>Current</translation>
     </message>
     <message>
         <source>预设组 (软件)</source>
-        <translation type="unfinished"></translation>
+        <translation>Voreingestellte Gruppe (SW)</translation>
     </message>
     <message>
         <source>上窗口数据</source>
-        <translation type="unfinished"></translation>
+        <translation>Oberes Grafikfenster</translation>
     </message>
     <message>
         <source>实时采样率</source>
-        <translation type="unfinished"></translation>
+        <translation>Echtzeit-Abtastrate</translation>
     </message>
     <message>
         <source>修改预设</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearbeiten</translation>
     </message>
     <message>
         <source>未连接</source>
-        <translation type="unfinished"></translation>
+        <translation>Getrennt</translation>
     </message>
     <message>
         <source>连接/断开</source>
-        <translation type="unfinished"></translation>
+        <translation>LINK/UNLINK</translation>
     </message>
     <message>
         <source>清空波形数据缓冲区</source>
-        <translation type="unfinished"></translation>
+        <translation>Wellenformdatenpuffer löschen</translation>
     </message>
     <message>
         <source>输出设定 / OUTPUT</source>
-        <translation type="unfinished"></translation>
+        <translation>AUSGABEEINSTELLUNG</translation>
     </message>
     <message>
         <source>目标参数</source>
-        <translation type="unfinished"></translation>
+        <translation>Ziel</translation>
     </message>
     <message>
         <source>目标功率</source>
-        <translation type="unfinished"></translation>
+        <translation>Ziel P</translation>
     </message>
     <message>
         <source>平均功率</source>
-        <translation type="unfinished"></translation>
+        <translation>AVG-P</translation>
     </message>
     <message>
         <source>序列执行</source>
-        <translation type="unfinished"></translation>
+        <translation>Sequenz</translation>
     </message>
     <message>
         <source>下窗口数据</source>
-        <translation type="unfinished"></translation>
+        <translation>Unteres Grafikfenster</translation>
     </message>
     <message>
         <source>不记录</source>
-        <translation type="unfinished"></translation>
+        <translation>Aus</translation>
     </message>
     <message>
         <source>功率闭环</source>
-        <translation type="unfinished"></translation>
+        <translation>Power Keep</translation>
     </message>
     <message>
         <source>放电曲线</source>
-        <translation type="unfinished"></translation>
+        <translation>Entladekurve</translation>
     </message>
     <message>
         <source>低电平</source>
-        <translation type="unfinished"></translation>
+        <translation>Niedrig</translation>
     </message>
     <message>
         <source>MDP-P906 数控电源上位机</source>
-        <translation type="unfinished"></translation>
+        <translation>MDP-P906 Digitaler Versorgungsregler</translation>
     </message>
     <message>
         <source>多节串联</source>
-        <translation type="unfinished"></translation>
+        <translation>Serie</translation>
     </message>
     <message>
         <source>单节容量</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapazität/S</translation>
     </message>
     <message>
         <source>单节内阻</source>
-        <translation type="unfinished"></translation>
+        <translation>InterRes/S</translation>
     </message>
     <message>
         <source>锯齿波</source>
-        <translation type="unfinished"></translation>
+        <translation>Sawtooth</translation>
     </message>
     <message>
         <source>电压 (V)</source>
-        <translation type="unfinished"></translation>
+        <translation>VOUT (V)</translation>
     </message>
     <message>
         <source> 周期 </source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitraum</translation>
     </message>
     <message>
         <source>停止</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <source>功率</source>
-        <translation type="unfinished"></translation>
+        <translation>Leistung</translation>
     </message>
     <message>
         <source>单次</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausführen</translation>
     </message>
     <message>
         <source>功能已关闭</source>
-        <translation type="unfinished"></translation>
+        <translation>Deaktiviert</translation>
     </message>
     <message>
         <source>噪音</source>
-        <translation type="unfinished"></translation>
+        <translation>Noise</translation>
     </message>
     <message>
         <source>回零</source>
-        <translation type="unfinished"></translation>
+        <translation>NULL</translation>
     </message>
     <message>
         <source>方波</source>
-        <translation type="unfinished"></translation>
+        <translation>Square</translation>
     </message>
     <message>
         <source>清零平均功率和能量累计</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurücksetzen der durchschnittlichen Leistung und Energieakkumulation</translation>
     </message>
     <message>
         <source>保持</source>
-        <translation type="unfinished"></translation>
+        <translation>HALTEN</translation>
     </message>
     <message>
         <source>保存</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Daten wurden gespeichert unter:</translation>
     </message>
     <message>
         <source>切换数据波形是否自动适应窗口</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatische Anpassung der Wellenform an das Fenster umschalten</translation>
     </message>
     <message>
         <source>导出</source>
-        <translation type="unfinished"></translation>
+        <translation>DUMP</translation>
     </message>
     <message>
         <source>电压</source>
-        <translation type="unfinished"></translation>
+        <translation>Spannung</translation>
     </message>
     <message>
         <source>电流</source>
-        <translation type="unfinished"></translation>
+        <translation>Current</translation>
     </message>
     <message>
         <source>录制</source>
-        <translation type="unfinished"></translation>
+        <translation>REC</translation>
     </message>
     <message>
         <source>延迟</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzögerung</translation>
     </message>
     <message>
         <source>适应</source>
-        <translation type="unfinished"></translation>
+        <translation>AUTO</translation>
     </message>
     <message>
         <source>循环</source>
-        <translation type="unfinished"></translation>
+        <translation>Loop</translation>
     </message>
     <message>
         <source>浮窗</source>
-        <translation type="unfinished"></translation>
+        <translation>FLOAT</translation>
     </message>
     <message>
         <source>清空</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle löschen</translation>
     </message>
     <message>
         <source>等待</source>
-        <translation type="unfinished"></translation>
+        <translation>Warten</translation>
     </message>
     <message>
         <source>阻值</source>
-        <translation type="unfinished"></translation>
+        <translation>Widerstand</translation>
     </message>
     <message>
         <source>载入</source>
-        <translation type="unfinished"></translation>
+        <translation>Laden</translation>
     </message>
     <message>
         <source>图形设置</source>
-        <translation type="unfinished"></translation>
+        <translation>GRAFIK EIN</translation>
     </message>
     <message>
         <source>切换数据监控悬浮窗</source>
-        <translation type="unfinished"></translation>
+        <translation>Wechseln Sie zum schwebenden Fenster für die Datenüberwachung</translation>
     </message>
     <message>
         <source>截止电量</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop Level</translation>
     </message>
 </context>
 <context>
