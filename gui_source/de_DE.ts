@@ -836,7 +836,7 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     </message>
     <message>
         <source>清空波形数据缓冲区</source>
-        <translation>CLEAR</translation>
+        <translation>Wellenformdatenpuffer löschen</translation>
     </message>
     <message>
         <source>输出设定 / OUTPUT</source>
@@ -984,7 +984,7 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     </message>
     <message>
         <source>清空</source>
-        <translation>Alle löschen</translation>
+        <translation>CLEAR</translation>
     </message>
     <message>
         <source>等待</source>
