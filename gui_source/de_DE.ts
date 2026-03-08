@@ -71,7 +71,8 @@
     </message>
     <message>
         <source>应用校准参数 (y=kx+b)</source>
-        <translation>Kalibrierungsparameter anwenden (y=kx+b)</translation>
+        <translatorcomment>Shortened due to lack of space</translatorcomment>
+        <translation>Kalibrierungspara. anwenden (y=kx+b)</translation>
     </message>
     <message>
         <source>暗黑风格</source>
@@ -265,7 +266,7 @@
     <name>MDPGraphics</name>
     <message>
         <source>图形设置</source>
-        <translation>GRAFIK EIN</translation>
+        <translation>GRAFIK EINSTELLUNGEN</translation>
     </message>
 </context>
 <context>
@@ -668,7 +669,7 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     </message>
     <message>
         <source>采样率:</source>
-        <translation>Beispiel:</translation>
+        <translation>Sample:</translation>
     </message>
     <message>
         <source>停止数据波形刷新（数据缓冲区仍在更新）</source>
