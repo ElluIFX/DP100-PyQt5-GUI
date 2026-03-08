@@ -788,7 +788,7 @@ Diese Software übernimmt keine Haftung für Schäden, die durch das Entsperren 
     </message>
     <message>
         <source>输出状态</source>
-        <translation>Spannungs- und Stromänderungen sind bei eingeschaltetem Ausgang nicht zulässig</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <source>Discharge Time: 00:00:00</source>
