@@ -103,6 +103,14 @@ if (
     app.installTranslator(trans)
     ENGLISH = True
 
+if system_lang.startswith("de"):
+    trans_de = QtCore.QTranslator()
+    if trans_de.load(os.path.join(ABS_PATH, "de_DE.qm")):
+        logger.info("german translation loaded")
+        app.installTranslator(trans_de)
+    else:
+        logger.warning("de_DE.qm could not be loaded")
+
 # load custom font
 _ = QtGui.QFontDatabase.addApplicationFont(FONT_PATH)
 fonts = QtGui.QFontDatabase.applicationFontFamilies(_)
