@@ -85,7 +85,7 @@ SETTING_FILE = os.path.join(ARG_PATH, "settings.json")
 ICON_PATH = os.path.join(ABS_PATH, "icon.ico")
 FONT_PATH = os.path.join(ABS_PATH, "SarasaFixedSC-SemiBold.ttf")
 BAT_EXAMPLE_PATH = os.path.join(ABS_PATH, "Li-ion.csv")
-VERSION = "Ver2.0.1"
+VERSION = "Ver2.0.2"
 qdarktheme.enable_hi_dpi()
 app = QtWidgets.QApplication(sys.argv)
 
@@ -102,6 +102,14 @@ if (
     trans.load(os.path.join(ABS_PATH, "en_US.qm"))
     app.installTranslator(trans)
     ENGLISH = True
+
+if system_lang.startswith("de"):
+    trans_de = QtCore.QTranslator()
+    if trans_de.load(os.path.join(ABS_PATH, "de_DE.qm")):
+        logger.info("german translation loaded")
+        app.installTranslator(trans_de)
+    else:
+        logger.warning("de_DE.qm could not be loaded")
 
 # load custom font
 _ = QtGui.QFontDatabase.addApplicationFont(FONT_PATH)

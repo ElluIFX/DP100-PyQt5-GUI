@@ -6,4 +6,5 @@ SOURCES += gui.py \
 
 CODECFORTR = UTF-8
 
-TRANSLATIONS += en_US.ts
+TRANSLATIONS += en_US.ts \
+                de_DE.ts
