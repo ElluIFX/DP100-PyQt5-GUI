@@ -490,6 +490,8 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     _i_set = 0.0
     _output_state = False
     _preset = 0
+    _device_mode = 0  # 0=single, 1=series, 2=parallel
+    api2: Optional[DP100] = None
     open_r = 1e7
     continuous_energy_counter = 0
     model = "Unknown"
@@ -517,6 +519,9 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.get_preset_hw("")
         self.close_state_ui()
         self.load_battery_model(BAT_EXAMPLE_PATH)
+        # secondary device realtime storage and output state
+        self.data2 = RealtimeData(setting.data_pts)
+        self._output_state2 = False
         center_window(self, 920, 800)
         self.ui.progressBarVoltage.setMaximum(1000)
         self.ui.progressBarCurrent.setMaximum(1000)
@@ -526,6 +531,92 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.listSeq.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.spinBoxVoltage.setSingleStep(0.001)
         self.ui.spinBoxCurrent.setSingleStep(0.001)
+
+        self.ui.labelDeviceMode = QtWidgets.QLabel(self)
+        self.ui.labelDeviceMode.setText(self.tr("输出模式"))
+        self.ui.labelDeviceMode.setMinimumSize(QtCore.QSize(0, 28))
+        self.ui.labelDeviceMode.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.comboDeviceMode = QtWidgets.QComboBox(self)
+        self.ui.comboDeviceMode.setMinimumSize(QtCore.QSize(140, 28))
+        self.ui.comboDeviceMode.addItems(
+            [
+                self.tr("单设备"),
+                self.tr("双设备串联"),
+                self.tr("双设备并联"),
+            ]
+        )
+        self.ui.comboDeviceMode.setCurrentIndex(0)
+        self.ui.comboDeviceMode.currentIndexChanged.connect(
+            self.on_comboDeviceMode_currentIndexChanged
+        )
+        self.ui.labelConnectState2 = QtWidgets.QLabel(self)
+        self.ui.labelConnectState2.setText(self.tr("未连接"))
+        self.ui.labelConnectState2.setMinimumSize(QtCore.QSize(0, 28))
+        self.ui.labelConnectState2.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelConnectState2.setVisible(False)
+
+        self.ui.labelSN1 = QtWidgets.QLabel(self)
+        self.ui.labelSN1.setText("")
+        self.ui.labelSN1.setMinimumSize(QtCore.QSize(140, 20))
+        self.ui.labelSN1.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelSN1.setVisible(False)
+
+        self.ui.labelSN2 = QtWidgets.QLabel(self)
+        self.ui.labelSN2.setText("")
+        self.ui.labelSN2.setMinimumSize(QtCore.QSize(140, 20))
+        self.ui.labelSN2.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelSN2.setVisible(False)
+
+        self.ui.horizontalLayout_12.insertWidget(1, self.ui.labelDeviceMode)
+        self.ui.horizontalLayout_12.insertWidget(2, self.ui.comboDeviceMode)
+        self.ui.horizontalLayout_12.insertWidget(3, self.ui.labelConnectState2)
+        self.ui.horizontalLayout_12.insertWidget(4, self.ui.labelSN1)
+        self.ui.horizontalLayout_12.insertWidget(5, self.ui.labelSN2)
+
+        # device info labels (model / firmware / preset) for both devices
+        self.ui.labelModel1 = QtWidgets.QLabel(self)
+        self.ui.labelModel1.setText("")
+        self.ui.labelModel1.setMinimumSize(QtCore.QSize(140, 18))
+        self.ui.labelModel1.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelModel1.setVisible(False)
+
+        self.ui.labelFW1 = QtWidgets.QLabel(self)
+        self.ui.labelFW1.setText("")
+        self.ui.labelFW1.setMinimumSize(QtCore.QSize(120, 18))
+        self.ui.labelFW1.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelFW1.setVisible(False)
+
+        self.ui.labelPreset1 = QtWidgets.QLabel(self)
+        self.ui.labelPreset1.setText("")
+        self.ui.labelPreset1.setMinimumSize(QtCore.QSize(100, 18))
+        self.ui.labelPreset1.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelPreset1.setVisible(False)
+
+        self.ui.labelModel2 = QtWidgets.QLabel(self)
+        self.ui.labelModel2.setText("")
+        self.ui.labelModel2.setMinimumSize(QtCore.QSize(140, 18))
+        self.ui.labelModel2.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelModel2.setVisible(False)
+
+        self.ui.labelFW2 = QtWidgets.QLabel(self)
+        self.ui.labelFW2.setText("")
+        self.ui.labelFW2.setMinimumSize(QtCore.QSize(120, 18))
+        self.ui.labelFW2.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelFW2.setVisible(False)
+
+        self.ui.labelPreset2 = QtWidgets.QLabel(self)
+        self.ui.labelPreset2.setText("")
+        self.ui.labelPreset2.setMinimumSize(QtCore.QSize(100, 18))
+        self.ui.labelPreset2.setAlignment(QtCore.Qt.AlignCenter)
+        self.ui.labelPreset2.setVisible(False)
+
+        self.ui.horizontalLayout_12.insertWidget(6, self.ui.labelModel1)
+        self.ui.horizontalLayout_12.insertWidget(7, self.ui.labelFW1)
+        self.ui.horizontalLayout_12.insertWidget(8, self.ui.labelPreset1)
+        self.ui.horizontalLayout_12.insertWidget(9, self.ui.labelModel2)
+        self.ui.horizontalLayout_12.insertWidget(10, self.ui.labelFW2)
+        self.ui.horizontalLayout_12.insertWidget(11, self.ui.labelPreset2)
+
         self.ui.doubleSpinBoxSampleRate.setValue(self.data_sr)
 
         self.ui.tabWidget.tabBar().setVisible(False)
@@ -534,13 +625,43 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         )
 
         self.mdp_thread = MDPThread()
+        self.mdp_thread2 = MDPThread()
         self.set_data_freq_signal.connect(self.mdp_thread.set_data_freq)
+        self.set_data_freq_signal.connect(self.mdp_thread2.set_data_freq)
         self.state_signal.connect(self.mdp_thread.state_callback)
         self.action_signal.connect(self.mdp_thread.action_proxy)
+        self.action_signal.connect(self.mdp_thread2.action_proxy)
         self.mdp_thread.data_signal.connect(self.data_callback)
+        self.mdp_thread2.data_signal.connect(self.data_callback2)
         self.mdp_thread.state_signal.connect(self.update_state_cbk)
+        self.mdp_thread2.state_signal.connect(self.update_state_cbk2)
         self.mdp_thread.error_signal.connect(self.error_handler)
+        self.mdp_thread2.error_signal.connect(self.error_handler)
         self.mdp_thread.start()
+        self.mdp_thread2.start()
+
+        # add secondary output button next to main output (if layout exists)
+        try:
+            self.ui.btnOutput2 = QtWidgets.QPushButton(self)
+            self.ui.btnOutput2.setMinimumSize(QtCore.QSize(96, 32))
+            self.ui.btnOutput2.setMaximumSize(QtCore.QSize(96, 16777215))
+            self.ui.btnOutput2.setText(self.tr("[N/A2]"))
+            self.ui.btnOutput2.clicked.connect(self.on_btnOutput2_clicked)
+            if hasattr(self.ui, "horizontalLayout_26"):
+                self.ui.horizontalLayout_26.addWidget(self.ui.btnOutput2)
+        except Exception:
+            pass
+
+        # add a checkbox to control visibility of secondary device small plots
+        try:
+            self.ui.checkBoxShowDev2Plots = QtWidgets.QCheckBox(self)
+            self.ui.checkBoxShowDev2Plots.setText(self.tr("显示副设备图"))
+            self.ui.checkBoxShowDev2Plots.setChecked(True)
+            if hasattr(self.ui, "horizontalLayout_39"):
+                self.ui.horizontalLayout_39.addWidget(self.ui.checkBoxShowDev2Plots)
+            self.ui.checkBoxShowDev2Plots.toggled.connect(self.on_checkBoxShowDev2Plots_toggled)
+        except Exception:
+            pass
 
         if ENGLISH:
             c_font = QtGui.QFont()
@@ -741,14 +862,38 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
     def set_output(self, output=None, v_set=None, i_set=None, preset=None):
         if self.api is None:
             return
-        self.action_signal.emit(
-            "set_output",
-            {
-                "output": output if output is not None else self._output_state,
-                "v_set": v_set if v_set is not None else self._v_set,
-                "i_set": i_set if i_set is not None else self._i_set,
-                "preset": preset if preset is not None else self._preset,
-            },
+        output_value = output if output is not None else self._output_state
+        v_value = v_set if v_set is not None else self._v_set
+        i_value = i_set if i_set is not None else self._i_set
+        preset_value = preset if preset is not None else self._preset
+
+        if self._device_mode == 0 or self.api2 is None:
+            self.api.set_output(
+                output=output_value,
+                v_set=v_value,
+                i_set=i_value,
+                preset=preset_value,
+            )
+            return
+
+        if self._device_mode == 1:
+            per_v = v_value / 2
+            per_i = i_value
+        else:
+            per_v = v_value
+            per_i = i_value / 2
+
+        self.api.set_output(
+            output=output_value,
+            v_set=per_v,
+            i_set=per_i,
+            preset=preset_value,
+        )
+        self.api2.set_output(
+            output=output_value,
+            v_set=per_v,
+            i_set=per_i,
+            preset=preset_value,
         )
 
     @property
@@ -862,9 +1007,54 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxVoltage.setEnabled(not self.locked)
         self.ui.spinBoxCurrent.setEnabled(not self.locked)
 
+    def update_state_cbk2(self, state: dict):
+        # Update secondary device state (preset, v_set, i_set, output)
+        try:
+            if self.api2 is None:
+                return
+            v = state.get("v_set", 0.0)
+            i = state.get("i_set", 0.0)
+            out = state.get("output", False)
+            if hasattr(self.ui, "labelSN2") and self.ui.labelSN2.isVisible():
+                self.ui.labelSN2.setText(f"SN: {self.api2.get_device_info().get('device_SN','')} V:{v:.3f} I:{i:.3f} {'ON' if out else 'OFF'}")
+        except Exception:
+            pass
+
     @QtCore.pyqtSlot()
     def on_btnOutput_clicked(self):
         self.output_state = not self.output_state
+
+    @QtCore.pyqtSlot()
+    def on_btnOutput2_clicked(self):
+        # toggle secondary device output independently
+        if self.api2 is None:
+            CustomMessageBox(self, self.tr("错误"), self.tr("请先连接副设备"))
+            return
+        new_state = not self._output_state2
+        # optional warning for secondary output
+        if setting.output_warning and not self._output_state2:
+            ok = CustomMessageBox.question(
+                self,
+                self.tr("警告"),
+                self.tr("确定要打开副设备输出?") + f"\n{self.tr('电压')}: {self._v_set:.3f}V\n{self.tr('电流')}: {self._i_set:.3f}A",
+            )
+            if not ok:
+                return
+        self._output_state2 = new_state
+        try:
+            # use same v/i splitting rules as set_output when in combined mode
+            if self._device_mode == 0 or self.api is None:
+                self.api2.set_output(output=new_state, v_set=self._v_set, i_set=self._i_set)
+            else:
+                if self._device_mode == 1:
+                    per_v = self._v_set / 2
+                    per_i = self._i_set
+                else:
+                    per_v = self._v_set
+                    per_i = self._i_set / 2
+                self.api2.set_output(output=new_state, v_set=per_v, i_set=per_i)
+        except Exception:
+            logger.exception("failed to set output for device2")
 
     def close_state_ui(self):
         self.ui.labelConnectState.setText(self.tr("未连接"))
@@ -879,6 +1069,19 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.curve1.setData(x=[], y=[])
         self.curve2.setData(x=[], y=[])
         self.ui.labelGraphInfo.setText("No Info")
+        if hasattr(self.ui, "labelConnectState2"):
+            self.ui.labelConnectState2.setVisible(False)
+            self.ui.labelConnectState2.setText(self.tr("未连接"))
+        for nm in [
+            "labelModel1",
+            "labelFW1",
+            "labelPreset1",
+            "labelModel2",
+            "labelFW2",
+            "labelPreset2",
+        ]:
+            if hasattr(self.ui, nm):
+                getattr(self.ui, nm).setVisible(False)
         for widget in [
             self.ui.lcdVoltage,
             self.ui.lcdCurrent,
@@ -908,6 +1111,80 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.ui.spinBoxCurrent.setValue(setting.last_iset)
         self._v_set = setting.last_vset
         self._i_set = setting.last_iset
+        # show main device SN
+        if hasattr(self.ui, "labelSN1"):
+            try:
+                sn1 = self.api.get_device_info().get("device_SN", "")
+                self.ui.labelSN1.setVisible(True)
+                self.ui.labelSN1.setText(f"SN: {sn1}")
+            except Exception:
+                self.ui.labelSN1.setVisible(False)
+
+        # populate device1 info: model / fw / preset
+        try:
+            info1 = self.api.get_device_info()
+            st1 = self.api.get_state()
+            if hasattr(self.ui, "labelModel1"):
+                self.ui.labelModel1.setVisible(True)
+                self.ui.labelModel1.setText(info1.get("device_name", ""))
+            if hasattr(self.ui, "labelFW1"):
+                self.ui.labelFW1.setVisible(True)
+                self.ui.labelFW1.setText(info1.get("application_version", ""))
+            if hasattr(self.ui, "labelPreset1"):
+                self.ui.labelPreset1.setVisible(True)
+                self.ui.labelPreset1.setText(f"Group-{st1.get('preset',0)}")
+        except Exception:
+            if hasattr(self.ui, "labelModel1"):
+                self.ui.labelModel1.setVisible(False)
+            if hasattr(self.ui, "labelFW1"):
+                self.ui.labelFW1.setVisible(False)
+            if hasattr(self.ui, "labelPreset1"):
+                self.ui.labelPreset1.setVisible(False)
+
+        if hasattr(self.ui, "labelConnectState2"):
+            self.ui.labelConnectState2.setVisible(self._device_mode != 0)
+            if self._device_mode != 0:
+                if self.api2 is not None:
+                    self.ui.labelConnectState2.setText(self.tr("副设备已连接"))
+                    set_color(
+                        self.ui.labelConnectState2,
+                        setting.get_color("general_green"),
+                    )
+                    if hasattr(self.ui, "labelSN2"):
+                        try:
+                            sn2 = self.api2.get_device_info().get("device_SN", "")
+                            self.ui.labelSN2.setVisible(True)
+                            self.ui.labelSN2.setText(f"SN: {sn2}")
+                        except Exception:
+                            self.ui.labelSN2.setVisible(False)
+                        # populate device2 info: model/fw/preset
+                        try:
+                            info2 = self.api2.get_device_info()
+                            st2 = self.api2.get_state()
+                            if hasattr(self.ui, "labelModel2"):
+                                self.ui.labelModel2.setVisible(True)
+                                self.ui.labelModel2.setText(info2.get("device_name", ""))
+                            if hasattr(self.ui, "labelFW2"):
+                                self.ui.labelFW2.setVisible(True)
+                                self.ui.labelFW2.setText(info2.get("application_version", ""))
+                            if hasattr(self.ui, "labelPreset2"):
+                                self.ui.labelPreset2.setVisible(True)
+                                self.ui.labelPreset2.setText(f"Group-{st2.get('preset',0)}")
+                        except Exception:
+                            if hasattr(self.ui, "labelModel2"):
+                                self.ui.labelModel2.setVisible(False)
+                            if hasattr(self.ui, "labelFW2"):
+                                self.ui.labelFW2.setVisible(False)
+                            if hasattr(self.ui, "labelPreset2"):
+                                self.ui.labelPreset2.setVisible(False)
+                else:
+                    self.ui.labelConnectState2.setText(self.tr("副设备未连接"))
+                    set_color(
+                        self.ui.labelConnectState2,
+                        setting.get_color("general_red"),
+                    )
+                    if hasattr(self.ui, "labelSN2"):
+                        self.ui.labelSN2.setVisible(False)
 
     def error_handler(self, error_type: str):
         self.disconnect_device()
@@ -919,20 +1196,57 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         api = self.api
         self.api = None
         self.mdp_thread.set_api(None)
+        if hasattr(self, "mdp_thread2"):
+            self.mdp_thread2.set_api(None)
         try:
             api.disconnect()
         except Exception:
             pass
+        if self.api2 is not None:
+            try:
+                self.api2.disconnect()
+            except Exception:
+                pass
+            self.api2 = None
         self.api = None
         self.v_set = 0.0
         self.i_set = 0.0
         self.model = "Unknown"
         self.ui.spinBoxCurrent.setRange(0, 10)
+        if hasattr(self.ui, "comboDeviceMode"):
+            self.ui.comboDeviceMode.setEnabled(True)
         self.CustomTitleBar.set_name(
             self.tr("数控电源") + f" {VERSION} By Dong Pan"
         )
         if DialogSettings.visible:
             DialogSettings.close()
+
+    def connect_single_device(self) -> DP100:
+        api = DP100()
+        api.connect()
+        time.sleep(0.05)
+        api.get_device_info()
+        return api
+
+    def on_comboDeviceMode_currentIndexChanged(self, index: int):
+        self._device_mode = index
+        if index == 0:
+            self.ui.spinBoxVoltage.setMaximum(30)
+            self.ui.spinBoxCurrent.setMaximum(10)
+        elif index == 1:
+            self.ui.spinBoxVoltage.setMaximum(60)
+            self.ui.spinBoxCurrent.setMaximum(10)
+        else:
+            self.ui.spinBoxVoltage.setMaximum(30)
+            self.ui.spinBoxCurrent.setMaximum(20)
+
+        if self.api is not None:
+            self.disconnect_device()
+            CustomMessageBox(
+                self,
+                self.tr("提示"),
+                self.tr("切换设备模式后，请重新连接设备。"),
+            )
 
     @QtCore.pyqtSlot()
     def on_btnConnect_clicked(self):
@@ -940,28 +1254,26 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             if self.api is not None:
                 self.disconnect_device()
             else:
-                api = None
+                self.api = None
+                self.api2 = None
                 try:
-                    api = DP100()
-                    api.connect()
-                    time.sleep(0.05)
-                    api.get_device_info()
+                    self.api = self.connect_single_device()
+                    if self._device_mode != 0:
+                        self.api2 = self.connect_single_device()
                 except Exception as e:
-                    if api is not None:
-                        try:
-                            api.disconnect()
-                        except Exception:
-                            pass
+                    self.disconnect_device()
                     logger.exception("Failed to connect")
                     raise e
-                self.api = api
-                self.mdp_thread.set_api(api)
+                self.mdp_thread.set_api(self.api)
+                if self.api2 is not None:
+                    self.mdp_thread2.set_api(self.api2)
                 self._last_state_change_t = time.perf_counter()
                 self.open_state_ui()
                 self.get_preset_hw("")
                 self.startMyTimer()
                 self.update_state()
                 self.on_btnGraphClear_clicked(skip_confirm=True)
+                self.ui.comboDeviceMode.setEnabled(False)
         except Exception as e:
             error = self.tr("无法与设备建立通信, 请检查USB连接是否正常")
             CustomMessageBox(self, self.tr("连接失败"), error)
@@ -1012,6 +1324,56 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             )
             data.times[data.update_count] = t - dt
             data.update_count += 1
+        self.fps_counter.tick()
+
+    def data_callback2(self, volt: float, curr: float, timestamp: float):
+        # process secondary device realtime data: store to buffer, update small UI and recording
+        if setting.use_cali:
+            volt = volt * setting.v_cali_k + setting.v_cali_b
+            curr = curr * setting.i_cali_k + setting.i_cali_b
+        if volt < setting.v_threshold:
+            volt = 0
+        if curr < setting.i_threshold:
+            curr = 0
+        data = self.data2
+        if self.graph_record_flag:
+            if not hasattr(self, "graph_record_data2") or self.graph_record_data2 is None:
+                self.graph_record_data2 = RecordData()
+                self.graph_record_data2.start_time = timestamp
+                self.graph_record_data2.last_time = timestamp
+            else:
+                t = timestamp - self.graph_record_data2.start_time
+                dt = timestamp - self.graph_record_data2.last_time
+                self.graph_record_data2.last_time = timestamp
+                self.graph_record_data2.add_values(volt, curr, t)
+        with data.sync_lock:
+            data.voltage_tmp.append(volt)
+            data.current_tmp.append(curr)
+            t = timestamp - data.start_time
+            dt = timestamp - data.last_time
+            data.last_time = timestamp
+            if data.update_count + 1 > data.data_length:
+                offset = data.update_count + 1 - data.data_length
+                data.voltages = np.roll(data.voltages, -offset)
+                data.currents = np.roll(data.currents, -offset)
+                data.powers = np.roll(data.powers, -offset)
+                data.resistances = np.roll(data.resistances, -offset)
+                data.times = np.roll(data.times, -offset)
+                data.update_count -= offset
+            data.voltages[data.update_count] = volt
+            data.currents[data.update_count] = curr
+            data.powers[data.update_count] = volt * curr
+            data.resistances[data.update_count] = volt / curr if curr != 0 else self.open_r
+            data.times[data.update_count] = t - dt
+            data.update_count += 1
+        # update small UI labels if present
+        try:
+            if hasattr(self.ui, "labelSN2") and self.ui.labelSN2.isVisible():
+                info = self.api2.get_device_info() if self.api2 is not None else {}
+                sn = info.get("device_SN", "")
+                self.ui.labelSN2.setText(f"SN: {sn} V:{volt:.3f} I:{curr:.3f}")
+        except Exception:
+            pass
         self.fps_counter.tick()
 
     def update_state_lcd(self):
@@ -1142,6 +1504,28 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.curve1 = self.ui.widgetGraph1.plot(pen=self.pen1, clear=True)
         self.curve2 = self.ui.widgetGraph2.plot(pen=self.pen2, clear=True)
 
+        # secondary device small plots (device 2)
+        try:
+            self.ui.widgetGraph1_b = pg.PlotWidget()
+            self.ui.widgetGraph2_b = pg.PlotWidget()
+            self.ui.widgetGraph1_b.setMinimumHeight(120)
+            self.ui.widgetGraph2_b.setMinimumHeight(120)
+            self.ui.widgetGraph1_b.setLabel("left", self.tr("电压 (副设备)"), units="V")
+            self.ui.widgetGraph2_b.setLabel("left", self.tr("电流 (副设备)"), units="A")
+            self.ui.widgetGraph1_b.showGrid(x=True, y=True)
+            self.ui.widgetGraph2_b.showGrid(x=True, y=True)
+            self.pen3 = pg.mkPen(color=setting.get_color("line1"), width=1)
+            self.pen4 = pg.mkPen(color=setting.get_color("line2"), width=1)
+            self.curve1_b = self.ui.widgetGraph1_b.plot(pen=self.pen3, clear=True)
+            self.curve2_b = self.ui.widgetGraph2_b.plot(pen=self.pen4, clear=True)
+            # insert secondary plots into graph area
+            if hasattr(self.ui, "verticalLayout_7"):
+                self.ui.verticalLayout_7.addWidget(self.ui.widgetGraph1_b)
+                self.ui.verticalLayout_7.addWidget(self.ui.widgetGraph2_b)
+        except Exception:
+            # fail silently if UI layout changes
+            pass
+
         # 设置自动缩放标志
         self._graph_auto_scale_flag = True
 
@@ -1222,6 +1606,24 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             np.min(eval_data),
             np.mean(eval_data),
         )
+
+    def get_data2(self, display_pts: int = None):
+        """从副设备缓存获取最近的数据段（简化版）"""
+        if display_pts is None:
+            display_pts = setting.display_pts
+        with self.data2.sync_lock:
+            update_count = self.data2.update_count
+            if update_count == 0:
+                return None, None, 0, 0, np.inf, -np.inf, 0
+            pts = min(display_pts, update_count)
+            start = update_count - pts
+            time_arr = self.data2.times[start:update_count]
+            volt_arr = self.data2.voltages[start:update_count]
+            curr_arr = self.data2.currents[start:update_count]
+            maxv = float(np.max(volt_arr)) if volt_arr.size > 0 else np.inf
+            minv = float(np.min(volt_arr)) if volt_arr.size > 0 else -np.inf
+            avg = float(np.mean(volt_arr)) if volt_arr.size > 0 else 0
+            return volt_arr, time_arr, start, update_count, maxv, minv, avg
 
     _typename_dict = None
 
@@ -1374,6 +1776,32 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                         time2[start_index2], time2[to_index2 - 1]
                     )
 
+        # draw secondary device small plots if available
+        try:
+            with self.data2.sync_lock:
+                cnt2 = self.data2.update_count
+                if cnt2 > 0:
+                    pts = min(setting.display_pts, cnt2)
+                    t = self.data2.times[cnt2 - pts : cnt2]
+                    v = self.data2.voltages[cnt2 - pts : cnt2]
+                    i = self.data2.currents[cnt2 - pts : cnt2]
+                    if hasattr(self, "curve1_b"):
+                        self.curve1_b.setData(x=t, y=v)
+                    if hasattr(self, "curve2_b"):
+                        self.curve2_b.setData(x=t, y=i)
+        except Exception:
+            pass
+
+    @QtCore.pyqtSlot(bool)
+    def on_checkBoxShowDev2Plots_toggled(self, checked: bool):
+        try:
+            if hasattr(self.ui, "widgetGraph1_b"):
+                self.ui.widgetGraph1_b.setVisible(checked)
+            if hasattr(self.ui, "widgetGraph2_b"):
+                self.ui.widgetGraph2_b.setVisible(checked)
+        except Exception:
+            pass
+
     def set_graph1_data(self, text, skip_update=False):
         if text == self.tr("无"):
             self.ui.widgetGraph1.hide()
@@ -1452,16 +1880,35 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
         self.graph_record_flag = not self.graph_record_flag
         if self.graph_record_flag:
             self.graph_record_data = RecordData()
+            self.graph_record_data2 = RecordData()
             time_str = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
             self.graph_record_filename = os.path.join(
                 ARG_PATH, f"record_{time_str}.csv"
+            )
+            self.graph_record_filename2 = os.path.join(
+                ARG_PATH, f"record_{time_str}_dev2.csv"
             )
             self.ui.btnGraphRecord.setText(self.tr("停止"))
             self.graph_record_save_timer.start(30000)
         else:
             self.graph_record_save_timer.stop()
+            # save primary
             self.graph_record_data.to_csv(self.graph_record_filename)
+            # save secondary if exists
+            try:
+                if hasattr(self, "graph_record_data2") and self.graph_record_data2 is not None:
+                    self.graph_record_data2.to_csv(self.graph_record_filename2)
+            except Exception:
+                logger.exception("failed to save graph_record_data2")
+            # also produce a merged CSV with synchronized timestamps (union of timepoints)
+            try:
+                if hasattr(self, "graph_record_data2") and self.graph_record_data2 is not None:
+                    merged_path = os.path.join(ARG_PATH, f"record_merged_{time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime())}.csv")
+                    self._save_merged_record(self.graph_record_data, self.graph_record_data2, merged_path)
+            except Exception:
+                logger.exception("failed to save merged record")
             self.graph_record_data = RecordData()
+            self.graph_record_data2 = RecordData()
 
             CustomMessageBox(
                 self,
@@ -1501,6 +1948,25 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
                 comments="",
                 fmt="%f",
             )
+            # also try to dump secondary device buffer
+            try:
+                path2 = os.path.splitext(path)[0] + "_dev2.csv"
+                with self.data2.sync_lock:
+                    voltages = self.data2.voltages[: self.data2.update_count]
+                    currents = self.data2.currents[: self.data2.update_count]
+                    powers = self.data2.powers[: self.data2.update_count]
+                    resistances = self.data2.resistances[: self.data2.update_count]
+                    times = self.data2.times[: self.data2.update_count]
+                    np.savetxt(
+                        path2,
+                        np.c_[times, voltages, currents, powers, resistances],
+                        delimiter=",",
+                        header="time/s,voltage/V,current/A,power/W,resistance/ohm",
+                        comments="",
+                        fmt="%f",
+                    )
+            except Exception:
+                logger.exception("failed to dump device2 buffer")
         CustomMessageBox(
             self,
             self.tr("保存完成"),
@@ -1523,6 +1989,35 @@ class MDPMainwindow(QtWidgets.QMainWindow, FramelessWindow):  # QtWidgets.QMainW
             self.graph_record_data.to_csv(self.graph_record_filename)
         else:
             self.graph_record_save_timer.stop()
+
+    def _save_merged_record(self, r1: RecordData, r2: RecordData, path: str):
+        """Merge two RecordData instances by time and save to CSV.
+
+        Output columns: time, v1, i1, v2, i2 (time is union of both time axes)
+        """
+        t1 = np.array(r1.times) if r1 is not None else np.array([])
+        v1 = np.array(r1.voltages) if r1 is not None else np.array([])
+        i1 = np.array(r1.currents) if r1 is not None else np.array([])
+        t2 = np.array(r2.times) if r2 is not None else np.array([])
+        v2 = np.array(r2.voltages) if r2 is not None else np.array([])
+        i2 = np.array(r2.currents) if r2 is not None else np.array([])
+        if t1.size == 0 and t2.size == 0:
+            return
+        # union of times (sorted)
+        all_times = np.unique(np.concatenate([t1, t2]))
+        # helper to interpolate values onto all_times; use NaN for missing
+        def interp(times_src, vals_src, target):
+            if times_src.size == 0:
+                return np.full(target.size, np.nan)
+            return np.interp(target, times_src, vals_src, left=np.nan, right=np.nan)
+
+        v1_i = interp(t1, v1, all_times)
+        i1_i = interp(t1, i1, all_times)
+        v2_i = interp(t2, v2, all_times)
+        i2_i = interp(t2, i2, all_times)
+        data = np.vstack([all_times, v1_i, i1_i, v2_i, i2_i]).T
+        header = "time/s,v1(V),i1(A),v2(V),i2(A)"
+        np.savetxt(path, data, delimiter=",", fmt="%f", header=header, comments="")
 
     ######### 辅助功能-预设组 #########
 
